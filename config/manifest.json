@@ -2,15 +2,24 @@
   "name": "OMG Network Community Points",
   "description": "Transfer Reddit community points on the OMG Network",
   "version": "1.0.0",
+  "permissions": [
+    "tabs"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://www.reddit.com/*"],
+      "js": ["contentScript.js"]
+    }
+  ],
+  "web_accessible_resources": [
+    "web3Bridge.js"
+  ],
   "background": {
     "scripts": [
       "background.js"
     ],
     "persistent": true
   },
-  "permissions": [
-    "tabs"
-  ],
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": {

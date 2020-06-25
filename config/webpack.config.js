@@ -11,7 +11,9 @@ module.exports = {
   devtool: 'cheap-module-source-map',
   entry: {
     background: './src/background/index.ts',
-    popup: './src/popup/index.tsx'
+    popup: './src/popup/index.tsx',
+    contentScript: './src/contentscript/index.ts',
+    web3Bridge: './src/web3Bridge/index.ts'
   },
   output: {
     path: BUILD_PATH,

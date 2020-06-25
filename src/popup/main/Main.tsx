@@ -40,12 +40,28 @@ function Main () {
     checkCurrentPage();
   }, []);
 
+  function handleEnable () {
+    // send enable message to content script
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        'payload': 'WEB3/ENABLE'
+      });
+    });
+  }
+
+  function handleNewTab () {
+    chrome.tabs.create({ url: 'https://www.reddit.com/r/omise_go' });
+  }
+
   return (
     <div className={styles.Main}>
       {view}
       {JSON.stringify(subReddit)}
-      <div onClick={() => chrome.tabs.create({ url: 'https://www.reddit.com/r/omise_go' })}>
+      <div onClick={handleNewTab}>
         Check out the best sub on Reddit
+      </div>
+      <div onClick={handleEnable}>
+        Enable web3
       </div>
     </div>
   );
