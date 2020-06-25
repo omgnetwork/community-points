@@ -1,6 +1,11 @@
 import subRedditMap from 'subRedditMap';
 
-export function getCurrentSubReddit (): Promise<{ token: string, subReddit: string }> {
+export interface ISubReddit {
+  token: string,
+  subReddit: string
+}
+
+export function getCurrentSubReddit (): Promise<ISubReddit> {
   return new Promise((resolve, _) => {
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
       const url = tabs[0].url;
