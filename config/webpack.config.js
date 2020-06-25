@@ -13,7 +13,7 @@ module.exports = {
     background: './src/background/index.ts',
     popup: './src/popup/index.tsx',
     contentScript: './src/contentscript/index.ts',
-    web3Bridge: './src/web3Bridge/index.ts'
+    bridge: './src/bridge/index.ts'
   },
   output: {
     path: BUILD_PATH,

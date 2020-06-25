@@ -12,7 +12,7 @@
     }
   ],
   "web_accessible_resources": [
-    "web3Bridge.js"
+    "bridge.js"
   ],
   "background": {
     "scripts": [

@@ -1,8 +1,8 @@
 import { get } from 'lodash';
 
-function injectWeb3Bridge() {
+function injectBridge() {
   const script = document.createElement('script');
-  const bridge = chrome.extension.getURL('web3Bridge.js');
+  const bridge = chrome.extension.getURL('bridge.js');
 
   script.setAttribute('type', 'text/javascript');
   script.setAttribute('src', bridge);
@@ -14,7 +14,7 @@ function injectWeb3Bridge() {
 // listen to ui messages and forward them to bridge
 chrome.runtime.onMessage.addListener(request => {
   window.postMessage({
-    key: 'to_web3Bridge',
+    key: 'to_bridge',
     payload: request.payload
   }, '*');
 });
@@ -24,7 +24,7 @@ window.addEventListener('message', async function (event) {
   const key = get(event, 'data.key', null);
   const payload = get(event, 'data.payload', null);
   const caller = get(event, 'data.caller', null);
-  if (key !== 'from_web3Bridge') {
+  if (key !== 'from_bridge') {
     return;
   }
 
@@ -33,4 +33,4 @@ window.addEventListener('message', async function (event) {
   }
 });
 
-injectWeb3Bridge();
+injectBridge();
