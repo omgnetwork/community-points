@@ -1,6 +1,6 @@
 import { get } from 'lodash';
 
-window.addEventListener('message', function (event) {
+window.addEventListener('message', async function (event) {
   const key = get(event, 'data.key', null);
   const payload = get(event, 'data.payload', null);
   if (key !== 'web3Bridge') {
@@ -8,6 +8,7 @@ window.addEventListener('message', function (event) {
   }
 
   if (payload === 'WEB3/ENABLE') {
-    (window as any).ethereum.enable();
+    const result = await (window as any).ethereum.enable();
+    console.log('result: ', result);
   }
 });
