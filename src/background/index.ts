@@ -17,6 +17,7 @@ const store = createStore(
 );
 
 console.log('background page booted');
+console.log((window as any).ethereum);
 export default wrapStore(
   store,
   { portName: 'omgnetwork-community-points' }
