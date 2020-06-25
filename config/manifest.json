@@ -3,7 +3,9 @@
   "description": "Transfer Reddit community points on the OMG Network",
   "version": "1.0.0",
   "background": {
-    "scripts": ["background.js"],
+    "scripts": [
+      "background.js"
+    ],
     "persistent": true
   },
   "browser_action": {

@@ -4,10 +4,11 @@ const CopyPlugin = require('copy-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 
 const BUILD_PATH = path.resolve(__dirname, '../build');
-const IMG_PATH = path.resolve(BUILD_PATH, 'images');
+const IMAGE_PATH = path.resolve(__dirname, '../build/images');
 
 module.exports = {
-  mode: 'production',
+  mode: 'development',
+  devtool: 'cheap-module-source-map',
   entry: {
     background: './src/background/index.ts',
     popup: './src/popup/index.tsx'
@@ -24,7 +25,7 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: path.resolve(__dirname, './manifest.json'), to: BUILD_PATH },
-        { from: path.resolve(__dirname, '../images'), to: IMG_PATH }
+        { from: path.resolve(__dirname, '../images'), to: IMAGE_PATH }
       ]
     }),
     new HtmlWebpackPlugin({
