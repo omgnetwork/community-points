@@ -1,0 +1,12 @@
+.yarn
+build
+config
+node_modules
+public
+*.scss
+*.css
+*.ttf
+*.png
+*.md
+*.svg
+*.html
