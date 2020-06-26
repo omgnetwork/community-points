@@ -5,6 +5,7 @@ import { ISubReddit } from 'popup/services/locationService';
 
 import * as locationService from 'popup/services/locationService';
 import * as messageService from 'popup/services/messageService';
+import * as networkService from 'popup/services/networkService';
 import * as styles from './Main.module.scss';
 
 function Main () {
@@ -37,13 +38,11 @@ function Main () {
   }
 
   async function handleTransfer (): Promise<any> {
-    const result = await messageService.send({
-      type: 'WEB3/TRANSFER',
-      payload: {
-        amount,
-        token: subReddit.token,
-        to: address
-      }
+    const result = await networkService.transfer({
+      amount,
+      currency: subReddit.token,
+      recipient: address,
+      metadata: 'toto'
     });
     console.log('transfer result: ', result);
   }

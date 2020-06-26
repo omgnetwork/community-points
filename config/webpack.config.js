@@ -40,10 +40,6 @@ module.exports = {
   module: {
     rules: [
       {
-        test: /\.md$/i,
-        use: 'raw-loader',
-      },
-      {
         test: /\.module\.scss$/,
         use: [
           'style-loader',
@@ -97,11 +93,6 @@ module.exports = {
             loader: "ts-loader"
           }
         ]
-      },
-      {
-        enforce: "pre",
-        test: /\.js$/,
-        loader: "source-map-loader"
       }
     ]
   }

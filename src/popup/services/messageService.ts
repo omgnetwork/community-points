@@ -13,7 +13,12 @@ export async function send ({
 
       chrome.runtime.onMessage.addListener(request => {
         if (request.type === type) {
-          resolve(request.payload);
+          if (request.status === 'success') {
+            resolve(request.payload);
+          }
+          if (request.status === 'error') {
+            reject(request.payload);
+          }
         }
       });
     } catch (error) {

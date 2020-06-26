@@ -13,6 +13,7 @@ chrome.runtime.onMessage.addListener(request => {
 window.addEventListener('message', async function (event) {
   const key = get(event, 'data.key', null);
   const type = get(event, 'data.type', null);
+  const status = get(event, 'data.status', null);
   const payload = get(event, 'data.payload', null);
 
   if (key !== 'from_bridge') {
@@ -20,6 +21,7 @@ window.addEventListener('message', async function (event) {
   }
   chrome.runtime.sendMessage({
     type,
+    status,
     payload
   });
 });
