@@ -8,7 +8,6 @@ const IMAGE_PATH = path.resolve(__dirname, '../build/images');
 
 module.exports = {
   mode: 'development',
-  devtool: 'cheap-module-source-map',
   entry: {
     background: './src/background/index.ts',
     popup: './src/popup/index.tsx',

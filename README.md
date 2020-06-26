@@ -1,6 +1,6 @@
-## Redit Community Points Chrome Extension
+## Reddit Community Points Chrome Extension
 
-This project is a Chrome extension used to transfer reddit community points on the OMG Network.
+This project is a Chrome extension used to transfer Reddit community points on the OMG Network.
 
 ### Architecture
 
@@ -16,11 +16,15 @@ This project is a Chrome extension used to transfer reddit community points on t
 
 - `nvm use` switch to correct node version
 - `yarn install` install project dependencies
-- `yarn build` compile extension bundle
+- `yarn build:dev` compile extension bundle
 - `yarn lint` runs linter
 - `yarn test` runs tests
 
 - in a Chrome based browser, open extensions in `Developer mode`, and `Load unpacked` pointing to this projects `build` folder
+
+### Production
+
+- `yarn build:prod` to compile production bundle
 
 ### SubReddit Support
 
