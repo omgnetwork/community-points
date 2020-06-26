@@ -44,6 +44,25 @@ window.addEventListener('message', async function (event) {
   }
 
   try {
+    if (type === 'WEB3/EXISTS') {
+      const provider = getProvider();
+      return respond({
+        type,
+        status: 'success',
+        payload: !!provider
+      });
+    }
+
+    if (type === 'WEB3/NETWORK') {
+      const web3 = getWeb3();
+      const network = await web3.eth.net.getNetworkType();
+      return respond({
+        type,
+        status: 'success',
+        payload: network
+      });
+    }
+
     if (type === 'WEB3/ACCOUNT') {
       const web3 = getWeb3();
       const allAccounts = await web3.eth.getAccounts();

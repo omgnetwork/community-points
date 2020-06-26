@@ -6,6 +6,21 @@ import * as typedDataService from 'popup/services/typedDataService';
 import * as messageService from 'popup/services/messageService';
 import config from 'config';
 
+export async function checkWeb3ProviderExists (): Promise<boolean> {
+  const exists = await messageService.send({ type: 'WEB3/EXISTS' });
+  return exists;
+}
+
+export async function getWeb3ProviderNetwork (): Promise<string> {
+  const network = await messageService.send({ type: 'WEB3/NETWORK' });
+  return network;
+}
+
+export async function enableWeb3Provider (): Promise<boolean> {
+  const enabled = await messageService.send({ type: 'WEB3/ENABLE' });
+  return enabled;
+}
+
 export const signTypedData = async (account, typedData): Promise<string> => {
   // TODO: multisig fee sign
   const signature = await messageService.send({

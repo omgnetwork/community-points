@@ -2,80 +2,84 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 
 import { ISubReddit } from 'popup/services/locationService';
-
 import * as locationService from 'popup/services/locationService';
-import * as messageService from 'popup/services/messageService';
 import * as networkService from 'popup/services/networkService';
+
+import Loading from 'popup/views/loading/Loading';
+import Home from 'popup/views/home/Home';
+import InvalidCommunity from 'popup/views/invalidcommunity/InvalidCommunity';
+import NoProvider from 'popup/views/noprovider/NoProvider';
+import WrongNetwork from 'popup/views/wrongnetwork/WrongNetwork';
+
+import config from 'config';
+
 import * as styles from './Main.module.scss';
 
-function Main () {
-  const [ view, setView ] = useState('LOADING');
-  const [ subReddit, setSubReddit ]: [ ISubReddit, any ] = useState(null);
-  const [ address, setAddress ] = useState('');
-  const [ amount, setAmount ] = useState(0);
+type IViewState = 'LOADING' | 'HOME' | 'INVALID_COMMUNITY' | 'NO_PROVIDER' | 'WRONG_NETWORK';
 
+function Main () {
+  const [ view, setView ]: [ IViewState, any ] = useState('LOADING');
+  const [ subReddit, setSubReddit ]: [ ISubReddit, any ] = useState(null);
+  const [ providerEnabled, setProviderEnabled ]: [ boolean, any ] = useState(false);
+  const [ correctNetwork, setCorrectNetwork ]: [ boolean, any ] = useState(false);
+
+  // 1. check if valid subreddit
   useEffect(() => {
     async function checkCurrentPage () {
       const validSubReddit = await locationService.getCurrentSubReddit();
-      if (validSubReddit) {
-        setSubReddit(validSubReddit);
-        return setView('SUPPORTED_COMMUNITY');
+      if (!validSubReddit) {
+        return setView('INVALID_COMMUNITY');
       }
-      return setView('UNSUPPORTED_COMMUNITY');
+      return setSubReddit(validSubReddit);
     }
     checkCurrentPage();
   }, []);
 
-  async function handleEnable (): Promise<any> {
-    const enableResult = await messageService.send({
-      type: 'WEB3/ENABLE'
-    });
-    console.log('enable result: ', enableResult);
-  }
+  // 2. check if provider installed, and enable if so
+  useEffect(() => {
+    async function checkWeb3ProviderExists () {
+      const exists = await networkService.checkWeb3ProviderExists();
+      if (!exists) {
+        return setView('NO_PROVIDER');
+      }
+      await networkService.enableWeb3Provider();
+      return setProviderEnabled(true);
+    }
+    if (subReddit) {
+      checkWeb3ProviderExists();
+    }
+  }, [subReddit]);
 
-  function handleNewTab (): void {
-    locationService.openTab('https://www.reddit.com/r/omise_go');
-  }
+  // 3. check if provider pointed to the correct network
+  useEffect(() => {
+    async function checkWeb3ProviderNetwork () {
+      const network = await networkService.getWeb3ProviderNetwork();
+      if (network !== config.network) {
+        return setView('WRONG_NETWORK');
+      }
+      return setCorrectNetwork(true);
+    }
+    if (providerEnabled) {
+      checkWeb3ProviderNetwork();
+    }
+  }, [providerEnabled]);
 
-  async function handleTransfer (): Promise<any> {
-    const result = await networkService.transfer({
-      amount,
-      currency: subReddit.token,
-      recipient: address,
-      metadata: 'toto'
-    });
-    console.log('transfer result: ', result);
-  }
+  // 4. if correct network, render app
+  useEffect(() => {
+    if (correctNetwork) {
+      return setView('HOME');
+    }
+  }, [correctNetwork]);
 
   return (
     <div className={styles.Main}>
-      <div>{view}</div>
-      <div>
-        {JSON.stringify(subReddit)}
-      </div>
-      <div onClick={handleNewTab}>
-        Check out the OMG subreddit
-      </div>
-      <div onClick={handleEnable}>
-        Enable web3
-      </div>
-      <input
-        type='number'
-        value={amount}
-        onChange={e => setAmount(Number(e.target.value))}
-        placeholder='Amount'
-      />
-      <input
-        type='text'
-        value={address}
-        onChange={e => setAddress(e.target.value)}
-        placeholder='Send some ROCK'
-      />
-      <div onClick={handleTransfer}>
-        Transfer
-      </div>
+      { (view as any) === 'LOADING' && <Loading />}
+      { (view as any) === 'HOME' && <Home subReddit={subReddit} />}
+      { (view as any) === 'INVALID_COMMUNITY' && <InvalidCommunity />}
+      { (view as any) === 'NO_PROVIDER' && <NoProvider />}
+      { (view as any) === 'WRONG_NETWORK' && <WrongNetwork />}
     </div>
   );
 }
 
-export default Main;
+export default React.memo(Main);
