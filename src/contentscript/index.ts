@@ -1,16 +1,5 @@
 import { get } from 'lodash';
 
-function injectBridge(): void {
-  const script = document.createElement('script');
-  const bridge = chrome.extension.getURL('bridge.js');
-
-  script.setAttribute('type', 'text/javascript');
-  script.setAttribute('src', bridge);
-
-  const node = document.getElementsByTagName('body')[0];
-  node.appendChild(script);
-}
-
 // listen to ui messages and forward them to bridge
 chrome.runtime.onMessage.addListener(request => {
   window.postMessage({
@@ -29,13 +18,21 @@ window.addEventListener('message', async function (event) {
   if (key !== 'from_bridge') {
     return;
   }
-
-  if (type === 'WEB3/ENABLE') {
-    chrome.runtime.sendMessage({
-      type,
-      payload
-    });
-  }
+  chrome.runtime.sendMessage({
+    type,
+    payload
+  });
 });
+
+// bridge injection
+function injectBridge (): void {
+  const bridge = chrome.extension.getURL('bridge.js');
+  const script = document.createElement('script');
+  script.setAttribute('type', 'text/javascript');
+  script.setAttribute('src', bridge);
+
+  const node = document.getElementsByTagName('body')[0];
+  node.appendChild(script);
+}
 
 injectBridge();

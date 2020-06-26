@@ -25,18 +25,19 @@ function Main () {
     checkCurrentPage();
   }, []);
 
-  function handleEnable (): void {
-    messageService.toBridge({
+  async function handleEnable (): Promise<any> {
+    const enableResult = await messageService.send({
       type: 'WEB3/ENABLE'
     });
+    console.log('enable result: ', enableResult);
   }
 
   function handleNewTab (): void {
     chrome.tabs.create({ url: 'https://www.reddit.com/r/omise_go' });
   }
 
-  function handleTransfer (): void {
-    messageService.toBridge({
+  async function handleTransfer (): Promise<any> {
+    const result = await messageService.send({
       type: 'WEB3/TRANSFER',
       payload: {
         amount,
@@ -44,6 +45,7 @@ function Main () {
         to: address
       }
     });
+    console.log('transfer result: ', result);
   }
 
   return (
