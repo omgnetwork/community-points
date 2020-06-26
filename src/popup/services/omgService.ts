@@ -21,7 +21,19 @@ export async function getFees () {
   });
 }
 
-export async function submitTransaction (transaction) {
+export async function getPointBalance (address, currency): Promise<string> {
+  const childchainBalances = await rpcApi.post({
+    url: `${config.watcherUrl}/account.get_balance`,
+    body: { address }
+  });
+  const pointBalance = childchainBalances.filter(i => i.currency.toLowerCase() === currency.toLowerCase());
+  if (!pointBalance.length) {
+    return '0';
+  }
+  return pointBalance[0].amount.toString();
+}
+
+export async function submitTransaction (transaction): Promise<any> {
   return rpcApi.post({
     url: `${config.watcherUrl}/transaction.submit`,
     body: { transaction: transaction.startsWith('0x') ? transaction : `0x${transaction}` }

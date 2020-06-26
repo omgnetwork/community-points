@@ -21,7 +21,7 @@ export async function enableWeb3Provider (): Promise<boolean> {
   return enabled;
 }
 
-export const signTypedData = async (account, typedData): Promise<string> => {
+export async function signTypedData (account, typedData): Promise<string> {
   // TODO: multisig fee sign
   const signature = await messageService.send({
     type: 'WEB3/SIGN',
@@ -33,12 +33,12 @@ export const signTypedData = async (account, typedData): Promise<string> => {
   return signature;
 };
 
-export const getActiveAccount = async (): Promise<string> => {
+export async function getActiveAccount (): Promise<string> {
   const account = await messageService.send({ type: 'WEB3/ACCOUNT' });
   return account;
 };
 
-export const transfer = async ({
+export async function transfer ({
   amount,
   currency,
   recipient,
@@ -48,7 +48,7 @@ export const transfer = async ({
   currency: string,
   recipient: string,
   metadata: string
-}): Promise<any> => {
+}): Promise<any> {
   const account = await getActiveAccount();
   const _utxos = await omgService.getUtxos(account);
   const utxos = orderBy(_utxos, i => i.amount, 'desc');
