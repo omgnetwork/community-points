@@ -5,26 +5,22 @@ export async function send ({
   payload
 } : Partial<IMessage>): Promise<any> {
   return new Promise((resolve, reject) => {
-    try {
-      chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-        chrome.tabs.sendMessage(tabs[0].id, {
-          'type': type,
-          'payload': payload
-        });
+    chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+      chrome.tabs.sendMessage(tabs[0].id, {
+        'type': type,
+        'payload': payload
       });
+    });
 
-      chrome.runtime.onMessage.addListener((message: IMessage) => {
-        if (message.type === type) {
-          if (message.status === 'success') {
-            resolve(message.payload);
-          }
-          if (message.status === 'error') {
-            reject(message.payload);
-          }
+    chrome.runtime.onMessage.addListener((message: IMessage) => {
+      if (message.type === type) {
+        if (message.status === 'success') {
+          resolve(message.payload);
         }
-      });
-    } catch (error) {
-      reject(error);
-    }
+        if (message.status === 'error') {
+          reject(message.payload);
+        }
+      }
+    });
   });
 }

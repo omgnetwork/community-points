@@ -34,7 +34,7 @@ function Main () {
   }
 
   function handleNewTab (): void {
-    chrome.tabs.create({ url: 'https://www.reddit.com/r/omise_go' });
+    locationService.openTab('https://www.reddit.com/r/omise_go');
   }
 
   async function handleTransfer (): Promise<any> {

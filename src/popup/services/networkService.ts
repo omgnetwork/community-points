@@ -8,7 +8,6 @@ import config from 'config';
 
 export const signTypedData = async (account, typedData): Promise<string> => {
   // TODO: multisig fee sign
-  console.log('sending to sign...');
   const signature = await messageService.send({
     type: 'WEB3/SIGN',
     payload: {
@@ -61,14 +60,8 @@ export const transfer = async ({
 
   const typedData = typedDataService.getTypedData(txBody, config.plasmaContractAddress);
   const signature = await signTypedData(account, typedData);
-
-  console.log('signed: ', signature);
-  if (signature) {
-    const signatures = new Array(txBody.inputs.length).fill(signature);
-    const signedTxn = omgService.buildSignedTransaction(typedData, signatures);
-    const submittedTransaction = await omgService.submitTransaction(signedTxn);
-
-    console.log('transaction submitted!: ', submittedTransaction);
-    return submittedTransaction;
-  }
+  const signatures = new Array(txBody.inputs.length).fill(signature);
+  const signedTxn = omgService.buildSignedTransaction(typedData, signatures);
+  const submittedTransaction = await omgService.submitTransaction(signedTxn);
+  return submittedTransaction;
 };

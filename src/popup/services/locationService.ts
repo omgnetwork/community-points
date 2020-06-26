@@ -28,3 +28,7 @@ export function getCurrentSubReddit (): Promise<ISubReddit> {
     });
   });
 }
+
+export function openTab (url: string): void {
+  return chrome.tabs.create({ url });
+}
