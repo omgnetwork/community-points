@@ -1,0 +1,11 @@
+@import 'popup/styles/colors';
+
+.Input {
+  height: 50px;
+  padding: 0 10px;
+  border: 1px solid $gray;
+  background-color: $white;
+  border-radius: 4px;
+  color: $black;
+  display: flex;
+}

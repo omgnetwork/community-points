@@ -1,6 +1,9 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
+import Button from 'popup/components/button/Button';
+import Input from 'popup/components/input/Input';
+
 import { ISubReddit } from 'popup/services/locationService';
 import * as networkService from 'popup/services/networkService';
 import * as omgService from 'popup/services/omgService';
@@ -14,10 +17,10 @@ interface HomeProps {
 function Home ({
   subReddit
 }: HomeProps): JSX.Element {
-  const [ userAddress, setUserAddress ] = useState(null);
-  const [ recipient, setRecipient ] = useState('');
-  const [ amount, setAmount ] = useState(0);
-  const [ pointBalance, setPointBalance ] = useState('');
+  const [ userAddress, setUserAddress ]: any = useState(null);
+  const [ recipient, setRecipient ]: any = useState('');
+  const [ amount, setAmount ]: any = useState();
+  const [ pointBalance, setPointBalance ]: any = useState('');
 
   useEffect(() => {
     async function initializeHome () {
@@ -39,6 +42,8 @@ function Home ({
     console.log('transfer result: ', result);
   }
 
+  const transferDisabled = !userAddress || !recipient || !amount || !pointBalance;
+
   return (
     <div className={styles.Home}>
       <h1>{`r/${subReddit.subReddit}`}</h1>
@@ -46,21 +51,27 @@ function Home ({
       <p>User Address: {userAddress}</p>
       <p>Point Balance: {pointBalance}</p>
 
-      <input
+      <Input
         type='number'
         value={amount}
         onChange={e => setAmount(Number(e.target.value))}
         placeholder='Amount'
+        className={styles.input}
       />
-      <input
+      <Input
         type='text'
         value={recipient}
         onChange={e => setRecipient(e.target.value)}
         placeholder='Recipient'
+        className={styles.input}
       />
-      <div onClick={handleTransfer}>
-        Transfer
-      </div>
+      <Button
+        onClick={handleTransfer}
+        className={styles.transferButton}
+        disabled={transferDisabled}
+      >
+        <span>TRANSFER</span>
+      </Button>
     </div>
   );
 }

@@ -1,0 +1,18 @@
+@import 'popup/styles/colors';
+
+.Button {
+  height: 50px;
+  background-color: $orange;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 200ms ease-in-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $white;
+
+  &.disabled {
+    pointer-events: none;
+    background-color: $black;
+  }
+}

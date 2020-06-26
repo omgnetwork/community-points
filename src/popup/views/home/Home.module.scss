@@ -1,0 +1,10 @@
+.Home {
+  display: flex;
+  flex-direction: column;
+  .transferButton {
+    margin-top: 20px;
+  }
+  .input {
+    margin-top: 10px;
+  }
+}

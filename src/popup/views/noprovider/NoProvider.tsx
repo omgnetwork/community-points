@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import Button from 'popup/components/button/Button';
+
 import * as locationService from 'popup/services/locationService';
 
 import * as styles from './NoProvider.module.scss';
@@ -18,9 +20,9 @@ function NoProvider () {
       <p>
         As this extension will never handle any private keys, please download the Metamask extension to sign network transactions.
       </p>
-      <div onClick={handleNewTab}>
-        Click Here
-      </div>
+      <Button onClick={handleNewTab}>
+        <span>DOWNLOAD METAMASK</span>
+      </Button>
     </div>
   );
 }

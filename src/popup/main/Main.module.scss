@@ -1,4 +1,18 @@
 .Main {
-  min-width: 400px;
-  height: 400px;
+  min-width: 200px;
+  min-height: 300px;
+  padding: 20px;
+}
+
+input {
+  font-family: 'MessinaMono', monospace;
+  font-size: 1em;
+  border: none;
+  outline: none;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

@@ -1,11 +1,13 @@
 import * as React from 'react';
 
+import logo from 'popup/images/favicon.png';
 import * as styles from './Loading.module.scss';
 
 function Loading () {
   return (
     <div className={styles.Loading}>
-      <h1>Loading...</h1>
+      <img src={logo} alt='loading' />
+      <p>Loading...</p>
     </div>
   );
 }
