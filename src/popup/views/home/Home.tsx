@@ -19,7 +19,7 @@ function Home ({
 }: HomeProps): JSX.Element {
   const [ userAddress, setUserAddress ]: any = useState(null);
   const [ recipient, setRecipient ]: any = useState('');
-  const [ amount, setAmount ]: any = useState();
+  const [ amount, setAmount ]: any = useState('');
   const [ pointBalance, setPointBalance ]: any = useState('');
 
   useEffect(() => {
@@ -54,7 +54,7 @@ function Home ({
       <Input
         type='number'
         value={amount}
-        onChange={e => setAmount(Number(e.target.value))}
+        onChange={e => setAmount(e.target.value)}
         placeholder='Amount'
         className={styles.input}
       />

@@ -13,9 +13,9 @@ function InvalidCommunity () {
 
   return (
     <div className={styles.InvalidCommunity}>
-      <h1>Invalid Community</h1>
+      <h1>Invalid Page</h1>
       <p>
-        This extension does not support this community yet. Please submit a request.
+        This extension only works on supported subreddits.
       </p>
       <p>
         Check out the OMG Networks subreddit to send community points with this extension.
