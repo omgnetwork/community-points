@@ -1,10 +1,11 @@
 import { uniq } from 'lodash';
 import numberToBN from 'number-to-bn';
 import * as rlp from 'rlp';
-import config from 'config';
 
 import * as typedDataService from 'popup/services/typedDataService';
 import * as rpcApi from 'popup/services/rpcService';
+
+import config from 'config';
 
 export async function getUtxos (address: string) {
   return rpcApi.post({
@@ -27,12 +28,10 @@ export async function submitTransaction (transaction) {
   });
 }
 
-export function encodeMetadata (str: string): string {
-  if (str.startsWith('0x')) {
-    return str;
-  }
-  const encodedMetadata = Buffer.from(str).toString('hex').padStart(64, '0');
-  return `0x${encodedMetadata}`;
+export function buildSignedTransaction (typedData, signatures) {
+  const txArray = toArray(typedData.message);
+  const signedTx = [ signatures, typedData.message.txType, ...txArray ];
+  return hexPrefix(rlp.encode(signedTx).toString('hex'));
 }
 
 export function createTransactionBody ({
@@ -123,10 +122,18 @@ export function createTransactionBody ({
   return txBody;
 }
 
-const BLOCK_OFFSET = numberToBN(1000000000);
-const TX_OFFSET = 10000;
+function encodeMetadata (str: string): string {
+  if (str.startsWith('0x')) {
+    return str;
+  }
+  const encodedMetadata = Buffer.from(str).toString('hex').padStart(64, '0');
+  return `0x${encodedMetadata}`;
+}
 
 function addInput (array, input) {
+  const BLOCK_OFFSET = numberToBN(1000000000);
+  const TX_OFFSET = 10000;
+
   if (input.blknum !== 0) {
     const blk = numberToBN(input.blknum).mul(BLOCK_OFFSET);
     const tx = numberToBN(input.txindex).muln(TX_OFFSET);
@@ -183,10 +190,4 @@ function toArray (typedDataMessage) {
   txArray.push(typedDataMessage.metadata);
 
   return txArray;
-}
-
-export function buildSignedTransaction (typedData, signatures) {
-  const txArray = toArray(typedData.message);
-  const signedTx = [ signatures, typedData.message.txType, ...txArray ];
-  return hexPrefix(rlp.encode(signedTx).toString('hex'));
 }
