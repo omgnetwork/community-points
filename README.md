@@ -34,3 +34,7 @@ This project is a Chrome extension used to transfer reddit community points on t
 - `yarn test` runs tests
 
 - in a Chrome based browser, open extensions in `Developer mode`, and `Load unpacked` pointing to this projects `build` folder
+
+### SubReddit Support
+
+- This extension keeps a map of subreddit names to erc20 addresses in `subRedditMap.ts`. To add support for another subreddit, a PR should be made modifying this file.

@@ -1,6 +1,7 @@
 import Web3 from 'web3';
 import JSONBigNumber from 'omg-json-bigint';
 import { get } from 'lodash';
+import { IMessage } from 'interfaces';
 
 function getProvider () {
   if ((window as any).ethereum) {
@@ -23,7 +24,7 @@ function getWeb3 () {
   }
 }
 
-function response ({ type, status, payload }) {
+function respond ({ type, status, payload }: IMessage): void {
   return window.postMessage({
     key: 'from_bridge',
     type,
@@ -47,7 +48,7 @@ window.addEventListener('message', async function (event) {
       const web3 = getWeb3();
       const allAccounts = await web3.eth.getAccounts();
       const account = allAccounts[0];
-      return response({
+      return respond({
         type,
         status: 'success',
         payload: account
@@ -57,13 +58,13 @@ window.addEventListener('message', async function (event) {
     if (type === 'WEB3/ENABLE') {
       if ((window as any).ethereum) {
         await (window as any).ethereum.enable();
-        return response({
+        return respond({
           type,
           status: 'success',
           payload: true
         });
       }
-      return response({
+      return respond({
         type,
         status: 'success',
         payload: true
@@ -80,13 +81,13 @@ window.addEventListener('message', async function (event) {
             JSONBigNumber.stringify(payload.typedData)
           ]
         );
-        return response({
+        return respond({
           type,
           status: 'success',
           payload: signature
         });
       } catch (error) {
-        return response({
+        return respond({
           type,
           status: 'error',
           payload: error.message
@@ -96,7 +97,7 @@ window.addEventListener('message', async function (event) {
   } catch (error) {
     // TODO: send to sentry
     console.warn('UNCAUGHT ERROR ON BRIDGE: ', error.message);
-    return response({
+    return respond({
       type,
       status: 'error',
       payload: error.message

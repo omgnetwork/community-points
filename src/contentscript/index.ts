@@ -1,11 +1,12 @@
 import { get } from 'lodash';
+import { IMessage } from 'interfaces';
 
 // listen to ui messages and forward them to bridge
-chrome.runtime.onMessage.addListener(request => {
+chrome.runtime.onMessage.addListener((message: Partial<IMessage>) => {
   window.postMessage({
     key: 'to_bridge',
-    type: request.type,
-    payload: request.payload
+    type: message.type,
+    payload: message.payload
   }, '*');
 });
 

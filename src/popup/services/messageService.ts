@@ -1,7 +1,9 @@
+import { IMessage } from 'interfaces';
+
 export async function send ({
   type,
   payload
-} : { type: string, payload?: any }): Promise<any> {
+} : Partial<IMessage>): Promise<any> {
   return new Promise((resolve, reject) => {
     try {
       chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
@@ -11,13 +13,13 @@ export async function send ({
         });
       });
 
-      chrome.runtime.onMessage.addListener(request => {
-        if (request.type === type) {
-          if (request.status === 'success') {
-            resolve(request.payload);
+      chrome.runtime.onMessage.addListener((message: IMessage) => {
+        if (message.type === type) {
+          if (message.status === 'success') {
+            resolve(message.payload);
           }
-          if (request.status === 'error') {
-            reject(request.payload);
+          if (message.status === 'error') {
+            reject(message.payload);
           }
         }
       });
