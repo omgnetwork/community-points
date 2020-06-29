@@ -78,5 +78,9 @@ export async function transfer ({
   const signatures = new Array(txBody.inputs.length).fill(signature);
   const signedTxn = omgService.buildSignedTransaction(typedData, signatures);
   const submittedTransaction = await omgService.submitTransaction(signedTxn);
-  return submittedTransaction;
+  return {
+    ...submittedTransaction,
+    timestamp: Math.round((new Date()).getTime() / 1000),
+    status: 'Pending'
+  };
 };

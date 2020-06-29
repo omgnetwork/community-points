@@ -35,7 +35,7 @@ function injectApp (): void {
         height: 40px;
         background-color:black;
         color:white;
-        cursor:pointer;
+        cursor:move;
         display:flex;
         align-items:center;
       '
