@@ -1,7 +1,7 @@
 export function createAction (
   key: string,
   asyncAction: Function,
-  customErrorMessage: string
+  customErrorMessage?: string
 ) {
   return async function (dispatch) {
     dispatch({ type: `${key}/REQUEST` });

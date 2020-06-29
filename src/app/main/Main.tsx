@@ -1,8 +1,5 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-
-import { initializeApp } from 'app/actions/appAction';
 
 import { ISubReddit } from 'app/services/locationService';
 import * as locationService from 'app/services/locationService';
@@ -21,7 +18,6 @@ import * as styles from './Main.module.scss';
 type IViewState = 'LOADING' | 'HOME' | 'INVALID_COMMUNITY' | 'NO_PROVIDER' | 'WRONG_NETWORK';
 
 function Main () {
-  const dispatch = useDispatch();
   const [ view, setView ]: [ IViewState, any ] = useState('LOADING');
   const [ subReddit, setSubReddit ]: [ ISubReddit, any ] = useState(null);
   const [ providerEnabled, setProviderEnabled ]: [ boolean, any ] = useState(false);
@@ -71,7 +67,6 @@ function Main () {
   // 4. if correct network, render app
   useEffect(() => {
     if (correctNetwork) {
-      dispatch(initializeApp());
       return setView('HOME');
     }
   }, [correctNetwork]);

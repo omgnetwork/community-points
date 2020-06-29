@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Button from 'app/components/button/Button';
 import Input from 'app/components/input/Input';
 
-import { selectAppState } from 'app/selectors/appSelector';
+import { transfer } from 'app/actions';
+import { selectLoading } from 'app/selectors/loadingSelector';
 
 import { ISubReddit } from 'app/services/locationService';
 import * as networkService from 'app/services/networkService';
@@ -20,14 +21,14 @@ interface HomeProps {
 function Home ({
   subReddit
 }: HomeProps): JSX.Element {
+  const dispatch = useDispatch();
   const [ userAddress, setUserAddress ]: [ string, any ] = useState(null);
   const [ pointBalance, setPointBalance ]: [ string, any ] = useState('');
 
   const [ recipient, setRecipient ]: [ string, any ] = useState('');
   const [ amount, setAmount ]: any = useState('');
 
-  const initialized: boolean = useSelector(selectAppState);
-  console.log('initialized: ', initialized);
+  const transferLoading: boolean = useSelector(selectLoading(['TRANSFER/CREATE']));
 
   useEffect(() => {
     async function initializeHome () {
@@ -41,19 +42,22 @@ function Home ({
 
   async function handleTransfer (): Promise<any> {
     try {
-      const result = await networkService.transfer({
+      const result = await dispatch(transfer({
         amount,
         currency: subReddit.token,
         recipient,
         metadata: 'Community point transfer'
-      });
-      console.log('transfer result: ', result);
-    } catch (error) {
-      if (error.includes('User denied')) {
-        // catch user denied signature
-        return;
+      }));
+
+      if (result) {
+        // TODO: user ui feedback that transfer was successful
+        setAmount('');
+        setRecipient('');
+      } else {
+        // TODO: user ui feedback that transfer failed
       }
-      throw error;
+    } catch (error) {
+      //
     }
   }
 
@@ -85,6 +89,7 @@ function Home ({
         onClick={handleTransfer}
         className={styles.transferButton}
         disabled={transferDisabled}
+        loading={transferLoading}
       >
         <span>TRANSFER</span>
       </Button>

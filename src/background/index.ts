@@ -32,3 +32,5 @@ chrome.contextMenus.create({
   title: 'OMG Network Community Points',
   contexts: ['all']
 });
+
+console.log('omgcp background initialized...');

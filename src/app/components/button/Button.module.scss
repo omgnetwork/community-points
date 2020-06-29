@@ -15,4 +15,9 @@
     pointer-events: none;
     background-color: $black;
   }
+
+  &.loading {
+    pointer-events: none;
+    opacity: 0.5;
+  }
 }
