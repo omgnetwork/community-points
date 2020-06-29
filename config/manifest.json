@@ -3,7 +3,8 @@
   "description": "Transfer Reddit community points on the OMG Network",
   "version": "1.0.0",
   "permissions": [
-    "tabs"
+    "tabs",
+    "contextMenus"
   ],
   "content_scripts": [
     {
@@ -12,7 +13,8 @@
     }
   ],
   "web_accessible_resources": [
-    "bridge.js"
+    "bridge.js",
+    "app.html"
   ],
   "background": {
     "scripts": [
@@ -21,7 +23,6 @@
     "persistent": true
   },
   "browser_action": {
-    "default_popup": "popup.html",
     "default_icon": {
       "16": "images/favicon.png",
       "32": "images/favicon.png",

@@ -2,8 +2,8 @@ import { uniq } from 'lodash';
 import numberToBN from 'number-to-bn';
 import * as rlp from 'rlp';
 
-import * as typedDataService from 'popup/services/typedDataService';
-import * as rpcApi from 'popup/services/rpcService';
+import * as typedDataService from 'app/services/typedDataService';
+import * as rpcApi from 'app/services/rpcService';
 
 import config from 'config';
 

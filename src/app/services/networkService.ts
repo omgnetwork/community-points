@@ -1,9 +1,9 @@
 import { orderBy } from 'lodash';
 import BN from 'bn.js';
 
-import * as omgService from 'popup/services/omgService';
-import * as typedDataService from 'popup/services/typedDataService';
-import * as messageService from 'popup/services/messageService';
+import * as omgService from 'app/services/omgService';
+import * as typedDataService from 'app/services/typedDataService';
+import * as messageService from 'app/services/messageService';
 import config from 'config';
 
 export async function checkWeb3ProviderExists (): Promise<boolean> {

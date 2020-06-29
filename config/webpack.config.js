@@ -11,7 +11,7 @@ module.exports = {
   mode: 'development',
   entry: {
     background: './src/background/index.ts',
-    popup: './src/popup/index.tsx',
+    app: './src/app/index.tsx',
     contentScript: './src/contentscript/index.ts',
     bridge: './src/bridge/index.ts'
   },
@@ -31,8 +31,8 @@ module.exports = {
       ]
     }),
     new HtmlWebpackPlugin({
-      template: './src/popup/index.html',
-      filename: 'popup.html',
+      template: './src/app/index.html',
+      filename: 'app.html',
       inject: false
     }),
     new Dotenv(),

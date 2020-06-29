@@ -1,9 +1,17 @@
 import { get } from 'lodash';
+
 import { IMessage } from 'interfaces';
+import injectApp from 'contentscript/elements/injectApp';
+import injectBridge from 'contentscript/elements/injectBridge';
 
 // listen to ui messages and forward them to bridge
 chrome.runtime.onMessage.addListener((message: Partial<IMessage>) => {
-  window.postMessage({
+  // catch message from icon click
+  if (message.type === 'BROWSERACTION/SHOW') {
+    return injectApp();
+  }
+
+  return window.postMessage({
     key: 'to_bridge',
     type: message.type,
     payload: message.payload
@@ -26,16 +34,5 @@ window.addEventListener('message', async function (event) {
     payload
   });
 });
-
-// bridge injection
-function injectBridge (): void {
-  const bridge = chrome.extension.getURL('bridge.js');
-  const script = document.createElement('script');
-  script.setAttribute('type', 'text/javascript');
-  script.setAttribute('src', bridge);
-
-  const node = document.getElementsByTagName('body')[0];
-  node.appendChild(script);
-}
 
 injectBridge();

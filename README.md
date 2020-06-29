@@ -7,10 +7,10 @@ This project is a Chrome extension used to transfer Reddit community points on t
 - Extensions are sandboxed javascript runtimes so we do not have direct access to the context of other scripts. We utilize Chrome's built in messaging to be able to communicate with the context of the page.
 
 - Components
-  - popup.js - manage ui and proxy store
+  - app.js - the application
   - contentScript.js - injects bridge and forwards messages from ui
-  - bridge.js - has access to the context of the page, listening for messages from the contentScript and interacting with the web3 provider
-  - background.js - redux store used to persist app state across the browser
+  - bridge.js - listening for messages from the contentScript and interacting with the injected web3 provider
+  - background.js - listens to user actions and has persisted redux store
 
 ### Development
 

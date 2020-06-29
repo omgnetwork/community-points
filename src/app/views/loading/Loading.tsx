@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import logo from 'popup/images/favicon.png';
+import logo from 'app/images/favicon.png';
 import * as styles from './Loading.module.scss';
 
 function Loading () {

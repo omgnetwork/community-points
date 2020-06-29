@@ -1,15 +1,15 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
-import { ISubReddit } from 'popup/services/locationService';
-import * as locationService from 'popup/services/locationService';
-import * as networkService from 'popup/services/networkService';
+import { ISubReddit } from 'app/services/locationService';
+import * as locationService from 'app/services/locationService';
+import * as networkService from 'app/services/networkService';
 
-import Loading from 'popup/views/loading/Loading';
-import Home from 'popup/views/home/Home';
-import InvalidCommunity from 'popup/views/invalidcommunity/InvalidCommunity';
-import NoProvider from 'popup/views/noprovider/NoProvider';
-import WrongNetwork from 'popup/views/wrongnetwork/WrongNetwork';
+import Loading from 'app/views/loading/Loading';
+import Home from 'app/views/home/Home';
+import InvalidCommunity from 'app/views/invalidcommunity/InvalidCommunity';
+import NoProvider from 'app/views/noprovider/NoProvider';
+import WrongNetwork from 'app/views/wrongnetwork/WrongNetwork';
 
 import config from 'config';
 

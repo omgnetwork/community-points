@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-import Button from 'popup/components/button/Button';
+import Button from 'app/components/button/Button';
 
-import * as locationService from 'popup/services/locationService';
+import * as locationService from 'app/services/locationService';
 
 import * as styles from './InvalidCommunity.module.scss';
 

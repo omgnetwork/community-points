@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
-import Button from 'popup/components/button/Button';
-import Input from 'popup/components/input/Input';
+import Button from 'app/components/button/Button';
+import Input from 'app/components/input/Input';
 
-import { ISubReddit } from 'popup/services/locationService';
-import * as networkService from 'popup/services/networkService';
-import * as omgService from 'popup/services/omgService';
+import { ISubReddit } from 'app/services/locationService';
+import * as networkService from 'app/services/networkService';
+import * as omgService from 'app/services/omgService';
 
 import * as styles from './Home.module.scss';
 
