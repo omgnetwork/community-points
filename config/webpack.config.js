@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 
 const BUILD_PATH = path.resolve(__dirname, '../build');
@@ -34,7 +35,8 @@ module.exports = {
       filename: 'popup.html',
       inject: false
     }),
-    new Dotenv()
+    new Dotenv(),
+    new CleanWebpackPlugin()
   ],
   module: {
     rules: [

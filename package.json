@@ -10,9 +10,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "clean": "rm -rf ./build",
-    "build:dev": "yarn clean && webpack --config config/webpack.dev.js",
-    "build:prod": "yarn clean && webpack --config config/webpack.prod.js",
+    "build:dev": "webpack --config config/webpack.dev.js",
+    "build:prod": "webpack --config config/webpack.prod.js",
     "lint": "eslint 'src/**'",
     "test": "jest src --passWithNoTests"
   },

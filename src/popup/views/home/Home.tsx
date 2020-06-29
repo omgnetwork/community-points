@@ -18,9 +18,10 @@ function Home ({
   subReddit
 }: HomeProps): JSX.Element {
   const [ userAddress, setUserAddress ]: any = useState(null);
+  const [ pointBalance, setPointBalance ]: any = useState('');
+
   const [ recipient, setRecipient ]: any = useState('');
   const [ amount, setAmount ]: any = useState('');
-  const [ pointBalance, setPointBalance ]: any = useState('');
 
   useEffect(() => {
     async function initializeHome () {
@@ -33,13 +34,21 @@ function Home ({
   }, []);
 
   async function handleTransfer (): Promise<any> {
-    const result = await networkService.transfer({
-      amount,
-      currency: subReddit.token,
-      recipient,
-      metadata: 'Community point transfer'
-    });
-    console.log('transfer result: ', result);
+    try {
+      const result = await networkService.transfer({
+        amount,
+        currency: subReddit.token,
+        recipient,
+        metadata: 'Community point transfer'
+      });
+      console.log('transfer result: ', result);
+    } catch (error) {
+      if (error.includes('User denied')) {
+        // catch user denied signature
+        return;
+      }
+      throw error;
+    }
   }
 
   const transferDisabled = !userAddress || !recipient || !amount || !pointBalance;
