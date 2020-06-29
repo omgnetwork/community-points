@@ -1,3 +1,4 @@
+/* global chrome */
 import { get } from 'lodash';
 
 import { IMessage } from 'interfaces';

@@ -1,3 +1,4 @@
+/* global chrome */
 function injectBridge (): void {
   const bridgeSrc = chrome.extension.getURL('bridge.js');
   const bridgeScript = document.createElement('script');

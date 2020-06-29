@@ -1,3 +1,4 @@
+/* global chrome */
 import makeDraggable from 'contentscript/util/makeDraggable';
 
 function injectApp (): void {

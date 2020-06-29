@@ -1,3 +1,4 @@
+/* global chrome */
 import { wrapStore, alias } from 'webext-redux';
 import { createStore, applyMiddleware } from 'redux';
 import reduxThunk from 'redux-thunk';

@@ -1,3 +1,4 @@
+/* global chrome */
 import { IMessage } from 'interfaces';
 
 export async function send ({

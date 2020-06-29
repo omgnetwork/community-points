@@ -1,3 +1,4 @@
+/* global chrome */
 import subRedditMap from 'subRedditMap';
 
 export interface ISubReddit {
