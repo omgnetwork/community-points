@@ -12,15 +12,19 @@ export async function send ({
       });
     });
 
-    chrome.runtime.onMessage.addListener((message: IMessage) => {
-      if (message.type === type) {
-        if (message.status === 'success') {
-          resolve(message.payload);
-        }
-        if (message.status === 'error') {
-          reject(message.payload);
+    chrome.runtime.onMessage.addListener(
+      function messageListener (message: IMessage) {
+        if (message.type === type) {
+          if (message.status === 'success') {
+            chrome.runtime.onMessage.removeListener(messageListener);
+            return resolve(message.payload);
+          }
+          if (message.status === 'error') {
+            chrome.runtime.onMessage.removeListener(messageListener);
+            return reject(message.payload);
+          }
         }
       }
-    });
+    );
   });
 }
