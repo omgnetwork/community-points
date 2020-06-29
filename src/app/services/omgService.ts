@@ -23,7 +23,7 @@ export async function getFees () {
 
 export async function getTransactions (address: string) {
   return rpcApi.post({
-    url: `${this.watcherUrl}/transaction.all`,
+    url: `${config.watcherUrl}/transaction.all`,
     body: { address }
   });
 }

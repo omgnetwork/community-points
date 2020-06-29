@@ -86,7 +86,12 @@ export async function transfer ({
   const submittedTransaction = await omgService.submitTransaction(signedTxn);
   return {
     ...submittedTransaction,
-    timestamp: Math.round((new Date()).getTime() / 1000),
+    block: {
+      blknum: submittedTransaction.blknum,
+      timestamp: Math.round((new Date()).getTime() / 1000)
+    },
+    amount,
+    recipient,
     status: 'Pending'
   };
 };

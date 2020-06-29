@@ -45,7 +45,7 @@ function injectApp (): void {
         id='omgcp-close-button'
         style='margin-left:10px;'
       >
-        𝖷
+        𝖷 Close
       </button>
     </div>
   `;

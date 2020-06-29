@@ -8,6 +8,8 @@ import Input from 'app/components/input/Input';
 import { transfer } from 'app/actions';
 import { selectLoading } from 'app/selectors/loadingSelector';
 
+import Transactions from 'app/views/transactions/Transactions';
+
 import { ISubReddit } from 'app/services/locationService';
 import * as networkService from 'app/services/networkService';
 import * as omgService from 'app/services/omgService';
@@ -24,6 +26,7 @@ function Home ({
   const dispatch = useDispatch();
   const [ userAddress, setUserAddress ]: [ string, any ] = useState(null);
   const [ pointBalance, setPointBalance ]: [ string, any ] = useState('');
+  const [ view, setView ]: [ 'transfer' | 'transaction', any ] = useState('transfer');
 
   const [ recipient, setRecipient ]: [ string, any ] = useState('');
   const [ amount, setAmount ]: any = useState('');
@@ -65,34 +68,44 @@ function Home ({
 
   return (
     <div className={styles.Home}>
-      <h1>{`r/${subReddit.subReddit}`}</h1>
+      {view === 'transfer' && (
+        <>
+          <h1>{`r/${subReddit.subReddit}`}</h1>
 
-      <p>User Address: {userAddress}</p>
-      <p>Point Address: {subReddit.token}</p>
-      <p>Point Balance: {pointBalance}</p>
+          <p>User Address: {userAddress}</p>
+          <p>Point Address: {subReddit.token}</p>
+          <p>Point Balance: {pointBalance}</p>
 
-      <Input
-        type='number'
-        value={amount}
-        onChange={e => setAmount(e.target.value)}
-        placeholder='Amount'
-        className={styles.input}
-      />
-      <Input
-        type='text'
-        value={recipient}
-        onChange={e => setRecipient(e.target.value)}
-        placeholder='Recipient'
-        className={styles.input}
-      />
-      <Button
-        onClick={handleTransfer}
-        className={styles.transferButton}
-        disabled={transferDisabled}
-        loading={transferLoading}
-      >
-        <span>TRANSFER</span>
-      </Button>
+          <Input
+            type='number'
+            value={amount}
+            onChange={e => setAmount(e.target.value)}
+            placeholder='Amount'
+            className={styles.input}
+          />
+          <Input
+            type='text'
+            value={recipient}
+            onChange={e => setRecipient(e.target.value)}
+            placeholder='Recipient'
+            className={styles.input}
+          />
+          <Button
+            onClick={handleTransfer}
+            className={styles.transferButton}
+            disabled={transferDisabled}
+            loading={transferLoading}
+          >
+            <span>TRANSFER</span>
+          </Button>
+
+          <p onClick={() => setView('transaction')}>
+            Transaction History
+          </p>
+        </>
+      )}
+
+      {(view as any) === 'transaction' && <Transactions />}
     </div>
   );
 }
