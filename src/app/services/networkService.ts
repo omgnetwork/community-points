@@ -38,6 +38,12 @@ export async function getActiveAccount (): Promise<string> {
   return account;
 };
 
+export async function getAllTransactions (): Promise<Array<Object>> {
+  const account = await getActiveAccount();
+  const transactions = await omgService.getTransactions(account);
+  return transactions;
+};
+
 export async function transfer ({
   amount,
   currency,

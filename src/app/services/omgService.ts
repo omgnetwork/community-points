@@ -21,6 +21,13 @@ export async function getFees () {
   });
 }
 
+export async function getTransactions (address: string) {
+  return rpcApi.post({
+    url: `${this.watcherUrl}/transaction.all`,
+    body: { address }
+  });
+}
+
 export async function getPointBalance (address, currency): Promise<string> {
   const childchainBalances = await rpcApi.post({
     url: `${config.watcherUrl}/account.get_balance`,

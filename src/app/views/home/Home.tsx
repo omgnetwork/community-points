@@ -28,7 +28,7 @@ function Home ({
   const [ recipient, setRecipient ]: [ string, any ] = useState('');
   const [ amount, setAmount ]: any = useState('');
 
-  const transferLoading: boolean = useSelector(selectLoading(['TRANSFER/CREATE']));
+  const transferLoading: boolean = useSelector(selectLoading(['TRANSACTION/CREATE']));
 
   useEffect(() => {
     async function initializeHome () {

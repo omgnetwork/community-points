@@ -8,12 +8,19 @@ export function transfer ({
   metadata
 }) {
   return createAction(
-    'TRANSFER/CREATE',
+    'TRANSACTION/CREATE',
     () => networkService.transfer({
       amount,
       currency,
       recipient,
       metadata
     })
+  );
+}
+
+export function getTransactions () {
+  return createAction(
+    'TRANSACTION/GETALL',
+    () => networkService.getAllTransactions()
   );
 }
