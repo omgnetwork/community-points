@@ -1,8 +1,11 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 
 import Button from 'app/components/button/Button';
 import Input from 'app/components/input/Input';
+
+import { selectAppState } from 'app/selectors/appSelector';
 
 import { ISubReddit } from 'app/services/locationService';
 import * as networkService from 'app/services/networkService';
@@ -17,11 +20,14 @@ interface HomeProps {
 function Home ({
   subReddit
 }: HomeProps): JSX.Element {
-  const [ userAddress, setUserAddress ]: any = useState(null);
-  const [ pointBalance, setPointBalance ]: any = useState('');
+  const [ userAddress, setUserAddress ]: [ string, any ] = useState(null);
+  const [ pointBalance, setPointBalance ]: [ string, any ] = useState('');
 
-  const [ recipient, setRecipient ]: any = useState('');
+  const [ recipient, setRecipient ]: [ string, any ] = useState('');
   const [ amount, setAmount ]: any = useState('');
+
+  const initialized: boolean = useSelector(selectAppState);
+  console.log('initialized: ', initialized);
 
   useEffect(() => {
     async function initializeHome () {
@@ -58,6 +64,7 @@ function Home ({
       <h1>{`r/${subReddit.subReddit}`}</h1>
 
       <p>User Address: {userAddress}</p>
+      <p>Point Address: {subReddit.token}</p>
       <p>Point Balance: {pointBalance}</p>
 
       <Input

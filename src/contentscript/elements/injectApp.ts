@@ -14,7 +14,7 @@ function injectApp (): void {
   appContainer.style.zIndex = '1000000';
   appContainer.style.backgroundColor = 'white';
   appContainer.style.width = '400px';
-  appContainer.style.height = '450px';
+  appContainer.style.height = '500px';
   appContainer.style.border = '1px solid black';
   appContainer.style.borderRadius = '4px';
 

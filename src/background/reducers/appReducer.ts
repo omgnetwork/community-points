@@ -4,12 +4,15 @@ interface AppState {
   [key: string]: any
 }
 
-const initialState: AppState = {};
+const initialState: AppState = {
+  initialized: false
+};
 
 function appReducer (
   state: AppState = initialState,
   action: IAction
 ): AppState {
+  console.log('appReducer receiving action: ', action);
   switch (action.type) {
     case 'APP/BOOT/SUCCESS':
       return { ...state, initialized: true };
