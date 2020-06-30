@@ -1,9 +1,17 @@
 import { createAction } from 'app/actions/createAction';
 import * as networkService from 'app/services/networkService';
 
+export function getSession () {
+  return createAction(
+    'SESSION/GET',
+    () => networkService.getSession()
+  );
+}
+
 export function transfer ({
   amount,
   currency,
+  symbol,
   recipient,
   metadata
 }) {
@@ -13,6 +21,7 @@ export function transfer ({
       amount,
       currency,
       recipient,
+      symbol,
       metadata
     })
   );

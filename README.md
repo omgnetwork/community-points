@@ -1,16 +1,16 @@
-## Reddit Community Points Chrome Extension
+## Reddit Wallet - Chrome Extension
 
-This project is a Chrome extension used to transfer Reddit community points on the OMG Network.
+This project is a Chrome extension used to transfer Reddit community points directly in the browser. It is powered by the OMG Network.
 
 ### Architecture
 
 - Extensions are sandboxed javascript runtimes so we do not have direct access to the context of other scripts. We utilize Chrome's built in messaging to be able to communicate with the context of the page.
 
 - Components
-  - app.js - the application
-  - contentScript.js - injects bridge and forwards messages from ui
-  - bridge.js - listening for messages from the contentScript and interacting with the injected web3 provider
-  - background.js - listens to user actions and has persisted redux store
+  - app.js - the user interface
+  - contentScript.js - injects bridge and forwards messages from user interface
+  - bridge.js - listens for messages from the contentScript and interacts with the web3 provider in the context of the dom
+  - background.js - listens to user actions and persists state
 
 ### Development
 

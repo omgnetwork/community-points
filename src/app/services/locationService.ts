@@ -1,11 +1,6 @@
 /* global chrome */
 import subRedditMap from 'subRedditMap';
-
-export interface ISubReddit {
-  token: string,
-  name: string,
-  symbol: string
-}
+import { ISubReddit } from 'interfaces';
 
 export function getCurrentSubReddit (): Promise<ISubReddit> {
   return new Promise((resolve, reject) => {

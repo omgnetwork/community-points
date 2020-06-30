@@ -8,6 +8,8 @@ import * as locationService from 'app/services/locationService';
 import { getTransactions } from 'app/actions/index';
 import { selectTransactions } from 'app/selectors/transactionSelector';
 
+import { ITransaction } from 'interfaces';
+
 import omgcp_copy from 'app/images/omgcp_copy.svg';
 import omgcp_thickarrow from 'app/images/omgcp_thickarrow.svg';
 
@@ -17,7 +19,7 @@ import * as styles from './Transactions.module.scss';
 
 function Transactions (): JSX.Element {
   const dispatch = useDispatch();
-  const transactions = useSelector(selectTransactions);
+  const transactions: ITransaction[] = useSelector(selectTransactions);
 
   useEffect(() => {
     dispatch(getTransactions());
@@ -34,7 +36,7 @@ function Transactions (): JSX.Element {
 
   return (
     <div className={styles.Transactions}>
-      {transactions && transactions.map((transaction, index: number): JSX.Element => {
+      {transactions && transactions.map((transaction: ITransaction, index: number): JSX.Element => {
         const isIncoming: boolean = transaction.direction === 'incoming';
         return (
           <div
@@ -91,7 +93,7 @@ function Transactions (): JSX.Element {
 
             <div className={styles.amounts}>
               <div className={styles.rawAmount}>
-                {transaction.amount} {transaction.token}
+                {transaction.amount}
               </div>
               <div className={styles.usdAmount}>
                 {`${isIncoming ? '+' : '-'} $ ${transaction.amount} USD`}

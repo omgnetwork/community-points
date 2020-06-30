@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
 
-import { ISubReddit } from 'app/services/locationService';
 import * as locationService from 'app/services/locationService';
 import * as networkService from 'app/services/networkService';
 
@@ -19,7 +18,8 @@ type IViewState = 'LOADING' | 'HOME' | 'INVALID_COMMUNITY' | 'NO_PROVIDER' | 'WR
 
 function Main () {
   const [ view, setView ]: [ IViewState, any ] = useState('LOADING');
-  const [ subReddit, setSubReddit ]: [ ISubReddit, any ] = useState(null);
+
+  const [ validSubReddit, setValidSubReddit ]: [ boolean, any ] = useState(false);
   const [ providerEnabled, setProviderEnabled ]: [ boolean, any ] = useState(false);
   const [ correctNetwork, setCorrectNetwork ]: [ boolean, any ] = useState(false);
 
@@ -30,7 +30,7 @@ function Main () {
       if (!validSubReddit) {
         return setView('INVALID_COMMUNITY');
       }
-      return setSubReddit(validSubReddit);
+      return setValidSubReddit(true);
     }
     checkCurrentPage();
   }, []);
@@ -45,10 +45,10 @@ function Main () {
       await networkService.enableWeb3Provider();
       return setProviderEnabled(true);
     }
-    if (subReddit) {
+    if (validSubReddit) {
       checkWeb3ProviderExists();
     }
-  }, [subReddit]);
+  }, [validSubReddit]);
 
   // 3. check if provider pointed to the correct network
   useEffect(() => {
@@ -74,7 +74,7 @@ function Main () {
   return (
     <div className={styles.Main}>
       { (view as any) === 'LOADING' && <Loading />}
-      { (view as any) === 'HOME' && <Home subReddit={subReddit} />}
+      { (view as any) === 'HOME' && <Home />}
       { (view as any) === 'INVALID_COMMUNITY' && <InvalidCommunity />}
       { (view as any) === 'NO_PROVIDER' && <NoProvider />}
       { (view as any) === 'WRONG_NETWORK' && <WrongNetwork />}

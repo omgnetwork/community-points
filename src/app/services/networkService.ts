@@ -1,9 +1,12 @@
-import { orderBy } from 'lodash';
+import { orderBy, find } from 'lodash';
 import BN from 'bn.js';
+
+import { ISession, ITransaction } from 'interfaces';
 
 import * as omgService from 'app/services/omgService';
 import * as typedDataService from 'app/services/typedDataService';
 import * as messageService from 'app/services/messageService';
+import * as locationService from 'app/services/locationService';
 import config from 'config';
 
 export async function checkWeb3ProviderExists (): Promise<boolean> {
@@ -38,26 +41,111 @@ export async function getActiveAccount (): Promise<string> {
   return account;
 };
 
-export async function getAllTransactions (): Promise<Array<Object>> {
+export async function getSession (): Promise<ISession> {
   const account = await getActiveAccount();
-  const transactions = await omgService.getTransactions(account);
-  return transactions;
+  const subReddit = await locationService.getCurrentSubReddit();
+  const balance = await omgService.getPointBalance(account, subReddit.token);
+  return {
+    account,
+    balance,
+    subReddit
+  };
+};
+
+export async function getAllTransactions (): Promise<Array<ITransaction>> {
+  const session = await getSession();
+  const allTransactions = await omgService.getTransactions(session.account);
+
+  const transactions: ITransaction[] = allTransactions.map(transaction => {
+    // - filter only the tx with currency we care about
+    const inInputs = find(transaction.inputs, i => {
+      return i.currency.toLowerCase() === session.subReddit.token.toLowerCase();
+    });
+    const inOutputs = find(transaction.outputs, i => {
+      return i.currency.toLowerCase() === session.subReddit.token.toLowerCase();
+    });
+    if (!inInputs && !inOutputs) {
+      return null;
+    }
+
+    // - check if outgoing or incoming transaction
+    // - if one of the inputs owner and currency match it is outgoing, else incoming
+    const isOutgoing = find(transaction.inputs, i => {
+      const currencyMatch = i.currency.toLowerCase() === session.subReddit.token.toLowerCase();
+      const ownerMatch = i.owner.toLowerCase() === session.account.toLowerCase();
+      return currencyMatch && ownerMatch;
+    });
+
+    // - add amount & recipient
+    // - for outbound, sum amount of currency going to recipient in outputs
+    let amount = '0';
+    let recipient;
+    let sender;
+
+    if (isOutgoing) {
+      sender = session.account;
+      const bnAmount = transaction.outputs
+        .filter(i => {
+          const currencyMatch = i.currency.toLowerCase() === session.subReddit.token.toLowerCase();
+          const ownerMatch = i.owner.toLowerCase() !== session.account.toLowerCase();
+          return currencyMatch && ownerMatch;
+        })
+        .reduce((acc, curr) => {
+          return acc.add(new BN(curr.amount));
+        }, new BN(0));
+      amount = bnAmount.toString();
+    }
+
+    if (!isOutgoing) {
+      recipient = session.account;
+      const bnAmount = transaction.outputs
+        .filter(i => {
+          const currencyMatch = i.currency.toLowerCase() === session.subReddit.token.toLowerCase();
+          const ownerMatch = i.owner.toLowerCase() === session.account.toLowerCase();
+          return currencyMatch && ownerMatch;
+        })
+        .reduce((acc, curr) => {
+          return acc.add(new BN(curr.amount));
+        }, new BN(0));
+      amount = bnAmount.toString();
+    }
+
+    return {
+      direction: isOutgoing ? 'outgoing' : 'incoming',
+      txhash: transaction.txhash,
+      status: 'Confirmed',
+      sender,
+      recipient,
+      amount,
+      currency: session.subReddit.token,
+      symbol: session.subReddit.symbol,
+      timestamp: new Date(transaction.inserted_at).getTime() / 1000
+    };
+  });
+
+  return transactions.filter(i => !!i);
 };
 
 export async function transfer ({
   amount,
   currency,
   recipient,
-  metadata
+  metadata,
+  symbol
 }: {
   amount: number,
   currency: string,
   recipient: string,
+  symbol: string,
   metadata: string
-}): Promise<any> {
+}): Promise<ITransaction> {
   const account = await getActiveAccount();
   const _utxos = await omgService.getUtxos(account);
   const utxos = orderBy(_utxos, i => i.amount, 'desc');
+
+  // TODO: pick and send utxo to fee relay
+  // sign returned data using metamask and submit it
+  // persist response to store
 
   const allFees = await omgService.getFees();
   const feeInfo = allFees['1'].find(i => i.currency === typedDataService.ETH_ADDRESS);
@@ -84,14 +172,16 @@ export async function transfer ({
   const signatures = new Array(txBody.inputs.length).fill(signature);
   const signedTxn = omgService.buildSignedTransaction(typedData, signatures);
   const submittedTransaction = await omgService.submitTransaction(signedTxn);
+
   return {
-    ...submittedTransaction,
-    block: {
-      blknum: submittedTransaction.blknum,
-      timestamp: Math.round((new Date()).getTime() / 1000)
-    },
-    amount,
+    direction: 'outgoing',
+    txhash: submittedTransaction.txhash,
+    status: 'Pending',
+    sender: account,
     recipient,
-    status: 'Pending'
+    amount,
+    currency,
+    symbol,
+    timestamp: Math.round((new Date()).getTime() / 1000)
   };
 };

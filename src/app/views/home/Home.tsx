@@ -8,50 +8,35 @@ import Input from 'app/components/input/Input';
 import PointBalance from 'app/components/pointbalance/PointBalance';
 import Tabs from 'app/components/tabs/Tabs';
 
-import { transfer } from 'app/actions';
+import { ISession } from 'interfaces';
+import { transfer, getSession } from 'app/actions';
 import { selectLoading } from 'app/selectors/loadingSelector';
+import { selectSession } from 'app/selectors/sessionSelector';
 
 import Transactions from 'app/views/transactions/Transactions';
 
-import { ISubReddit } from 'app/services/locationService';
-import * as networkService from 'app/services/networkService';
-import * as omgService from 'app/services/omgService';
-
 import * as styles from './Home.module.scss';
 
-interface HomeProps {
-  subReddit: ISubReddit
-}
-
-function Home ({
-  subReddit
-}: HomeProps): JSX.Element {
+function Home (): JSX.Element {
   const dispatch = useDispatch();
-  const [ userAddress, setUserAddress ]: [ string, any ] = useState(null);
-  const [ pointBalance, setPointBalance ]: [ string, any ] = useState('');
   const [ view, setView ]: [ 'Transfer' | 'History', any ] = useState('Transfer');
-
   const [ recipient, setRecipient ]: [ string, any ] = useState('');
   const [ amount, setAmount ]: any = useState('');
 
   const transferLoading: boolean = useSelector(selectLoading(['TRANSACTION/CREATE']));
+  const session: ISession = useSelector(selectSession);
 
   useEffect(() => {
-    async function initializeHome () {
-      const userAccount = await networkService.getActiveAccount();
-      const userBalance = await omgService.getPointBalance(userAccount, subReddit.token);
-      setUserAddress(userAccount);
-      setPointBalance(userBalance);
-    }
-    initializeHome();
+    dispatch(getSession());
   }, []);
 
   async function handleTransfer (): Promise<any> {
     try {
       const result = await dispatch(transfer({
         amount,
-        currency: subReddit.token,
         recipient,
+        currency: session.subReddit.token,
+        symbol: session.subReddit.symbol,
         metadata: 'Community point transfer'
       }));
 
@@ -67,18 +52,24 @@ function Home ({
     }
   }
 
-  const transferDisabled = !userAddress || !recipient || !amount || !pointBalance;
+  const transferDisabled = !session || !recipient || !amount;
+
+  if (!session) {
+    return (
+      <div>Loading...</div>
+    );
+  }
 
   return (
     <div className={styles.Home}>
-      <h1>{`r/${subReddit.name}`}</h1>
+      <h1>{`r/${session.subReddit.name}`}</h1>
       <Address
-        address={userAddress}
+        address={session.account}
         className={styles.address}
       />
       <PointBalance
-        amount={pointBalance}
-        symbol={subReddit.symbol}
+        amount={session.balance}
+        symbol={session.subReddit.symbol}
         className={styles.pointbalance}
       />
 
@@ -96,7 +87,7 @@ function Home ({
             onChange={e => setAmount(e.target.value)}
             placeholder='Amount'
             className={styles.input}
-            suffix={subReddit.symbol}
+            suffix={session.subReddit.symbol}
           />
           <Input
             type='text'
