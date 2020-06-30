@@ -1,0 +1,19 @@
+@import 'app/styles/colors';
+
+.Tabs {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  .tab {
+    margin-right: 20px;
+    padding-bottom: 10px;
+    border-bottom: 3px solid transparent;
+    transition: all 200ms ease-in-out;
+    cursor: pointer;
+
+    &.selected {
+      border-bottom: 3px solid $orange;
+      font-weight: bold;
+    }
+  }
+}

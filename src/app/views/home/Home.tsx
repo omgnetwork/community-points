@@ -6,6 +6,7 @@ import Address from 'app/components/address/Address';
 import Button from 'app/components/button/Button';
 import Input from 'app/components/input/Input';
 import PointBalance from 'app/components/pointbalance/PointBalance';
+import Tabs from 'app/components/tabs/Tabs';
 
 import { transfer } from 'app/actions';
 import { selectLoading } from 'app/selectors/loadingSelector';
@@ -28,7 +29,7 @@ function Home ({
   const dispatch = useDispatch();
   const [ userAddress, setUserAddress ]: [ string, any ] = useState(null);
   const [ pointBalance, setPointBalance ]: [ string, any ] = useState('');
-  const [ view, setView ]: [ 'transfer' | 'transaction', any ] = useState('transfer');
+  const [ view, setView ]: [ 'Transfer' | 'History', any ] = useState('Transfer');
 
   const [ recipient, setRecipient ]: [ string, any ] = useState('');
   const [ amount, setAmount ]: any = useState('');
@@ -55,9 +56,9 @@ function Home ({
       }));
 
       if (result) {
-        // TODO: user ui feedback that transfer was successful
         setAmount('');
         setRecipient('');
+        setView('History');
       } else {
         // TODO: user ui feedback that transfer failed
       }
@@ -70,24 +71,32 @@ function Home ({
 
   return (
     <div className={styles.Home}>
-      {view === 'transfer' && (
+      <h1>{`r/${subReddit.name}`}</h1>
+      <Address
+        address={userAddress}
+        className={styles.address}
+      />
+      <PointBalance
+        amount={pointBalance}
+        symbol={subReddit.symbol}
+        className={styles.pointbalance}
+      />
+
+      <Tabs
+        options={[ 'Transfer', 'History' ]}
+        selected={view}
+        onSelect={setView}
+      />
+
+      {(view as any) === 'Transfer' && (
         <>
-          <h1>{`r/${subReddit.name}`}</h1>
-          <Address
-            address={userAddress}
-            className={styles.address}
-          />
-          <PointBalance
-            amount={pointBalance}
-            symbol={subReddit.symbol}
-            className={styles.pointbalance}
-          />
           <Input
             type='number'
             value={amount}
             onChange={e => setAmount(e.target.value)}
             placeholder='Amount'
             className={styles.input}
+            suffix={subReddit.symbol}
           />
           <Input
             type='text'
@@ -104,14 +113,10 @@ function Home ({
           >
             <span>TRANSFER</span>
           </Button>
-
-          <p onClick={() => setView('transaction')}>
-            Transaction History
-          </p>
         </>
       )}
 
-      {(view as any) === 'transaction' && <Transactions />}
+      {(view as any) === 'History' && <Transactions />}
     </div>
   );
 }

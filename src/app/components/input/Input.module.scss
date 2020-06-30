@@ -1,11 +1,31 @@
 @import 'app/styles/colors';
 
 .Input {
-  height: 50px;
-  padding: 0 10px;
-  border: 1px solid $gray2;
-  background-color: $white;
-  border-radius: 4px;
-  color: $black;
-  display: flex;
+  position: relative;
+  
+  input {
+    height: 50px;
+    background-color: $white;
+    border-radius: 4px;
+    border: 1px solid $gray2;
+    padding: 0 20px;
+    color: $black;
+    transition: all 200ms ease-in-out;
+    box-sizing: border-box;
+    width: 100%;
+    &:focus {
+      border: 1px solid $orange;
+    }
+  }
+
+  .suffix {
+    position: absolute;
+    text-transform: uppercase;
+    right: 10px;
+    top: 7px;
+    background-color: $white;
+    padding: 10px;
+    box-sizing: border-box;
+    color: $gray4;
+  }
 }

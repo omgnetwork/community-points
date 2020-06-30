@@ -1,0 +1,71 @@
+@import 'app/styles/colors';
+
+.Transactions {
+  display: flex;
+  flex-direction: column;
+
+  .more {
+    color: $gray3;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .transaction {
+    border: 1px solid $gray1;
+    border-radius: 4px;
+    padding: 15px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    box-sizing: border-box;
+    &:hover {
+      background-color: $gray1;
+    }
+
+    .arrow {
+      margin-right: 20px;
+      &.incoming {
+        transform: rotate(180deg);
+      }
+    }
+
+    .data {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      .direction {
+        font-weight: bold;
+      }
+      .info {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        .status {
+          padding: 3px 7px;
+          transition: all 200ms ease-in-out;
+          background-color: $green;
+          margin-right: 5px;
+          &.pending {
+            background-color: $yellow;
+          }
+        }
+
+        .address {
+          margin-right: 5px;
+        }
+      }
+    }
+
+    .amounts {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      .rawAmount {
+        font-weight: bold;
+      }
+    }
+  }
+}

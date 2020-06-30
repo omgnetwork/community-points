@@ -7,7 +7,8 @@ interface InputProps {
   type: string,
   value: any,
   onChange: (e) => void,
-  className?: string
+  className?: string,
+  suffix?: string
 }
 
 function Input ({
@@ -15,19 +16,29 @@ function Input ({
   type,
   value,
   onChange,
-  className
+  className,
+  suffix
 }: InputProps): JSX.Element {
   return (
-    <input
+    <div
       className={[
         styles.Input,
         className
       ].join(' ')}
-      placeholder={placeholder}
-      type={type}
-      value={value}
-      onChange={onChange}
-    />
+    >
+      <input
+        placeholder={placeholder}
+        type={type}
+        value={value}
+        spellCheck={false}
+        onChange={onChange}
+      />
+      {suffix && (
+        <div className={styles.suffix}>
+          {suffix}
+        </div>
+      )}
+    </div>
   );
 }
 
