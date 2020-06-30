@@ -1,3 +1,23 @@
+@import 'app/styles/colors';
+
 .Address {
-  
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  .identicon {
+    width: 34px;
+    height: 34px;
+    margin-right: 10px;
+    border-radius: 5px;
+    border: 1px solid $gray3;
+    canvas {
+      border-radius: 4px;
+    }
+  }
+  .address {
+    margin-right: 10px;
+  }
+  .copy {
+    cursor: pointer;
+  }
 }

@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
+import Address from 'app/components/address/Address';
 import Button from 'app/components/button/Button';
 import Input from 'app/components/input/Input';
 import PointBalance from 'app/components/pointbalance/PointBalance';
@@ -72,14 +73,15 @@ function Home ({
       {view === 'transfer' && (
         <>
           <h1>{`r/${subReddit.name}`}</h1>
-
-          <p>User Address: {userAddress}</p>
-
+          <Address
+            address={userAddress}
+            className={styles.address}
+          />
           <PointBalance
             amount={pointBalance}
             symbol={subReddit.symbol}
+            className={styles.pointbalance}
           />
-
           <Input
             type='number'
             value={amount}

@@ -6,15 +6,21 @@ import * as styles from './PointBalance.module.scss';
 
 interface PointBalanceProps {
   amount: string,
-  symbol: string
+  symbol: string,
+  className?: string
 }
 
 function PointBalance ({
   amount,
-  symbol
+  symbol,
+  className
 }: PointBalanceProps): JSX.Element {
   return (
-    <div className={styles.PointBalance}>
+    <div
+      className={[
+        styles.PointBalance,
+        className
+      ].join(' ')}>
       <div className={styles.data}>
         <img
           src={omgcp_reddit}

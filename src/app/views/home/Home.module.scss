@@ -1,6 +1,12 @@
 .Home {
   display: flex;
   flex-direction: column;
+  .address {
+    margin-bottom: 20px;
+  }
+  .pointbalance {
+    margin-bottom: 20px;
+  }
   .transferButton {
     margin-top: 20px;
   }
