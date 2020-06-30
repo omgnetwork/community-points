@@ -76,7 +76,7 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
       return currencyMatch && ownerMatch;
     });
 
-    // - add amount & recipient
+    // - TODO: add amount & recipient
     // - for outbound, sum amount of currency going to recipient in outputs
     let amount = '0';
     let recipient;
