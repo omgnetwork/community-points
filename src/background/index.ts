@@ -29,7 +29,7 @@ chrome.contextMenus.onClicked.addListener(
 
 chrome.contextMenus.create({
   id: 'omgcp-contextmenu',
-  title: 'OMG Network Community Points',
+  title: 'Reddit Wallet',
   contexts: ['all']
 });
 

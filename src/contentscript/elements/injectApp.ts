@@ -12,40 +12,46 @@ function injectApp (): void {
   appContainer.style.top = '20px';
   appContainer.style.right = '20px';
   appContainer.style.zIndex = '1000000';
-  appContainer.style.backgroundColor = 'white';
+  appContainer.style.backgroundColor = '#FFFFFF';
   appContainer.style.width = '400px';
   appContainer.style.height = '500px';
-  appContainer.style.border = '1px solid black';
-  appContainer.style.borderRadius = '4px';
+  appContainer.style.borderRadius = '8px';
+  appContainer.style.boxShadow = '0px 0px 29px -8px rgba(0,0,0,0.5)';
 
   appContainer.innerHTML = `
     <iframe
       id='omgcp-iframe'
       style='
-        height:100%;
+        height: 100%;
         width: 100%;
       '
     ></iframe>
     <div
       style='
-        position:absolute;
-        top:0px;
-        left:0px;
-        right:0px;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        right: 0px;
         height: 40px;
-        background-color:black;
-        color:white;
-        cursor:move;
-        display:flex;
-        align-items:center;
+        background-color: #101010;
+        color: #FFFFFF;
+        cursor: move;
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0px 20px;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        font-weight: bold;
       '
       id='omgcp-header'
     >
-      <button
-        id='omgcp-close-button'
-        style='margin-left:10px;'
-      >
-        𝖷 Close
+      <span>
+        Reddit Wallet
+      </span>
+      <button id='omgcp-close-button'>
+        𝖷
       </button>
     </div>
   `;

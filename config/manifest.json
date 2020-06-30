@@ -1,6 +1,6 @@
 {
-  "name": "OMG Network Community Points",
-  "description": "Transfer Reddit community points on the OMG Network",
+  "name": "Reddit Wallet",
+  "description": "Extension to transfer Reddit community points",
   "version": "1.0.0",
   "permissions": [
     "tabs",

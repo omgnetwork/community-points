@@ -3,7 +3,7 @@ import * as React from 'react';
 import * as styles from './Button.module.scss';
 
 interface ButtonProps {
-  children: JSX.Element,
+  children: JSX.Element | JSX.Element[],
   onClick: () => void,
   disabled?: boolean,
   className?: string,

@@ -3,7 +3,8 @@ import subRedditMap from 'subRedditMap';
 
 export interface ISubReddit {
   token: string,
-  subReddit: string
+  name: string,
+  symbol: string
 }
 
 export function getCurrentSubReddit (): Promise<ISubReddit> {
@@ -15,13 +16,14 @@ export function getCurrentSubReddit (): Promise<ISubReddit> {
         if (!subReddit) {
           return resolve(null);
         }
-        const token = subRedditMap[subReddit[1]];
-        if (!token) {
+        const name = subReddit[1];
+        const subRedditObject = subRedditMap[name];
+        if (!subRedditObject) {
           return resolve(null);
         }
         return resolve({
-          token,
-          subReddit: subReddit[1]
+          ...subRedditObject,
+          name
         });
       } catch (error) {
         reject(error);

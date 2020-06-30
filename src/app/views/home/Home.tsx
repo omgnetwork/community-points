@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux';
 
 import Button from 'app/components/button/Button';
 import Input from 'app/components/input/Input';
+import PointBalance from 'app/components/pointbalance/PointBalance';
 
 import { transfer } from 'app/actions';
 import { selectLoading } from 'app/selectors/loadingSelector';
@@ -70,11 +71,14 @@ function Home ({
     <div className={styles.Home}>
       {view === 'transfer' && (
         <>
-          <h1>{`r/${subReddit.subReddit}`}</h1>
+          <h1>{`r/${subReddit.name}`}</h1>
 
           <p>User Address: {userAddress}</p>
-          <p>Point Address: {subReddit.token}</p>
-          <p>Point Balance: {pointBalance}</p>
+
+          <PointBalance
+            amount={pointBalance}
+            symbol={subReddit.symbol}
+          />
 
           <Input
             type='number'

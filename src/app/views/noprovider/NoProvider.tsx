@@ -2,6 +2,9 @@ import * as React from 'react';
 
 import Button from 'app/components/button/Button';
 
+import arrow from 'app/images/omgcp-arrow.svg';
+import omgcp_metamask from 'app/images/omgcp_metamask.svg';
+
 import * as locationService from 'app/services/locationService';
 
 import * as styles from './NoProvider.module.scss';
@@ -13,15 +16,23 @@ function NoProvider () {
 
   return (
     <div className={styles.NoProvider}>
-      <h1>Missing Web3 Provider</h1>
+      <img
+        className={styles.icon}
+        src={omgcp_metamask}
+        alt='logo'
+      />
+      <h1>
+        Please install Metamask to work with this extension
+      </h1>
       <p>
-        No web3 provider was detected on this browser.
+        Install Metamask and login to connect your existing wallet with this extension.
       </p>
-      <p>
-        As this extension will never handle any private keys, please download the Metamask extension to sign network transactions.
-      </p>
-      <Button onClick={handleNewTab}>
-        <span>DOWNLOAD METAMASK</span>
+      <Button
+        onClick={handleNewTab}
+        className={styles.button}
+      >
+        <span>INSTALL METAMASK</span>
+        <img src={arrow} alt='arrow' />
       </Button>
     </div>
   );

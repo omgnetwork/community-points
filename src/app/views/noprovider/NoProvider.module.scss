@@ -1,4 +1,16 @@
 .NoProvider {
   display: flex;
   flex-direction: column;
+  .icon {
+    align-self: flex-start;
+    margin-bottom: 20px;
+  }
+  .button {
+    margin-top: 20px;
+    align-items: center;
+    img {
+      margin-left: 7px;
+      height: 12px;
+    }
+  }
 }

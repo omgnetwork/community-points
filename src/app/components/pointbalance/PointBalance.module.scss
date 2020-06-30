@@ -1,0 +1,31 @@
+@import 'app/styles/colors';
+
+.PointBalance {
+  background-color: $gray1;
+  border-radius: 18px;
+  height: 34px;
+  padding: 0px 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  .data {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  img {
+    height: 22px;
+    margin-right: 10px;
+  }
+  .amount {
+    color: $orange;
+    font-weight: bold;
+  }
+  .symbol {
+    color: $gray3;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-right: 5px;
+  }
+}
