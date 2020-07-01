@@ -22,7 +22,7 @@ function WrongNetwork () {
       />
       <h1>You are on the wrong network</h1>
       <p>
-        Please point your wallet on Metamask to the {networkMap[config.network]}.
+        Please point your Metamask wallet to the {networkMap[config.network]}.
       </p>
     </div>
   );
