@@ -4,9 +4,11 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  margin-bottom: 15px;
+
   .tab {
     margin-right: 20px;
-    padding-bottom: 10px;
+    padding-bottom: 7px;
     border-bottom: 3px solid transparent;
     transition: all 200ms ease-in-out;
     cursor: pointer;

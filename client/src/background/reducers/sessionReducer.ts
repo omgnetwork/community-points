@@ -13,7 +13,8 @@ const initialState: SessionState = {
   subReddit: {
     token: null,
     name: null,
-    symbol: null
+    symbol: null,
+    decimals: null
   }
 };
 

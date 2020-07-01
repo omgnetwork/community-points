@@ -1,4 +1,4 @@
-import { orderBy, find } from 'lodash';
+import { orderBy } from 'lodash';
 import BN from 'bn.js';
 
 import { ISession, ITransaction } from 'interfaces';
@@ -57,13 +57,13 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
   const subRedditToken = session.subReddit.token.toLowerCase();
   const user = session.account.toLowerCase();
 
-  function byMatchingCurrencyAndOwner (i) {
+  function matchingCurrencyAndOwner (i) {
     const currencyMatch = i.currency.toLowerCase() === subRedditToken;
     const ownerMatch = i.owner.toLowerCase() === user;
     return currencyMatch && ownerMatch;
   }
 
-  function byMatchingCurrencyAndDifferentOwner (i) {
+  function matchingCurrencyAndDifferentOwner (i) {
     const currencyMatch = i.currency.toLowerCase() === subRedditToken;
     const ownerMatch = i.owner.toLowerCase() !== user;
     return currencyMatch && ownerMatch;
@@ -71,10 +71,10 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
 
   const transactions: ITransaction[] = allTransactions.map(transaction => {
     // - filter only the tx with currency we care about
-    const inInputs = find(transaction.inputs, i => {
+    const inInputs = transaction.inputs.some(i => {
       return i.currency.toLowerCase() === subRedditToken;
     });
-    const inOutputs = find(transaction.outputs, i => {
+    const inOutputs = transaction.outputs.some(i => {
       return i.currency.toLowerCase() === subRedditToken;
     });
     if (!inInputs && !inOutputs) {
@@ -83,7 +83,7 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
 
     // - check if outgoing or incoming transaction
     // - if one of the inputs owner and currency match it is outgoing, else incoming
-    const isOutgoing = find(transaction.inputs, byMatchingCurrencyAndOwner);
+    const isOutgoing = transaction.inputs.some(matchingCurrencyAndOwner);
 
     // - for outgoing, sum amount of currency going to recipient in outputs
     let amount = '0';
@@ -92,7 +92,9 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
 
     if (isOutgoing) {
       sender = user;
-      const recipientOutputs = transaction.outputs.filter(byMatchingCurrencyAndDifferentOwner);
+      const recipientOutputs = transaction.outputs.filter(matchingCurrencyAndDifferentOwner);
+      console.log('recipientOutputs: ', recipientOutputs);
+
       recipient = recipientOutputs[0].owner; // naive assign recipient from first output
 
       const bnAmount = recipientOutputs.reduce((acc, curr) => {
@@ -104,13 +106,13 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
     if (!isOutgoing) {
       recipient = user;
       const bnAmount = transaction.outputs
-        .filter(byMatchingCurrencyAndOwner)
+        .filter(matchingCurrencyAndOwner)
         .reduce((acc, curr) => {
           return acc.add(new BN(curr.amount));
         }, new BN(0));
       amount = bnAmount.toString();
 
-      const senderInputs = transaction.inputs.filter(byMatchingCurrencyAndDifferentOwner);
+      const senderInputs = transaction.inputs.filter(matchingCurrencyAndDifferentOwner);
       sender = senderInputs[0].owner; // naive assign sender from first input
     }
 
@@ -135,10 +137,12 @@ export async function transfer ({
   currency,
   recipient,
   metadata,
-  symbol
+  symbol,
+  decimals
 }: {
   amount: number,
   currency: string,
+  decimals: number,
   recipient: string,
   symbol: string,
   metadata: string
@@ -186,6 +190,7 @@ export async function transfer ({
     amount,
     currency,
     symbol,
+    decimals,
     timestamp: Math.round((new Date()).getTime() / 1000)
   };
 };

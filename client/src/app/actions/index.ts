@@ -12,6 +12,7 @@ export function transfer ({
   amount,
   currency,
   symbol,
+  decimals,
   recipient,
   metadata
 }) {
@@ -22,6 +23,7 @@ export function transfer ({
       currency,
       recipient,
       symbol,
+      decimals,
       metadata
     })
   );

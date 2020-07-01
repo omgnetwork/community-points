@@ -3,6 +3,7 @@
 export default {
   'omise_go': {
     token: '0xc778417e063141139fce010982780140aa0cd5ab',
-    symbol: 'WETH'
+    symbol: 'WETH',
+    decimals: 18
   }
 };

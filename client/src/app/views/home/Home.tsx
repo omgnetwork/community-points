@@ -37,6 +37,7 @@ function Home (): JSX.Element {
         recipient,
         currency: session.subReddit.token,
         symbol: session.subReddit.symbol,
+        decimals: session.subReddit.decimals,
         metadata: 'Community point transfer'
       }));
 
@@ -70,6 +71,7 @@ function Home (): JSX.Element {
       <PointBalance
         amount={session.balance}
         symbol={session.subReddit.symbol}
+        decimals={session.subReddit.decimals}
         className={styles.pointbalance}
       />
 

@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
+    "bignumber.js": "^9.0.0",
     "bn.js": "^5.1.2",
     "lodash": "^4.17.15",
     "number-to-bn": "^1.7.0",
