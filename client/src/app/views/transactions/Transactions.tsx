@@ -23,11 +23,9 @@ function Transactions (): JSX.Element {
   const allTransactions: ITransaction[] = useSelector(selectTransactions);
 
   useEffect(() => {
-    if (allTransactions) {
-      if (!visibleTransactions.length && allTransactions.length) {
-        const firstSet = allTransactions.slice(0, TRANSACTIONS_PER_PAGE);
-        setVisibleTransactions(firstSet);
-      }
+    if (allTransactions.length) {
+      const firstSet = allTransactions.slice(0, TRANSACTIONS_PER_PAGE);
+      setVisibleTransactions(firstSet);
     }
   }, [allTransactions]);
 
@@ -50,7 +48,8 @@ function Transactions (): JSX.Element {
           <div
             key={index}
             className={[
-              styles.transaction
+              styles.transaction,
+              transaction.status === 'Pending' ? styles.flash : ''
             ].join(' ')}
             onClick={() => handleTransactionClick(transaction.txhash)}
           >

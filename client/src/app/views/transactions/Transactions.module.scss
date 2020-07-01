@@ -32,6 +32,11 @@
       background-color: $gray1;
     }
 
+    &.flash {
+      animation-name: flash-animation;
+      animation-duration: 1s;
+    }
+
     .arrow {
       margin-right: 15px;
       &.incoming {
@@ -87,4 +92,9 @@
       }
     }
   }
+}
+
+@keyframes flash-animation {  
+  from { background-color: rgba(255, 221, 100, 0.5); }
+  to   { background-color: default; }
 }
