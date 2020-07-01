@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { unix } from 'moment';
 import truncate from 'truncate-middle';
 import { useSelector } from 'react-redux';
@@ -15,21 +16,35 @@ import config from 'config';
 
 import * as styles from './Transactions.module.scss';
 
+const TRANSACTIONS_PER_PAGE = 4;
+
 function Transactions (): JSX.Element {
-  const transactions: ITransaction[] = useSelector(selectTransactions);
+  const [ visibleTransactions, setVisibleTransactions ]: [ ITransaction[], any ] = useState([]);
+  const allTransactions: ITransaction[] = useSelector(selectTransactions);
+
+  useEffect(() => {
+    if (allTransactions) {
+      if (!visibleTransactions.length && allTransactions.length) {
+        const firstSet = allTransactions.slice(0, TRANSACTIONS_PER_PAGE);
+        setVisibleTransactions(firstSet);
+      }
+    }
+  }, [allTransactions]);
+
+  function handleLoadMore (): void {
+    const currentIndex: number = visibleTransactions.length;
+    const nextSet = allTransactions.slice(currentIndex, currentIndex + TRANSACTIONS_PER_PAGE);
+    const newSet = [ ...visibleTransactions, ...nextSet ];
+    setVisibleTransactions(newSet);
+  }
 
   function handleTransactionClick (hash: string): void {
     locationService.openTab(`${config.blockExplorerUrl}/transaction/${hash}`);
   }
 
-  // TODO: filter and client side paginate until load more is clicked
-  function handleLoadMore (): void {
-    console.log('load more, next pagination set');
-  }
-
   return (
     <div className={styles.Transactions}>
-      {transactions && transactions.map((transaction: ITransaction, index: number): JSX.Element => {
+      {visibleTransactions && visibleTransactions.map((transaction: ITransaction, index: number): JSX.Element => {
         const isIncoming: boolean = transaction.direction === 'incoming';
         return (
           <div
@@ -84,9 +99,11 @@ function Transactions (): JSX.Element {
         );
       })}
 
-      <div onClick={handleLoadMore} className={styles.more}>
-        Load more
-      </div>
+      {visibleTransactions.length !== allTransactions.length && (
+        <div onClick={handleLoadMore} className={styles.more}>
+          Load more
+        </div>
+      )}
     </div>
   );
 }
