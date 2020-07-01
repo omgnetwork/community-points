@@ -7,6 +7,7 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 import * as locationService from 'app/services/locationService';
 import { getTransactions } from 'app/actions/index';
 import { selectTransactions } from 'app/selectors/transactionSelector';
+import { logAmount } from 'app/util/amountConvert';
 
 import { ITransaction } from 'interfaces';
 
@@ -77,6 +78,7 @@ function Transactions (): JSX.Element {
                   }
                 </div>
                 <CopyToClipboard
+                  className={styles.copyContainer}
                   text={isIncoming
                     ? transaction.sender
                     : transaction.recipient
@@ -93,10 +95,10 @@ function Transactions (): JSX.Element {
 
             <div className={styles.amounts}>
               <div className={styles.rawAmount}>
-                {transaction.amount}
+                {`${logAmount(transaction.amount, transaction.decimals)} ${transaction.symbol}`}
               </div>
               <div className={styles.usdAmount}>
-                {`${isIncoming ? '+' : '-'} $ ${transaction.amount} USD`}
+                {`${isIncoming ? '+' : '-'} $TODO USD`}
               </div>
             </div>
           </div>

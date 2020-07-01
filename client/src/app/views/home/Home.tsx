@@ -14,6 +14,7 @@ import { selectLoading } from 'app/selectors/loadingSelector';
 import { selectSession } from 'app/selectors/sessionSelector';
 
 import Transactions from 'app/views/transactions/Transactions';
+import { powAmount } from 'app/util/amountConvert';
 
 import * as styles from './Home.module.scss';
 
@@ -33,7 +34,7 @@ function Home (): JSX.Element {
   async function handleTransfer (): Promise<any> {
     try {
       const result = await dispatch(transfer({
-        amount,
+        amount: powAmount(amount, session.subReddit.decimals),
         recipient,
         currency: session.subReddit.token,
         symbol: session.subReddit.symbol,

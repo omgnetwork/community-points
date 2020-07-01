@@ -125,6 +125,7 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
       amount,
       currency: session.subReddit.token,
       symbol: session.subReddit.symbol,
+      decimals: session.subReddit.decimals,
       timestamp: new Date(transaction.inserted_at).getTime() / 1000
     };
   });
