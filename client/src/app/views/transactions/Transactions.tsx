@@ -1,7 +1,7 @@
 import * as React from 'react';
+import { unix } from 'moment';
 import truncate from 'truncate-middle';
 import { useSelector } from 'react-redux';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import * as locationService from 'app/services/locationService';
 import { selectTransactions } from 'app/selectors/transactionSelector';
@@ -9,7 +9,6 @@ import { logAmount } from 'app/util/amountConvert';
 
 import { ITransaction } from 'interfaces';
 
-import omgcp_copy from 'app/images/omgcp_copy.svg';
 import omgcp_thickarrow from 'app/images/omgcp_thickarrow.svg';
 
 import config from 'config';
@@ -70,19 +69,6 @@ function Transactions (): JSX.Element {
                     : truncate(transaction.recipient, 6, 4, '...')
                   }
                 </div>
-                <CopyToClipboard
-                  className={styles.copyContainer}
-                  text={isIncoming
-                    ? transaction.sender
-                    : transaction.recipient
-                  }
-                >
-                  <img
-                    className={styles.copy}
-                    src={omgcp_copy}
-                    alt='copy'
-                  />
-                </CopyToClipboard>
               </div>
             </div>
 
@@ -90,8 +76,8 @@ function Transactions (): JSX.Element {
               <div className={styles.rawAmount}>
                 {`${logAmount(transaction.amount, transaction.decimals)} ${transaction.symbol}`}
               </div>
-              <div className={styles.usdAmount}>
-                {`${isIncoming ? '+' : '-'} $TODO USD`}
+              <div className={styles.timestamp}>
+                {unix(transaction.timestamp).format('lll')}
               </div>
             </div>
           </div>

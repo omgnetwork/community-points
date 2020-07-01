@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
+import BigNumber from 'bignumber.js';
 import { useDispatch, useSelector, batch } from 'react-redux';
 
 import Address from 'app/components/address/Address';
@@ -15,13 +16,15 @@ import { selectSession } from 'app/selectors/sessionSelector';
 import * as omgService from 'app/services/omgService';
 
 import Transactions from 'app/views/transactions/Transactions';
-import { powAmount } from 'app/util/amountConvert';
+import { powAmount, powAmountAsBN } from 'app/util/amountConvert';
 import useInterval from 'app/util/useInterval';
+import isAddress from 'app/util/isAddress';
 
 import * as styles from './Home.module.scss';
 
 function Home (): JSX.Element {
   const dispatch = useDispatch();
+
   const [ view, setView ]: [ 'Transfer' | 'History', any ] = useState('Transfer');
   const [ recipient, setRecipient ]: [ string, any ] = useState('');
   const [ amount, setAmount ]: any = useState('');
@@ -48,7 +51,7 @@ function Home (): JSX.Element {
         currency: session.subReddit.token,
         symbol: session.subReddit.symbol,
         decimals: session.subReddit.decimals,
-        metadata: 'Community point transfer'
+        metadata: `${session.subReddit.symbol} community points`
       }));
 
       if (result) {
@@ -63,7 +66,28 @@ function Home (): JSX.Element {
     }
   }
 
-  const transferDisabled = !session || !recipient || !amount;
+  function disableTransfer (): boolean {
+    if (!session || !recipient || !amount) {
+      return true;
+    };
+    // no invalid addresses
+    if (!isAddress(recipient)) {
+      return true;
+    };
+    // no merge transactions
+    if (recipient.toLowerCase() === session.account.toLowerCase()) {
+      return true;
+    }
+    // positive amount
+    if (amount <= 0) {
+      return true;
+    }
+    // no amounts greater than point balance
+    if (powAmountAsBN(amount, session.subReddit.decimals).gt(new BigNumber(session.balance))) {
+      return true;
+    }
+    return false;
+  }
 
   if (!session) {
     return (
@@ -111,7 +135,7 @@ function Home (): JSX.Element {
           <Button
             onClick={handleTransfer}
             className={styles.transferButton}
-            disabled={transferDisabled}
+            disabled={disableTransfer()}
             loading={transferLoading}
           >
             <span>TRANSFER</span>

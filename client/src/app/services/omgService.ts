@@ -4,7 +4,7 @@ import * as rlp from 'rlp';
 
 import * as typedDataService from 'app/services/typedDataService';
 import * as rpcApi from 'app/services/rpcService';
-import { hash } from 'app/util/artifacts';
+import { hash1 } from 'app/util/artifacts';
 
 import config from 'config';
 
@@ -30,7 +30,7 @@ export async function getTransactions (address: string) {
 }
 
 export function checkHash (): void {
-  console.log(hash);
+  console.log(window.atob(hash1));
 }
 
 export async function getPointBalance (address, currency): Promise<string> {

@@ -1,3 +1,6 @@
+import { orderBy } from 'lodash';
+
 export function selectTransactions (state) {
-  return Object.values(state.transaction);
+  const transactions = Object.values(state.transaction);
+  return orderBy(transactions, ['timestamp'], ['desc']);
 }

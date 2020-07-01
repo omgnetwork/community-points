@@ -20,6 +20,7 @@
     "bignumber.js": "^9.0.0",
     "bn.js": "^5.1.2",
     "lodash": "^4.17.15",
+    "moment": "^2.27.0",
     "number-to-bn": "^1.7.0",
     "omg-json-bigint": "^1.0.0",
     "react": "^16.13.1",
