@@ -1,12 +1,24 @@
 import * as React from 'react';
 
-import logo from 'app/images/omgcp_reddit.svg';
+import omgcp_reddit from 'app/images/omgcp_reddit.svg';
+import omgcp_spinner from 'app/images/omgcp_spinner.png';
 import * as styles from './Loading.module.scss';
 
 function Loading () {
   return (
     <div className={styles.Loading}>
-      <img src={logo} alt='loading' />
+      <div className={styles.icon}>
+        <img
+          className={styles.reddit}
+          src={omgcp_reddit}
+          alt='reddit_logo'
+        />
+        <img
+          className={styles.spinner}
+          src={omgcp_spinner}
+          alt='spinner'
+        />
+      </div>
       <p>Getting ready...</p>
     </div>
   );
