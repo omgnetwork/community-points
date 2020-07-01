@@ -93,8 +93,6 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
     if (isOutgoing) {
       sender = user;
       const recipientOutputs = transaction.outputs.filter(matchingCurrencyAndDifferentOwner);
-      console.log('recipientOutputs: ', recipientOutputs);
-
       recipient = recipientOutputs[0].owner; // naive assign recipient from first output
 
       const bnAmount = recipientOutputs.reduce((acc, curr) => {

@@ -3,6 +3,7 @@
   min-height: 300px;
   padding: 20px;
   margin-top: 40px;
+  box-sizing: border-box;
 }
 
 h1 {
@@ -19,4 +20,8 @@ input::-webkit-outer-spin-button,
 input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+::-webkit-scrollbar {
+  display: none;
 }

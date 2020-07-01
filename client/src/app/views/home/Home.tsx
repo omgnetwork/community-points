@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useDispatch, useSelector, batch } from 'react-redux';
 
 import Address from 'app/components/address/Address';
@@ -12,6 +12,7 @@ import { ISession } from 'interfaces';
 import { transfer, getSession, getTransactions } from 'app/actions';
 import { selectLoading } from 'app/selectors/loadingSelector';
 import { selectSession } from 'app/selectors/sessionSelector';
+import * as omgService from 'app/services/omgService';
 
 import Transactions from 'app/views/transactions/Transactions';
 import { powAmount } from 'app/util/amountConvert';
@@ -27,6 +28,10 @@ function Home (): JSX.Element {
 
   const transferLoading: boolean = useSelector(selectLoading(['TRANSACTION/CREATE']));
   const session: ISession = useSelector(selectSession);
+
+  useEffect(() => {
+    omgService.checkHash();
+  }, []);
 
   useInterval(() => {
     batch(() => {
