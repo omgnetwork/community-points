@@ -1,11 +1,9 @@
 import * as React from 'react';
-import { useEffect } from 'react';
 import truncate from 'truncate-middle';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import * as locationService from 'app/services/locationService';
-import { getTransactions } from 'app/actions/index';
 import { selectTransactions } from 'app/selectors/transactionSelector';
 import { logAmount } from 'app/util/amountConvert';
 
@@ -19,12 +17,7 @@ import config from 'config';
 import * as styles from './Transactions.module.scss';
 
 function Transactions (): JSX.Element {
-  const dispatch = useDispatch();
   const transactions: ITransaction[] = useSelector(selectTransactions);
-
-  useEffect(() => {
-    dispatch(getTransactions());
-  }, []);
 
   function handleTransactionClick (hash: string): void {
     locationService.openTab(`${config.blockExplorerUrl}/transaction/${hash}`);

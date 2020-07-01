@@ -1,6 +1,6 @@
 import * as React from 'react';
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
+import { useDispatch, useSelector, batch } from 'react-redux';
 
 import Address from 'app/components/address/Address';
 import Button from 'app/components/button/Button';
@@ -9,12 +9,13 @@ import PointBalance from 'app/components/pointbalance/PointBalance';
 import Tabs from 'app/components/tabs/Tabs';
 
 import { ISession } from 'interfaces';
-import { transfer, getSession } from 'app/actions';
+import { transfer, getSession, getTransactions } from 'app/actions';
 import { selectLoading } from 'app/selectors/loadingSelector';
 import { selectSession } from 'app/selectors/sessionSelector';
 
 import Transactions from 'app/views/transactions/Transactions';
 import { powAmount } from 'app/util/amountConvert';
+import useInterval from 'app/util/useInterval';
 
 import * as styles from './Home.module.scss';
 
@@ -27,9 +28,12 @@ function Home (): JSX.Element {
   const transferLoading: boolean = useSelector(selectLoading(['TRANSACTION/CREATE']));
   const session: ISession = useSelector(selectSession);
 
-  useEffect(() => {
-    dispatch(getSession());
-  }, []);
+  useInterval(() => {
+    batch(() => {
+      dispatch(getSession());
+      dispatch(getTransactions());
+    });
+  }, 20 * 1000);
 
   async function handleTransfer (): Promise<any> {
     try {
@@ -43,9 +47,9 @@ function Home (): JSX.Element {
       }));
 
       if (result) {
+        setView('History');
         setAmount('');
         setRecipient('');
-        setView('History');
       } else {
         // TODO: user ui feedback that transfer failed
       }

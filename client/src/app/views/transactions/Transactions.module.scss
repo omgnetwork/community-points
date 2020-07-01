@@ -11,6 +11,10 @@
     align-items: center;
     margin-top: 20px;
     cursor: pointer;
+    transition: all 200ms ease-in-out;
+    &:hover {
+      color: $orange;
+    }
   }
 
   .transaction {
