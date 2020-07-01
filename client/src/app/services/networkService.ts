@@ -25,7 +25,6 @@ export async function enableWeb3Provider (): Promise<boolean> {
 }
 
 export async function signTypedData (account, typedData): Promise<string> {
-  // TODO: multisig fee sign
   const signature = await messageService.send({
     type: 'WEB3/SIGN',
     payload: {
@@ -55,14 +54,28 @@ export async function getSession (): Promise<ISession> {
 export async function getAllTransactions (): Promise<Array<ITransaction>> {
   const session = await getSession();
   const allTransactions = await omgService.getTransactions(session.account);
+  const subRedditToken = session.subReddit.token.toLowerCase();
+  const user = session.account.toLowerCase();
+
+  function byMatchingCurrencyAndOwner (i) {
+    const currencyMatch = i.currency.toLowerCase() === subRedditToken;
+    const ownerMatch = i.owner.toLowerCase() === user;
+    return currencyMatch && ownerMatch;
+  }
+
+  function byMatchingCurrencyAndDifferentOwner (i) {
+    const currencyMatch = i.currency.toLowerCase() === subRedditToken;
+    const ownerMatch = i.owner.toLowerCase() !== user;
+    return currencyMatch && ownerMatch;
+  }
 
   const transactions: ITransaction[] = allTransactions.map(transaction => {
     // - filter only the tx with currency we care about
     const inInputs = find(transaction.inputs, i => {
-      return i.currency.toLowerCase() === session.subReddit.token.toLowerCase();
+      return i.currency.toLowerCase() === subRedditToken;
     });
     const inOutputs = find(transaction.outputs, i => {
-      return i.currency.toLowerCase() === session.subReddit.token.toLowerCase();
+      return i.currency.toLowerCase() === subRedditToken;
     });
     if (!inInputs && !inOutputs) {
       return null;
@@ -70,44 +83,35 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
 
     // - check if outgoing or incoming transaction
     // - if one of the inputs owner and currency match it is outgoing, else incoming
-    const isOutgoing = find(transaction.inputs, i => {
-      const currencyMatch = i.currency.toLowerCase() === session.subReddit.token.toLowerCase();
-      const ownerMatch = i.owner.toLowerCase() === session.account.toLowerCase();
-      return currencyMatch && ownerMatch;
-    });
+    const isOutgoing = find(transaction.inputs, byMatchingCurrencyAndOwner);
 
-    // - TODO: add amount & recipient
-    // - for outbound, sum amount of currency going to recipient in outputs
+    // - for outgoing, sum amount of currency going to recipient in outputs
     let amount = '0';
     let recipient;
     let sender;
 
     if (isOutgoing) {
-      sender = session.account;
-      const bnAmount = transaction.outputs
-        .filter(i => {
-          const currencyMatch = i.currency.toLowerCase() === session.subReddit.token.toLowerCase();
-          const ownerMatch = i.owner.toLowerCase() !== session.account.toLowerCase();
-          return currencyMatch && ownerMatch;
-        })
-        .reduce((acc, curr) => {
-          return acc.add(new BN(curr.amount));
-        }, new BN(0));
+      sender = user;
+      const recipientOutputs = transaction.outputs.filter(byMatchingCurrencyAndDifferentOwner);
+      recipient = recipientOutputs[0].owner; // naive assign recipient from first output
+
+      const bnAmount = recipientOutputs.reduce((acc, curr) => {
+        return acc.add(new BN(curr.amount));
+      }, new BN(0));
       amount = bnAmount.toString();
     }
 
     if (!isOutgoing) {
-      recipient = session.account;
+      recipient = user;
       const bnAmount = transaction.outputs
-        .filter(i => {
-          const currencyMatch = i.currency.toLowerCase() === session.subReddit.token.toLowerCase();
-          const ownerMatch = i.owner.toLowerCase() === session.account.toLowerCase();
-          return currencyMatch && ownerMatch;
-        })
+        .filter(byMatchingCurrencyAndOwner)
         .reduce((acc, curr) => {
           return acc.add(new BN(curr.amount));
         }, new BN(0));
       amount = bnAmount.toString();
+
+      const senderInputs = transaction.inputs.filter(byMatchingCurrencyAndDifferentOwner);
+      sender = senderInputs[0].owner; // naive assign sender from first input
     }
 
     return {
