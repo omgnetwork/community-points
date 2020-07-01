@@ -51,7 +51,10 @@ function Transactions (): JSX.Element {
               styles.transaction,
               transaction.status === 'Pending' ? styles.flash : ''
             ].join(' ')}
-            onClick={() => handleTransactionClick(transaction.txhash)}
+            onClick={transaction.status === 'Confirmed'
+              ? () => handleTransactionClick(transaction.txhash)
+              : null
+            }
           >
             <img
               src={omgcp_thickarrow}
