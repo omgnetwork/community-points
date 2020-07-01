@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import Button from 'app/components/button/Button';
 
-import arrow from 'app/images/omgcp-arrow.svg';
+import arrow from 'app/images/omgcp_arrow.svg';
 import omgcp_subreddit from 'app/images/omgcp_subreddit.svg';
 import * as locationService from 'app/services/locationService';
 
