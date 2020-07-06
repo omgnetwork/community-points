@@ -1,4 +1,12 @@
 .DS_Store
 .env
 .vscode
+
+# npm packages
 node_modules
+
+# truffle build artifect
+contracts/build
+
+# VS code workspace setting
+*.code-workspace
