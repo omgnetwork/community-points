@@ -14,40 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License. */
 
 const promiseRetry = require('promise-retry')
-const { transaction, hexPrefix } = require('@omisego/omg-js-util')
+const { transaction } = require('@omisego/omg-js-util')
 const BN = require('bn.js')
-
-async function selectUtxos (childChain, utxos, amount, currency, feeCurrency) {
-  const fees = (await childChain.getFees())['1']
-  const { amount: feeEthAmountWei } = fees.find(f => f.currency === feeCurrency)
-
-  // Filter by desired currency and sort in descending order
-  const sorted = utxos
-    .filter(utxo => utxo.currency.toLowerCase() === currency.toLowerCase())
-    .sort((a, b) => new BN(b.amount).sub(new BN(a.amount)))
-
-  if (sorted) {
-    const selected = []
-    const currentBalance = new BN(0)
-    for (let i = 0; i < Math.min(sorted.length, 4); i++) {
-      selected.push(sorted[i])
-      currentBalance.iadd(new BN(sorted[i].amount))
-      const expectedTotalIncludeFee = new BN(amount).add(new BN(feeEthAmountWei))
-      if (currency === feeCurrency && currentBalance.gte(expectedTotalIncludeFee)) {
-        break
-      } else if (currentBalance.gte(new BN(amount))) {
-        break
-      }
-    }
-    if (currency !== feeCurrency) {
-      const ethUtxos = utxos.find(
-        utxo => utxo.currency.toLowerCase() === feeCurrency.toLowerCase()
-      )
-      selected.push(ethUtxos)
-    }
-    return selected
-  }
-}
 
 function waitForBalance (childChain, address, currency, callback) {
   return promiseRetry(async (retry, number) => {
@@ -70,92 +38,39 @@ function waitForBalance (childChain, address, currency, callback) {
   })
 }
 
-async function sendAndWait (childChain, from, to, amount, currency, feeCurrency, privateKey, expectedBalance, verifyingContract) {
-  const ret = await send(childChain, from, to, amount, currency, feeCurrency, privateKey, verifyingContract)
+async function send ({ childChain, from, fromPK, to, amount, currency, feeCurrency }) {
+  const transferAmount = new BN(amount)
+
+  const payments = [{
+    owner: to,
+    currency,
+    amount: transferAmount
+  }]
+
+  const createdTxn = await childChain.createTransaction({
+    owner: from,
+    payments,
+    fee: { currency: feeCurrency },
+    metadata: 'Happy Birthday Kasima'
+  })
+
+  // type/sign/build/submit
+  const typedData = transaction.getTypedData(createdTxn.transactions[0], childChain.plasmaContractAddress)
+  const privateKeys = new Array(createdTxn.transactions[0].inputs.length).fill(fromPK)
+  const signatures = childChain.signTransaction(typedData, privateKeys)
+  const signedTxn = childChain.buildSignedTransaction(typedData, signatures)
+  return childChain.submitTransaction(signedTxn)
+}
+
+async function sendAndWait (childChain, from, to, amount, currency, feeCurrency, fromPK, expectedBalance) {
+  const ret = await send({ childChain, from, fromPK, to, amount, currency, feeCurrency })
   const expectedBn = new BN(expectedBalance)
   await waitForBalance(childChain, to, currency, balance => new BN(balance.amount).eq(expectedBn))
   return ret
 }
 
-async function createTx (childChain, from, to, amount, currency, feeCurrency, fromPrivateKey, verifyingContract) {
-  if (amount <= 0) {
-    return
-  }
-
-  const utxos = await childChain.getUtxos(from)
-  const utxosToSpend = await selectUtxos(childChain, utxos, amount, currency, feeCurrency, true)
-  if (!utxosToSpend || utxosToSpend.length === 0) {
-    throw new Error(`Not enough funds in ${from} to cover ${amount} ${currency}`)
-  }
-
-  // Construct the tx body
-  const txBody = {
-    inputs: utxosToSpend,
-    outputs: [{
-      outputType: 1,
-      outputGuard: to,
-      currency,
-      amount
-    }]
-  }
-
-  const fees = (await childChain.getFees())['1']
-  const { amount: feeAmount } = fees.find(f => f.currency.toLowerCase() === feeCurrency.toLowerCase())
-
-  const utxoAmount = new BN(utxosToSpend.find(utxo => utxo.currency.toLowerCase() === currency.toLowerCase()).amount)
-  const feeUtxoAmount = new BN(utxosToSpend.find(utxo => utxo.currency.toLowerCase() === feeCurrency.toLowerCase()).amount)
-  const isFeeCurrency = currency.toLowerCase() === feeCurrency.toLowerCase()
-
-  if (!isFeeCurrency) {
-    // Need to add a 'change' output
-    if (utxoAmount.gt(new BN(amount))) {
-      const CHANGE_AMOUNT = utxoAmount.sub(new BN(amount))
-      txBody.outputs.push({
-        outputType: 1,
-        outputGuard: from,
-        currency,
-        amount: CHANGE_AMOUNT
-      })
-    }
-
-    const CHANGE_AMOUNT_FEE = feeUtxoAmount.sub(new BN(feeAmount))
-
-    txBody.outputs.push({
-      outputType: 1,
-      outputGuard: from,
-      currency: feeCurrency,
-      amount: CHANGE_AMOUNT_FEE
-    })
-  } else {
-    const totalDeduct = new BN(amount).add(new BN(feeAmount))
-    if (utxoAmount.gt(totalDeduct)) {
-      const CHANGE_AMOUNT = utxoAmount.sub(new BN(amount)).sub(new BN(feeAmount))
-      txBody.outputs.push({
-        outputType: 1,
-        outputGuard: from,
-        currency,
-        amount: CHANGE_AMOUNT
-      })
-    }
-  }
-
-  const privateKeys = new Array(utxosToSpend.length).fill(fromPrivateKey)
-  const typedData = transaction.getTypedData(txBody, verifyingContract)
-  const signatures = childChain.signTransaction(typedData, privateKeys)
-
-  return childChain.buildSignedTransaction(typedData, signatures)
-}
-
-async function send (childChain, from, to, amount, currency, feeCurrency, fromPrivateKey, verifyingContract) {
-  const signedTx = await createTx(childChain, from, to, amount, currency, feeCurrency, fromPrivateKey, verifyingContract)
-  const result = await childChain.submitTransaction(signedTx)
-  return { result, txbytes: hexPrefix(signedTx) }
-}
-
 module.exports = {
   waitForBalance,
-  send,
-  createTx,
   sendAndWait,
-  selectUtxos
+  send
 }

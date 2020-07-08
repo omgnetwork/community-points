@@ -20,12 +20,24 @@ const childChain = new ChildChain({
   plasmaContractAddress: process.env.OMG_PLASMA_CONTRACT
 })
 
+const ETH = '0x0000000000000000000000000000000000000000'
+
 async function initFaucet () {
   // Init the faucet
   // Deposit fee token
-  const FAUCET_FEE_TOPUP = 1000000
+  const FAUCET_FEE_TOPUP = new BN(6000000000000000).muln(20)
   const FAUCET_SPEND_TOPUP = 100
 
+  if (feeToken !== ETH) {
+    await rootChain.approveToken({
+      erc20Address: feeToken,
+      amount: FAUCET_FEE_TOPUP,
+      txOptions: {
+        from: faucetAddress,
+        privateKey: faucetPrivateKey
+      }
+    })
+  }
   await rootChain.deposit({
     amount: FAUCET_FEE_TOPUP,
     currency: feeToken,
@@ -73,16 +85,16 @@ describe('relay-tx integration test', () => {
 
     // create and fund feepayer account with fee token
     this.feeRelayer = web3.eth.accounts.create()
+    const feeAmount = new BN(6000000000000000).muln(2)
     await helper.sendAndWait(
       childChain,
       faucetAddress,
       this.feeRelayer.address,
-      1000,
+      feeAmount,
       feeToken,
       feeToken,
       faucetPrivateKey,
-      1000,
-      childChain.plasmaContractAddress
+      feeAmount
     )
 
     // create and fund alice account with spend token
@@ -95,8 +107,7 @@ describe('relay-tx integration test', () => {
       spendToken,
       feeToken,
       faucetPrivateKey,
-      10,
-      childChain.plasmaContractAddress
+      10
     )
 
     // create bob account
