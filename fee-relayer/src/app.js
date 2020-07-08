@@ -41,6 +41,7 @@ app.use(expressLogger)
 app.post('/create-relayed-tx', async (req, res) => {
   try {
     // TODO validate body params
+    logger.info(`/create-relayed-tx: from ${req.body.utxos[0].owner}, to ${req.body.to}, amount ${req.body.amount}`)
     const tx = await relayTx.create(
       childChain,
       req.body.utxos,
