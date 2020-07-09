@@ -63,37 +63,41 @@ function Transactions (): JSX.Element {
               ].join(' ')}
               alt='arrow'
             />
+
             <div className={styles.data}>
-              <div className={styles.direction}>
-                {isIncoming
-                  ? 'Received'
-                  : 'Sent'
-                }
-              </div>
-              <div className={styles.info}>
-                <div
-                  className={[
-                    styles.status,
-                    transaction.status === 'Pending' ? styles.pending : ''
-                  ].join(' ')}
-                >
-                  {transaction.status === 'Pending' ? 'Pending' : 'Confirmed'}
-                </div>
-                <div className={styles.address}>
+              <div className={styles.row}>
+                <div className={styles.direction}>
                   {isIncoming
-                    ? truncate(transaction.sender, 6, 4, '...')
-                    : truncate(transaction.recipient, 6, 4, '...')
+                    ? 'Received'
+                    : 'Sent'
                   }
                 </div>
+                <div className={styles.rawAmount}>
+                  {`${logAmount(transaction.amount, transaction.decimals)} ${transaction.symbol}`}
+                </div>
               </div>
-            </div>
 
-            <div className={styles.amounts}>
-              <div className={styles.rawAmount}>
-                {`${logAmount(transaction.amount, transaction.decimals)} ${transaction.symbol}`}
-              </div>
-              <div className={styles.timestamp}>
-                {unix(transaction.timestamp).format('lll')}
+              <div className={styles.row}>
+                <div className={styles.info}>
+                  <div
+                    className={[
+                      styles.status,
+                      transaction.status === 'Pending' ? styles.pending : ''
+                    ].join(' ')}
+                  >
+                    {transaction.status === 'Pending' ? 'Pending' : 'Confirmed'}
+                  </div>
+                  <div className={styles.address}>
+                    {isIncoming
+                      ? truncate(transaction.sender, 6, 4, '...')
+                      : truncate(transaction.recipient, 6, 4, '...')
+                    }
+                  </div>
+                </div>
+
+                <div className={styles.timestamp}>
+                  {unix(transaction.timestamp).format('lll')}
+                </div>
               </div>
             </div>
           </div>
