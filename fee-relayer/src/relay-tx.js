@@ -22,9 +22,8 @@ let feeInfo = null
 async function getFeeInfo (childChain, currency) {
   if (!feeInfo) {
     const fees = (await childChain.getFees())['1']
-    feeInfo = fees.find(fee => fee.currency === currency)
+    feeInfo = fees.find(fee => fee.currency.toLowerCase() === currency.toLowerCase())
   }
-
   return feeInfo
 }
 

@@ -3,7 +3,7 @@ import BN from 'bn.js';
 import { ISession, ITransaction, ISubReddit } from 'interfaces';
 
 import * as omgService from 'app/services/omgService';
-import * as rpcService from 'app/services/rpcService';
+import * as transportService from 'app/services/transportService';
 import * as messageService from 'app/services/messageService';
 import * as locationService from 'app/services/locationService';
 
@@ -157,7 +157,8 @@ export async function transfer ({
   }
 
   // post to /create-relayed-tx { utxos, amount, to }
-  const relayedTx = await rpcService.post({
+  const relayedTx = await transportService.post({
+    rpc: false,
     url: `${subReddit.feeRelay}/create-relayed-tx`,
     body: {
       utxos: spendableUtxos,
@@ -172,7 +173,8 @@ export async function transfer ({
     signature = await signTypedData(account, relayedTx.typedData);
   } catch (error) {
     // if error or user cancels sign, post to /cancel-relayed-tx
-    await rpcService.post({
+    await transportService.post({
+      rpc: false,
       url: `${subReddit.feeRelay}/cancel-relayed-tx`,
       body: { tx: relayedTx.tx }
     });
@@ -186,7 +188,8 @@ export async function transfer ({
   const signatures = new Array(clientInputs.length).fill(signature);
 
   // post to /submit-relayed-tx { typedData, signatures }
-  const submittedTransaction = await rpcService.post({
+  const submittedTransaction = await transportService.post({
+    rpc: false,
     url: `${subReddit.feeRelay}/submit-relayed-tx`,
     body: {
       typedData: relayedTx.typedData,

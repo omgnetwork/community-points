@@ -1,26 +1,36 @@
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import JSONBigNumber from 'omg-json-bigint';
 
 function getTransformResponse () {
   return [(data) => data];
 }
 
-async function parseResponse (res) {
+function parseResponse (res: AxiosResponse): any {
   let data;
   try {
     data = JSONBigNumber.parse(res.data);
   } catch (err) {
     throw new Error(`Unable to parse response from server: ${err}`);
   }
+
   if (data.success) {
     return data.data;
   }
   throw new Error(data.data);
 }
 
-export async function post ({ url, body }) {
-  body.jsonrpc = body.jsonrpc || '2.0';
-  body.id = body.id || 0;
+interface IPost {
+  url: string,
+  body: {[ key: string]: any },
+  rpc?: boolean
+}
+
+export async function post ({ url, body, rpc = true }: IPost): Promise<any> {
+  if (rpc) {
+    body.jsonrpc = body.jsonrpc || '2.0';
+    body.id = body.id || 0;
+  }
+
   try {
     const options = {
       method: 'POST',

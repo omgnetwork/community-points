@@ -1,17 +1,17 @@
-import * as rpcApi from 'app/services/rpcService';
+import * as transportService from 'app/services/transportService';
 import { hash1 } from 'app/util/artifacts';
 
 import config from 'config';
 
 export async function getUtxos (address: string) {
-  return rpcApi.post({
+  return transportService.post({
     url: `${config.watcherUrl}/account.get_utxos`,
     body: { address }
   });
 }
 
 export async function getTransactions (address: string) {
-  return rpcApi.post({
+  return transportService.post({
     url: `${config.watcherUrl}/transaction.all`,
     body: { address }
   });
@@ -22,7 +22,7 @@ export function checkHash (): void {
 }
 
 export async function getPointBalance (address, currency): Promise<string> {
-  const childchainBalances = await rpcApi.post({
+  const childchainBalances = await transportService.post({
     url: `${config.watcherUrl}/account.get_balance`,
     body: { address }
   });
