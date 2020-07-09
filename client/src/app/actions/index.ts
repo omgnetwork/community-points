@@ -10,21 +10,15 @@ export function getSession () {
 
 export function transfer ({
   amount,
-  currency,
-  symbol,
-  decimals,
   recipient,
-  metadata
+  subReddit
 }) {
   return createAction(
     'TRANSACTION/CREATE',
     () => networkService.transfer({
       amount,
-      currency,
       recipient,
-      symbol,
-      decimals,
-      metadata
+      subReddit
     })
   );
 }

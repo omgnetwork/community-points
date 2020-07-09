@@ -21,7 +21,8 @@ export interface ISubReddit {
   token: string,
   name: string,
   symbol: string,
-  decimals: number
+  decimals: number,
+  feeRelay: string
 }
 
 export interface ISession {

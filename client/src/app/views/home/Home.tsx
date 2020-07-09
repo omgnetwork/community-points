@@ -48,10 +48,7 @@ function Home (): JSX.Element {
       const result = await dispatch(transfer({
         amount: powAmount(amount, session.subReddit.decimals),
         recipient,
-        currency: session.subReddit.token,
-        symbol: session.subReddit.symbol,
-        decimals: session.subReddit.decimals,
-        metadata: `${session.subReddit.symbol} community points`
+        subReddit: session.subReddit
       }));
 
       if (result) {
