@@ -20,20 +20,19 @@ const TRANSACTIONS_PER_PAGE = 4;
 
 function Transactions (): JSX.Element {
   const [ visibleTransactions, setVisibleTransactions ]: [ ITransaction[], any ] = useState([]);
+  const [ visibleCount, setVisibleCount ]: [ number, any ] = useState(TRANSACTIONS_PER_PAGE);
+
   const allTransactions: ITransaction[] = useSelector(selectTransactions);
 
   useEffect(() => {
     if (allTransactions.length) {
-      const firstSet = allTransactions.slice(0, TRANSACTIONS_PER_PAGE);
-      setVisibleTransactions(firstSet);
+      const visibleSet = allTransactions.slice(0, visibleCount);
+      setVisibleTransactions(visibleSet);
     }
-  }, [allTransactions]);
+  }, [ visibleCount, allTransactions ]);
 
   function handleLoadMore (): void {
-    const currentIndex: number = visibleTransactions.length;
-    const nextSet = allTransactions.slice(currentIndex, currentIndex + TRANSACTIONS_PER_PAGE);
-    const newSet = [ ...visibleTransactions, ...nextSet ];
-    setVisibleTransactions(newSet);
+    setVisibleCount(visibleCount => visibleCount + TRANSACTIONS_PER_PAGE);
   }
 
   function handleTransactionClick (hash: string): void {
