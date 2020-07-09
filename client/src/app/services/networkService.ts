@@ -1,4 +1,5 @@
 import BN from 'bn.js';
+import { get } from 'lodash';
 
 import { ISession, ITransaction, ISubReddit } from 'interfaces';
 
@@ -83,6 +84,13 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
     // - if one of the inputs owner and currency match it is outgoing, else incoming
     const isOutgoing = transaction.inputs.some(matchingCurrencyAndOwner);
 
+    // - check if merge transaction, if so ignore this tx
+    // - if outgoing and only user in outputs
+    const allUserOutputs = transaction.outputs.every(i => i.owner.toLowerCase() === user);
+    if (isOutgoing && allUserOutputs) {
+      return null;
+    }
+
     // - for outgoing, sum amount of currency going to recipient in outputs
     let amount = '0';
     let recipient;
@@ -91,7 +99,7 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
     if (isOutgoing) {
       sender = user;
       const recipientOutputs = transaction.outputs.filter(matchingCurrencyAndDifferentOwner);
-      recipient = recipientOutputs[0].owner; // naive assign recipient from first output
+      recipient = get(recipientOutputs, '[0].owner', 'N/A'); // naive assign recipient from first output
 
       const bnAmount = recipientOutputs.reduce((acc, curr) => {
         return acc.add(new BN(curr.amount));
@@ -109,7 +117,7 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
       amount = bnAmount.toString();
 
       const senderInputs = transaction.inputs.filter(matchingCurrencyAndDifferentOwner);
-      sender = senderInputs[0].owner; // naive assign sender from first input
+      sender = get(senderInputs, '[0].owner', 'N/A'); // naive assign sender from first input
     }
 
     return {
