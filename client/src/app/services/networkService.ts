@@ -171,14 +171,12 @@ export async function transfer ({
   try {
     signature = await signTypedData(account, relayedTx.typedData);
   } catch (error) {
-    // if user cancels sign, post to /cancel-relayed-tx
-    if (error.message.includes('User denied')) {
-      await rpcService.post({
-        url: `${subReddit.feeRelay}/cancel-relayed-tx`,
-        body: { tx: relayedTx.tx }
-      });
-      throw Error('User denied transaction signature.');
-    }
+    // if error or user cancels sign, post to /cancel-relayed-tx
+    await rpcService.post({
+      url: `${subReddit.feeRelay}/cancel-relayed-tx`,
+      body: { tx: relayedTx.tx }
+    });
+    throw error;
   }
 
   // create array of sigs based on how many inputs in typed data from client
