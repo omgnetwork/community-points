@@ -20,7 +20,9 @@ definitions:
       - txindex
     properties:
       amount:
-        type: object
+        oneOf:
+          - type: object
+          - type: integer
       blknum:
         type: integer
       currency:
@@ -42,7 +44,9 @@ definitions:
         items:
           $ref: "#/definitions/utxo"
       amount:
-        type: object
+        oneOf:
+          - type: object
+          - type: integer
       to:
         type: string
 
