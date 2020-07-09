@@ -19,9 +19,12 @@ const relayTx = require('./relay-tx')
 const signer = require('./signer')
 const { ChildChain } = require('@omisego/omg-js')
 const express = require('express')
-const bodyParser = require('body-parser')
+const bodyParser = require('omg-body-parser')
+const JSONBigNumber = require('omg-json-bigint')
+const createMiddleware = require('@apidevtools/swagger-express-middleware');
 const pino = require('pino')
 const expressPino = require('express-pino-logger')
+const BN = require('bn.js')
 
 const childChain = new ChildChain({
   watcherUrl: process.env.OMG_WATCHER_URL,
@@ -38,51 +41,60 @@ const logger = pino({ level: process.env.LOG_LEVEL || 'info' })
 const expressLogger = expressPino({ logger })
 app.use(expressLogger)
 
-app.post('/create-relayed-tx', async (req, res) => {
-  try {
-    // TODO validate body params
-    logger.info(`/create-relayed-tx: from ${req.body.utxos[0].owner}, to ${req.body.to}, amount ${req.body.amount}`)
-    const tx = await relayTx.create(
-      childChain,
-      req.body.utxos,
-      req.body.amount,
-      spendableToken,
-      req.body.to,
-      signer.getAddress(),
-      feeToken
-    )
-    res.send(tx)
-  } catch (err) {
-    res.status(500)
-    res.send(err.toString())
-  }
-})
+createMiddleware('./swagger/swagger.yaml', app, function (err, middleware) {
+  app.use(
+    middleware.files(),
+    middleware.metadata(),
+    middleware.parseRequest(),
+    middleware.validateRequest(),
+  );
 
-app.post('/submit-relayed-tx', async (req, res) => {
-  try {
-    // TODO validate body params
-    const result = await relayTx.submit(
-      childChain,
-      req.body.typedData,
-      req.body.signatures,
-      signer.sign
-    )
-    res.send(result)
-  } catch (err) {
-    res.status(500)
-    res.send(err.toString())
-  }
-})
+  app.post('/create-relayed-tx', async (req, res) => {
+    try {
+      logger.info(`/create-relayed-tx: from ${req.body.utxos[0].owner}, to ${req.body.to}, amount ${req.body.amount}`)
+      const tx = await relayTx.create(
+        childChain,
+        req.body.utxos,
+        req.body.amount,
+        spendableToken,
+        req.body.to,
+        signer.getAddress(),
+        feeToken
+      )
+      res.type('application/json')
+      res.send(JSONBigNumber.stringify(tx, null, 2))
+    } catch (err) {
+      res.status(500)
+      res.send(err.toString())
+    }
+  })
 
-app.post('/cancel-relayed-tx', async (req, res) => {
-  try {
-    // TODO validate body params
-    relayTx.cancel(req.body.tx)
-    res.send('')
-  } catch (err) {
-    res.status(500)
-    res.send(err.toString())
-  }
-})
+  app.post('/submit-relayed-tx', async (req, res) => {
+    try {
+      // TODO validate body params
+      const result = await relayTx.submit(
+        childChain,
+        req.body.typedData,
+        req.body.signatures,
+        signer.sign
+      )
+      res.send(result)
+    } catch (err) {
+      res.status(500)
+      res.send(err.toString())
+    }
+  })
 
-app.listen(port, () => logger.info('Server running on port %d', port))
+  app.post('/cancel-relayed-tx', async (req, res) => {
+    try {
+      // TODO validate body params
+      relayTx.cancel(req.body.tx)
+      res.send('')
+    } catch (err) {
+      res.status(500)
+      res.send(err.toString())
+    }
+  })
+
+  app.listen(port, () => logger.info('Server running on port %d', port))
+});
