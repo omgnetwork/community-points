@@ -22,7 +22,10 @@ This project is a Chrome extension used to transfer Reddit community points dire
 
 #### Installation
 
-- in a Chrome based browser (Brave or Chrome), open Extensions in `Developer mode`, and click `Load unpacked` pointing to the distribution
+- Find the latest version from the [releases page](https://github.com/omgnetwork/community-points/releases)
+- Download and unzip the `Release` bundle found in the `Assets` section
+- In a Chrome based browser (Brave or Chrome), open Extensions in `Developer mode`, and click `Load unpacked` and select the folder you just unzipped
+- Visit a supported subreddit and transfer!
 
 ### SubReddit Support
 
