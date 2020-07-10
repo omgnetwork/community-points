@@ -9,10 +9,11 @@ import Input from 'app/components/input/Input';
 import PointBalance from 'app/components/pointbalance/PointBalance';
 import Tabs from 'app/components/tabs/Tabs';
 
-import { ISession } from 'interfaces';
-import { transfer, getSession, getTransactions } from 'app/actions';
+import { ISession, IUserAddress } from 'interfaces';
+import { transfer, getSession, getTransactions, getUserAddressMap } from 'app/actions';
 import { selectLoading } from 'app/selectors/loadingSelector';
 import { selectSession } from 'app/selectors/sessionSelector';
+import { selectUserAddressMap } from 'app/selectors/addressSelector';
 import { selectIsPendingTransaction } from 'app/selectors/transactionSelector';
 import * as omgService from 'app/services/omgService';
 
@@ -33,10 +34,12 @@ function Home (): JSX.Element {
   const transferLoading: boolean = useSelector(selectLoading(['TRANSACTION/CREATE']));
   const session: ISession = useSelector(selectSession);
   const isPendingTransaction: boolean = useSelector(selectIsPendingTransaction);
+  const userAddressMap: IUserAddress[] = useSelector(selectUserAddressMap);
 
   useEffect(() => {
     omgService.checkHash();
-  }, []);
+    dispatch(getUserAddressMap());
+  }, [dispatch]);
 
   useInterval(() => {
     batch(() => {
@@ -96,6 +99,9 @@ function Home (): JSX.Element {
       <div>Loading...</div>
     );
   }
+
+  // TODO: pass to dropdown component
+  console.log(userAddressMap);
 
   return (
     <div className={styles.Home}>

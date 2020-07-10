@@ -47,5 +47,6 @@ export async function get ({ url }): Promise<any> {
     method: 'GET',
     url
   };
-  return axios(options as any);
+  const result = await axios(options as any);
+  return result.data;
 };

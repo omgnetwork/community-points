@@ -54,6 +54,5 @@ export async function getUserAddressMap (): Promise<IUserAddress[]> {
   const rawData = await transportService.get({
     url: `${config.userAddressUrl}.json`
   });
-
   return parseThreadJSON(rawData);
 }
