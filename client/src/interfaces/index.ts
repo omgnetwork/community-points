@@ -30,3 +30,9 @@ export interface ISession {
   balance: string,
   subReddit: ISubReddit
 }
+
+export interface IUserAddress {
+  author: string,
+  address: string,
+  created: number
+}

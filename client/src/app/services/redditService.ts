@@ -3,9 +3,10 @@ import { get, find } from 'lodash';
 import * as transportService from 'app/services/transportService';
 import isAddress from 'app/util/isAddress';
 
+import { IUserAddress } from 'interfaces';
 import config from 'config';
 
-export function parseThreadJSON (json) {
+export function parseThreadJSON (json): IUserAddress[] {
   const rawComments = get(json, '[1].data.children', []);
 
   let userAddressMap = [];
@@ -49,12 +50,10 @@ export function parseThreadJSON (json) {
   return userAddressMap;
 }
 
-export async function getUserAddressMap (): Promise<any> {
+export async function getUserAddressMap (): Promise<IUserAddress[]> {
   const rawData = await transportService.get({
     url: `${config.userAddressUrl}.json`
   });
-  const userAddressMap = parseThreadJSON(rawData);
 
-  // persist map to redux
-  return userAddressMap;
+  return parseThreadJSON(rawData);
 }

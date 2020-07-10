@@ -13,7 +13,7 @@ function makeMock (comments: Object[]) {
 }
 
 describe('redditService', () => {
-  test('it should parse full raw json correctly', () => {
+  test('it should parse full raw json correctly disregarding spam', () => {
     const result = parseThreadJSON(mockData);
     const expected = [
       {
