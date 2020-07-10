@@ -87,7 +87,6 @@ module.exports = {
 
 function totalAmount (utxos) {
   return utxos.reduce((prev, curr) => {
-    const currentAmount = new BN(curr.amount.toString());
-    return prev.add(currentAmount)
+    return prev.add(new BN(curr.amount))
   }, new BN(0))
 }
