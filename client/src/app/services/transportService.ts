@@ -31,17 +31,21 @@ export async function post ({ url, body, rpc = true }: IPost): Promise<any> {
     body.id = body.id || 0;
   }
 
-  try {
-    const options = {
-      method: 'POST',
-      url: url,
-      headers: { 'Content-Type': 'application/json' },
-      data: JSONBigNumber.stringify(body),
-      transformResponse: getTransformResponse()
-    };
-    const res = await axios.request(options as any);
-    return parseResponse(res);
-  } catch (err) {
-    throw new Error(err);
-  }
+  const options = {
+    method: 'POST',
+    url,
+    headers: { 'Content-Type': 'application/json' },
+    data: JSONBigNumber.stringify(body),
+    transformResponse: getTransformResponse()
+  };
+  const res = await axios.request(options as any);
+  return parseResponse(res);
+};
+
+export async function get ({ url }): Promise<any> {
+  const options = {
+    method: 'GET',
+    url
+  };
+  return axios(options as any);
 };
