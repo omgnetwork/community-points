@@ -66,20 +66,19 @@ createMiddleware('./swagger/swagger.yaml', app, function (err, middleware) {
       res.type('application/json')
       res.send({
         success: true,
-        data: JSONBigNumber.stringify(tx, null, 2))
+        data: JSONBigNumber.stringify(tx)
       })
     } catch (err) {
       res.status(500)
       res.send({
         success: false,
-        data: err.toString())
+        data: err.toString()
       })
     }
   })
 
   app.post('/submit-relayed-tx', async (req, res) => {
     try {
-      // TODO validate body params
       const result = await relayTx.submit(
         childChain,
         req.body.typedData,
@@ -94,14 +93,13 @@ createMiddleware('./swagger/swagger.yaml', app, function (err, middleware) {
       res.status(500)
       res.send({
         success: false,
-        data: err.toString())
+        data: err.toString()
       })
     }
   })
 
   app.post('/cancel-relayed-tx', async (req, res) => {
     try {
-      // TODO validate body params
       relayTx.cancel(req.body.tx)
       res.send({
         success: true,
@@ -111,7 +109,7 @@ createMiddleware('./swagger/swagger.yaml', app, function (err, middleware) {
       res.status(500)
       res.send({
         success: false,
-        data: err.toString())
+        data: err.toString()
       })
     }
   })

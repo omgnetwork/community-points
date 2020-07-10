@@ -1,5 +1,6 @@
 import BN from 'bn.js';
 import { get } from 'lodash';
+import JSONBigNumber from 'omg-json-bigint';
 
 import { ISession, ITransaction, ISubReddit } from 'interfaces';
 
@@ -102,7 +103,7 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
       recipient = get(recipientOutputs, '[0].owner', 'N/A'); // naive assign recipient from first output
 
       const bnAmount = recipientOutputs.reduce((acc, curr) => {
-        return acc.add(new BN(curr.amount));
+        return acc.add(new BN(curr.amount.toString()));
       }, new BN(0));
       amount = bnAmount.toString();
     }
@@ -112,7 +113,7 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
       const bnAmount = transaction.outputs
         .filter(matchingCurrencyAndOwner)
         .reduce((acc, curr) => {
-          return acc.add(new BN(curr.amount));
+          return acc.add(new BN(curr.amount.toString()));
         }, new BN(0));
       amount = bnAmount.toString();
 
@@ -151,21 +152,21 @@ export async function transfer ({
   const allUtxos = await omgService.getUtxos(account);
   const subRedditUtxos = allUtxos
     .filter(utxo => utxo.currency.toLowerCase() === subReddit.token.toLowerCase())
-    .sort((a, b) => new BN(b.amount).sub(new BN(a.amount)));
+    .sort((a, b) => new BN(b.amount.toString()).sub(new BN(a.amount.toString())));
 
   const spendableUtxos = [];
   for (const utxo of subRedditUtxos) {
     const spendableSum = spendableUtxos.reduce((prev, curr) => {
-      return prev.add(new BN(curr.amount));
+      return prev.add(new BN(curr.amount.toString()));
     }, new BN(0));
-    if (spendableSum.gte(new BN(amount))) {
+    if (spendableSum.gte(new BN(amount.toString()))) {
       break;
     }
     spendableUtxos.push(utxo);
   }
 
   // post to /create-relayed-tx { utxos, amount, to }
-  const relayedTx = await transportService.post({
+  const _relayedTx = await transportService.post({
     rpc: false,
     url: `${subReddit.feeRelay}/create-relayed-tx`,
     body: {
@@ -174,6 +175,7 @@ export async function transfer ({
       to: recipient
     }
   });
+  const relayedTx = JSONBigNumber.parse(_relayedTx);
 
   // sign returned typed data and get sig
   let signature;

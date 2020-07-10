@@ -23,6 +23,7 @@ definitions:
         oneOf:
           - type: object
           - type: integer
+          - type: string
       blknum:
         type: integer
       currency:
@@ -33,7 +34,7 @@ definitions:
         type: string
       txindex:
         type: integer
-  body:
+  create-relayed-tx-body:
     required:
       - utxos
       - amount
@@ -47,8 +48,26 @@ definitions:
         oneOf:
           - type: object
           - type: integer
+          - type: string
       to:
         type: string
+  submit-relayed-tx-body:
+    required:
+      - typedData
+      - signatures
+    properties:
+      typedData:
+        type: object
+      signatures:
+        type: array
+        items:
+          type: string
+  cancel-relayed-tx-body:
+    required:
+      - tx
+    properties:
+      tx:
+        type: object
 
 
 paths:
@@ -60,7 +79,33 @@ paths:
           in: body
           required: true
           schema:
-            $ref: "#/definitions/body"
+            $ref: "#/definitions/create-relayed-tx-body"
       responses:
         200:
           description: Returns the transaction
+
+  /submit-relayed-tx:
+    post:
+      description: Submits a transaction
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/submit-relayed-tx-body"
+      responses:
+        200:
+          description: Returns the submitted transaction receipt
+
+  /cancel-relayed-tx:
+    post:
+      description: Cancels a transaction
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/cancel-relayed-tx-body"
+      responses:
+        200:
+          description: Returns true on success
