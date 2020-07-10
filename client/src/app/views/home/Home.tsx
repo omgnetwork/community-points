@@ -13,6 +13,7 @@ import { ISession } from 'interfaces';
 import { transfer, getSession, getTransactions } from 'app/actions';
 import { selectLoading } from 'app/selectors/loadingSelector';
 import { selectSession } from 'app/selectors/sessionSelector';
+import { selectIsPendingTransaction } from 'app/selectors/transactionSelector';
 import * as omgService from 'app/services/omgService';
 
 import Transactions from 'app/views/transactions/Transactions';
@@ -31,6 +32,7 @@ function Home (): JSX.Element {
 
   const transferLoading: boolean = useSelector(selectLoading(['TRANSACTION/CREATE']));
   const session: ISession = useSelector(selectSession);
+  const isPendingTransaction: boolean = useSelector(selectIsPendingTransaction);
 
   useEffect(() => {
     omgService.checkHash();
@@ -64,6 +66,9 @@ function Home (): JSX.Element {
   }
 
   function disableTransfer (): boolean {
+    if (isPendingTransaction) {
+      return true;
+    }
     if (!session || !recipient || !amount) {
       return true;
     };
@@ -110,6 +115,7 @@ function Home (): JSX.Element {
         options={[ 'Transfer', 'History' ]}
         selected={view}
         onSelect={setView}
+        blockTransfer={isPendingTransaction}
       />
 
       {(view as any) === 'Transfer' && (

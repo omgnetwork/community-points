@@ -6,14 +6,16 @@ interface TabsProps {
   options: string[],
   selected: string,
   onSelect: (selected: string) => void,
-  className?: string
+  className?: string,
+  blockTransfer: boolean
 }
 
 function Tabs ({
   options,
   selected,
   onSelect,
-  className
+  className,
+  blockTransfer
 }: TabsProps): JSX.Element {
   return (
     <div
@@ -27,9 +29,15 @@ function Tabs ({
           key={i}
           className={[
             styles.tab,
-            selected === i ? styles.selected : ''
+            selected === i ? styles.selected : '',
+            blockTransfer && i === 'Transfer' ? styles.disabled : ''
           ].join(' ')}
-          onClick={() => onSelect(i)}
+          onClick={() => {
+            if (blockTransfer && i === 'Transfer') {
+              return;
+            }
+            onSelect(i);
+          }}
         >
           {i}
         </div>
