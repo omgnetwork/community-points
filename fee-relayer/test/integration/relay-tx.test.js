@@ -13,7 +13,7 @@ const spendToken = process.env.TEST_SPEND_TOKEN
 const faucetAddress = process.env.TEST_FAUCET_ADDRESS
 const faucetPrivateKey = process.env.TEST_FAUCET_PK
 
-const web3 = new Web3(new Web3.providers.HttpProvider(process.env.TEST_ETH_NODE))
+const web3 = new Web3(new Web3.providers.HttpProvider(process.env.TEST_ETH_NODE), null, { transactionConfirmationBlocks: 1 })
 const rootChain = new RootChain({ web3, plasmaContractAddress: process.env.OMG_PLASMA_CONTRACT })
 const childChain = new ChildChain({
   watcherUrl: process.env.OMG_WATCHER_URL,

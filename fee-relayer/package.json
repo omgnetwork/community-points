@@ -9,17 +9,19 @@
     "integration-test": "mocha --timeout=0 test/integration"
   },
   "author": "",
-  "license": "ISC",
+  "license": "apache 2.0",
   "dependencies": {
+    "@apidevtools/swagger-express-middleware": "^4.0.0",
     "@omisego/omg-js": "^4.0.1-1.0.0",
     "bn.js": "^5.1.2",
-    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "eth-sig-util": "^2.5.3",
     "ethereumjs-util": "^7.0.2",
     "express": "^4.17.1",
     "express-pino-logger": "^5.0.0",
+    "omg-body-parser": "^1.19.0",
+    "omg-json-bigint": "^1.0.0",
     "pino": "^6.3.2"
   },
   "devDependencies": {
