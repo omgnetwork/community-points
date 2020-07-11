@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  * We will mint the point in L1 and distribute in L2.
  */
 contract SubredditPoint is ERC20, Ownable {
-    constructor() public ERC20("OMG Reddit Point", "ORP") {}
+    constructor() public ERC20("OMG Rock Point", "ROCK") {}
 
     function mint(address account, uint256 amount) onlyOwner public {
         ERC20._mint(account, amount);

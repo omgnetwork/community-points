@@ -28,7 +28,8 @@ contract Distribution {
         uint256 baseSupply;
     }
 
-    uint256 public constant PERCENT_PRECISION = 1000000;
+    // to simplify, use 100 instead of a more precise one
+    uint256 public constant PERCENT_PRECISION = 100;
 
     SubredditPoint public subredditPointContract;
     address public subredditOwner;
@@ -36,19 +37,22 @@ contract Distribution {
     uint256 public currentRound;
 
     // maps round number to the distributed data of points
-    mapping(uint256 => DistributionData) private distributionRounds;
+    mapping(uint256 => DistributionData) public distributionRounds;
 
     constructor(
-        address subredditPointContract_,
+        SubredditPoint subredditPointContract_,
         uint256 supplyDecayPercent_,
-        uint256 initialDistribution,
         address subredditOwner_
     ) public {
-        subredditPointContract = SubredditPoint(subredditPointContract_);
+        subredditPointContract = subredditPointContract_;
         supplyDecayPercent = supplyDecayPercent_;
         subredditOwner = subredditOwner_;
 
         currentRound = 0;
+
+    }
+
+    function initRound(uint256 initialDistribution) external {
         distribute(initialDistribution, initialDistribution);
     }
 
@@ -56,7 +60,9 @@ contract Distribution {
      * Different from original distribution contract, we passed in "burnedPoints" as an args here.
      * This is because it is not trivial to calculate the Layer2 burned point withouth waiting exit period.
      */
-    function advanceToRound(uint256 round, uint256 burnedPoints) external {
+    function advanceToNextRound(uint256 burnedPoints) external {
+        require(currentRound > 0, "Please call initRound to initialize the first round");
+
         DistributionData memory currentRoundDistribution = distributionRounds[currentRound];
 
         uint256 nextRoundDecrease = currentRoundDistribution.baseSupply.mul(supplyDecayPercent).div(PERCENT_PRECISION);
