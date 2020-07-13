@@ -1,0 +1,66 @@
+swagger: "2.0"
+info:
+  version: 1.0.0
+  title: Fee Relayer
+  description: Community Points Fee Relayer Service
+
+consumes:
+  - application/json
+produces:
+  - application/json
+
+definitions:
+  utxo:
+    required:
+      - amount
+      - blknum
+      - currency
+      - oindex
+      - owner
+      - txindex
+    properties:
+      amount:
+        oneOf:
+          - type: object
+          - type: integer
+      blknum:
+        type: integer
+      currency:
+        type: string
+      oindex:
+        type: integer
+      owner:
+        type: string
+      txindex:
+        type: integer
+  body:
+    required:
+      - utxos
+      - amount
+      - to
+    properties:
+      utxos:
+        type: array
+        items:
+          $ref: "#/definitions/utxo"
+      amount:
+        oneOf:
+          - type: object
+          - type: integer
+      to:
+        type: string
+
+
+paths:
+  /create-relayed-tx:
+    post:
+      description: Creates a transaction
+      parameters:
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/body"
+      responses:
+        200:
+          description: Returns the transaction
