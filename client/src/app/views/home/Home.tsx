@@ -1,10 +1,12 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import BigNumber from 'bignumber.js';
+import truncate from 'truncate-middle';
 import { useDispatch, useSelector, batch } from 'react-redux';
 
 import Address from 'app/components/address/Address';
 import Button from 'app/components/button/Button';
+import Select from 'app/components/select/Select';
 import Input from 'app/components/input/Input';
 import PointBalance from 'app/components/pointbalance/PointBalance';
 import Tabs from 'app/components/tabs/Tabs';
@@ -100,9 +102,6 @@ function Home (): JSX.Element {
     );
   }
 
-  // TODO: pass to dropdown component
-  console.log(userAddressMap);
-
   return (
     <div className={styles.Home}>
       <h1>{`r/${session.subReddit.name}`}</h1>
@@ -134,12 +133,18 @@ function Home (): JSX.Element {
             className={styles.input}
             suffix={session.subReddit.symbol}
           />
-          <Input
-            type='text'
-            value={recipient}
-            onChange={e => setRecipient(e.target.value)}
-            placeholder='Recipient'
+          <Select
             className={styles.input}
+            placeholder='Recipient'
+            value={recipient}
+            options={!!userAddressMap && userAddressMap.map(i => {
+              return {
+                value: i.address,
+                title: i.author,
+                detail: truncate(i.address, 6, 4, '...')
+              };
+            })}
+            onSelect={setRecipient}
           />
           <Button
             onClick={handleTransfer}

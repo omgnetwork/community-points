@@ -142,13 +142,13 @@ describe('redditService', () => {
     const result = parseThreadJSON(mock);
     expect(result).toEqual([
       {
-        address: '0xa013debd703e28af78c2ffd0264ef70f978c5465',
-        author: 'foo',
+        address: '0x434e2863a78752166ffd5ed883607cbaf74f3858',
+        author: 'bar',
         created: 3
       },
       {
-        address: '0x434e2863a78752166ffd5ed883607cbaf74f3858',
-        author: 'bar',
+        address: '0xa013debd703e28af78c2ffd0264ef70f978c5465',
+        author: 'foo',
         created: 3
       }
     ]);

@@ -1,0 +1,84 @@
+@import 'app/styles/colors';
+
+.Select {
+  cursor: pointer;
+
+  .field {
+    display: flex;
+    align-items: center;
+    position: relative;
+    height: 50px;
+    background-color: $white;
+    border-radius: 4px;
+    border: 1px solid $gray2;
+    padding: 0 20px;
+    color: $black;
+    transition: all 200ms ease-in-out;
+    box-sizing: border-box;
+    width: 100%;
+    &:focus {
+      border: 1px solid $orange;
+    }
+
+    .placeholder {
+      color: $gray4;
+      width: 100%;
+      height: 48px;
+      display: flex;
+      align-items: center;
+    }
+
+    .chevron {
+      position: absolute;
+      right: 10px;
+      top: 7px;
+      background-color: $white;
+      padding: 10px;
+      height: 7px;
+      box-sizing: border-box;
+    }
+
+    .dropdown {
+      position: absolute;
+      top: 54px;
+      left: -1px;
+      right: -1px;
+      max-height: 200px;
+      overflow-y: scroll;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0px 0px 29px -8px rgba(0,0,0,0.5);
+      border-radius: 4px;
+      padding: 5px 15px;
+      background-color: $white;
+    }  
+  }
+
+  .option {
+    height: 48px;
+    background-color: $white;
+    color: $black;
+    transition: all 200ms ease-in-out;
+    box-sizing: border-box;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    img {
+      margin-right: 10px;
+      width: 34px;
+      height: 34px;
+    }
+    .data {
+      display: flex;
+      flex-direction: column;
+      .title {
+        font-weight: bold;
+      }
+      .detail {
+        color: $gray4;
+      }
+    }
+  }
+}

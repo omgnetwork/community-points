@@ -1,4 +1,4 @@
-import { get, find } from 'lodash';
+import { get, find, orderBy } from 'lodash';
 
 import * as transportService from 'app/services/transportService';
 import isAddress from 'app/util/isAddress';
@@ -47,7 +47,9 @@ export function parseThreadJSON (json): IUserAddress[] {
     }
   }
 
-  return userAddressMap;
+  // sort addressmap
+  const sortedUserAddressMap = orderBy(userAddressMap, ['author'], ['asc']);
+  return sortedUserAddressMap;
 }
 
 export async function getUserAddressMap (): Promise<IUserAddress[]> {
