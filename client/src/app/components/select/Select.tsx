@@ -1,8 +1,8 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { find, get } from 'lodash';
 
-import omgcp_avatar from 'app/images/omgcp_avatar.png';
+import Option from 'app/components/option/Option';
 import omgcp_chevron from 'app/images/omgcp_chevron.svg';
 
 import * as styles from './Select.module.scss';
@@ -12,42 +12,6 @@ interface IOption {
   image?: string,
   title: string,
   detail: string
-}
-
-interface OptionProps {
-  title: string,
-  detail: string,
-  image: string,
-  onClick?: () => void,
-  selected?: boolean
-}
-
-function Option ({
-  onClick,
-  title,
-  detail,
-  image,
-  selected
-}: OptionProps): JSX.Element {
-  return (
-    <div
-      onClick={onClick}
-      className={[
-        styles.option,
-        selected ? styles.selected : ''
-      ].join(' ')}
-    >
-      <img src={image || omgcp_avatar} alt='avatar' />
-      <div className={styles.data}>
-        <div className={styles.title}>
-          {title}
-        </div>
-        <div className={styles.detail}>
-          {detail}
-        </div>
-      </div>
-    </div>
-  );
 }
 
 interface SelectProps {
@@ -65,6 +29,8 @@ function Select ({
   options = [],
   className
 }: SelectProps): JSX.Element {
+  const selectNode = useRef(null);
+
   const [ isOpen, setIsOpen ]: [ boolean, any ] = useState(false);
   const [ inputValue, setInputValue ]: [ string, any ] = useState('');
   const [ filteredOptions, setFilteredOptions ]: [ IOption[], any ] = useState([]);
@@ -74,6 +40,18 @@ function Select ({
       setFilteredOptions(options);
     }
   }, [options]);
+
+  useEffect(() => {
+    function handleClick (e) {
+      if (selectNode.current && !selectNode.current.contains(e.target)) {
+        setInputValue('');
+        setFilteredOptions(options);
+        setIsOpen(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   function handleFieldClick (): void {
     setIsOpen(true);
@@ -90,16 +68,15 @@ function Select ({
 
   function handleOptionClick (option: IOption): void {
     onSelect(option.value);
-    setIsOpen(false);
     setInputValue('');
+    setIsOpen(false);
   }
-
-  // TODO: close dropdown on outside click
 
   const selected: IOption = find(options, i => i.value === value);
 
   return (
     <div
+      ref={selectNode}
       className={[
         styles.Select,
         className
@@ -109,7 +86,7 @@ function Select ({
         {isOpen && (
           <>
             <input
-              placeholder='Search by username'
+              placeholder='Search by Reddit username'
               type='text'
               value={inputValue}
               spellCheck={false}
