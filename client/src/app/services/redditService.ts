@@ -54,7 +54,7 @@ export function parseThreadJSON (json): IUserAddress[] {
 
 export async function getUserAddressMap (): Promise<IUserAddress[]> {
   const rawData = await transportService.get({
-    url: `${config.userAddressUrl}.json`
+    url: `${config.userAddressUrl}.json?limit=5000`
   });
   return parseThreadJSON(rawData);
 }

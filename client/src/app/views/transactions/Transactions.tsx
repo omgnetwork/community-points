@@ -6,9 +6,10 @@ import { useSelector } from 'react-redux';
 
 import * as locationService from 'app/services/locationService';
 import { selectTransactions } from 'app/selectors/transactionSelector';
+import { selectUserAddressMap, getUsernameFromMap } from 'app/selectors/addressSelector';
 import { logAmount } from 'app/util/amountConvert';
 
-import { ITransaction } from 'interfaces';
+import { ITransaction, IUserAddress } from 'interfaces';
 
 import omgcp_thickarrow from 'app/images/omgcp_thickarrow.svg';
 
@@ -23,6 +24,7 @@ function Transactions (): JSX.Element {
   const [ visibleCount, setVisibleCount ]: [ number, any ] = useState(TRANSACTIONS_PER_PAGE);
 
   const allTransactions: ITransaction[] = useSelector(selectTransactions);
+  const userAddressMap: IUserAddress[] = useSelector(selectUserAddressMap);
 
   useEffect(() => {
     if (allTransactions.length) {
@@ -43,6 +45,11 @@ function Transactions (): JSX.Element {
     <div className={styles.Transactions}>
       {visibleTransactions && visibleTransactions.map((transaction: ITransaction, index: number): JSX.Element => {
         const isIncoming: boolean = transaction.direction === 'incoming';
+
+        const otherUsername: string = isIncoming
+          ? getUsernameFromMap(transaction.sender, userAddressMap)
+          : getUsernameFromMap(transaction.recipient, userAddressMap);
+
         return (
           <div
             key={index}
@@ -89,8 +96,8 @@ function Transactions (): JSX.Element {
                   </div>
                   <div className={styles.address}>
                     {isIncoming
-                      ? truncate(transaction.sender, 6, 4, '...')
-                      : truncate(transaction.recipient, 6, 4, '...')
+                      ? otherUsername || truncate(transaction.sender, 6, 4, '...')
+                      : otherUsername || truncate(transaction.recipient, 6, 4, '...')
                     }
                   </div>
                 </div>

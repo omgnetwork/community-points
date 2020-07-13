@@ -2,10 +2,8 @@ import * as React from 'react';
 import truncate from 'truncate-middle';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
-import { get } from 'lodash';
 
-import { selectUserAddressMap } from 'app/selectors/addressSelector';
-import { IUserAddress } from 'interfaces';
+import { selectUsername } from 'app/selectors/addressSelector';
 
 import Option from 'app/components/option/Option';
 
@@ -21,12 +19,7 @@ function Address ({
   address,
   className
 }: AddressProps): JSX.Element {
-  const userAddressMap: IUserAddress[] = useSelector(selectUserAddressMap);
-  const userCandidate: IUserAddress[] = userAddressMap.filter(i => i.address.toLowerCase() === address.toLowerCase());
-
-  // if duplicate addresses dont assume the username
-  const username = userCandidate.length === 1 ? get(userCandidate, '[0].author', 'User') : 'User';
-
+  const username = useSelector(selectUsername(address));
   return (
     <div
       className={[
@@ -35,7 +28,7 @@ function Address ({
       ].join(' ')}
     >
       <Option
-        title={username}
+        title={username || 'User'}
         detail={truncate(address, 6, 4, '...')}
       />
       <CopyToClipboard text={address}>
