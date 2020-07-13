@@ -25,7 +25,7 @@ function Address ({
   const userCandidate: IUserAddress[] = userAddressMap.filter(i => i.address.toLowerCase() === address.toLowerCase());
 
   // if duplicate addresses dont assume the username
-  const username = userCandidate.length === 1 ? get(userCandidate, 'author', 'User') : 'User';
+  const username = userCandidate.length === 1 ? get(userCandidate, '[0].author', 'User') : 'User';
 
   return (
     <div

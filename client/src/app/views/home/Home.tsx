@@ -137,13 +137,15 @@ function Home (): JSX.Element {
             className={styles.input}
             placeholder='Recipient'
             value={recipient}
-            options={!!userAddressMap && userAddressMap.map(i => {
-              return {
-                value: i.address,
-                title: i.author,
-                detail: truncate(i.address, 6, 4, '...')
-              };
-            })}
+            options={!!userAddressMap && userAddressMap
+              .filter(i => i.address.toLowerCase() !== session.account.toLowerCase())
+              .map(i => {
+                return {
+                  value: i.address,
+                  title: i.author,
+                  detail: truncate(i.address, 6, 4, '...')
+                };
+              })}
             onSelect={setRecipient}
           />
           <Button
