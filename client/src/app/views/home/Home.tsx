@@ -1,18 +1,22 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import BigNumber from 'bignumber.js';
+import truncate from 'truncate-middle';
 import { useDispatch, useSelector, batch } from 'react-redux';
 
 import Address from 'app/components/address/Address';
 import Button from 'app/components/button/Button';
+import Select from 'app/components/select/Select';
 import Input from 'app/components/input/Input';
 import PointBalance from 'app/components/pointbalance/PointBalance';
 import Tabs from 'app/components/tabs/Tabs';
 
-import { ISession } from 'interfaces';
-import { transfer, getSession, getTransactions } from 'app/actions';
+import { ISession, IUserAddress } from 'interfaces';
+import { transfer, getSession, getTransactions, getUserAddressMap } from 'app/actions';
 import { selectLoading } from 'app/selectors/loadingSelector';
 import { selectSession } from 'app/selectors/sessionSelector';
+import { selectUserAddressMap } from 'app/selectors/addressSelector';
+import { selectIsPendingTransaction } from 'app/selectors/transactionSelector';
 import * as omgService from 'app/services/omgService';
 
 import Transactions from 'app/views/transactions/Transactions';
@@ -31,10 +35,13 @@ function Home (): JSX.Element {
 
   const transferLoading: boolean = useSelector(selectLoading(['TRANSACTION/CREATE']));
   const session: ISession = useSelector(selectSession);
+  const isPendingTransaction: boolean = useSelector(selectIsPendingTransaction);
+  const userAddressMap: IUserAddress[] = useSelector(selectUserAddressMap);
 
   useEffect(() => {
     omgService.checkHash();
-  }, []);
+    dispatch(getUserAddressMap());
+  }, [dispatch]);
 
   useInterval(() => {
     batch(() => {
@@ -48,10 +55,7 @@ function Home (): JSX.Element {
       const result = await dispatch(transfer({
         amount: powAmount(amount, session.subReddit.decimals),
         recipient,
-        currency: session.subReddit.token,
-        symbol: session.subReddit.symbol,
-        decimals: session.subReddit.decimals,
-        metadata: `${session.subReddit.symbol} community points`
+        subReddit: session.subReddit
       }));
 
       if (result) {
@@ -67,6 +71,9 @@ function Home (): JSX.Element {
   }
 
   function disableTransfer (): boolean {
+    if (isPendingTransaction) {
+      return true;
+    }
     if (!session || !recipient || !amount) {
       return true;
     };
@@ -113,6 +120,7 @@ function Home (): JSX.Element {
         options={[ 'Transfer', 'History' ]}
         selected={view}
         onSelect={setView}
+        blockTransfer={isPendingTransaction}
       />
 
       {(view as any) === 'Transfer' && (
@@ -125,12 +133,20 @@ function Home (): JSX.Element {
             className={styles.input}
             suffix={session.subReddit.symbol}
           />
-          <Input
-            type='text'
-            value={recipient}
-            onChange={e => setRecipient(e.target.value)}
-            placeholder='Recipient'
+          <Select
             className={styles.input}
+            placeholder='Recipient'
+            value={recipient}
+            options={!!userAddressMap && userAddressMap
+              .filter(i => i.address.toLowerCase() !== session.account.toLowerCase())
+              .map(i => {
+                return {
+                  value: i.address,
+                  title: i.author,
+                  detail: truncate(i.address, 6, 4, '...')
+                };
+              })}
+            onSelect={setRecipient}
           />
           <Button
             onClick={handleTransfer}

@@ -1,7 +1,11 @@
 import * as React from 'react';
-import Identicon from 'react-identicons';
 import truncate from 'truncate-middle';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import { useSelector } from 'react-redux';
+
+import { selectUsername } from 'app/selectors/addressSelector';
+
+import Option from 'app/components/option/Option';
 
 import omgcp_copy from 'app/images/omgcp_copy.svg';
 import * as styles from './Address.module.scss';
@@ -15,6 +19,7 @@ function Address ({
   address,
   className
 }: AddressProps): JSX.Element {
+  const username = useSelector(selectUsername(address));
   return (
     <div
       className={[
@@ -22,12 +27,10 @@ function Address ({
         className
       ].join(' ')}
     >
-      <div className={styles.identicon}>
-        <Identicon size={34} string={address} />
-      </div>
-      <div className={styles.address}>
-        {truncate(address, 6, 4, '...')}
-      </div>
+      <Option
+        title={username || 'User'}
+        detail={truncate(address, 6, 4, '...')}
+      />
       <CopyToClipboard text={address}>
         <img
           className={styles.copy}

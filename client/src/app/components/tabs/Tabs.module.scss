@@ -17,5 +17,10 @@
       border-bottom: 3px solid $orange;
       font-weight: bold;
     }
+
+    &.disabled {
+      pointer-events: none;
+      color: $gray4;
+    }
   }
 }

@@ -34,7 +34,7 @@
 
     &.flash {
       animation-name: flash-animation;
-      animation-duration: 1s;
+      animation-duration: 2s;
     }
 
     .arrow {
@@ -47,48 +47,47 @@
     .data {
       display: flex;
       flex-direction: column;
-      align-items: flex-start;
       flex: 1;
-      .direction {
-        font-weight: bold;
-        margin-bottom: 5px;
-      }
-      .info {
+
+      .row {
         display: flex;
         flex-direction: row;
-        align-items: center;
+        justify-content: space-between;
 
-        .status {
-          padding: 3px 7px;
-          transition: all 200ms ease-in-out;
-          background-color: $green;
-          border-radius: 4px;
-          margin-right: 5px;
-          &.pending {
-            background-color: $yellow;
+        .direction {
+          font-weight: bold;
+          margin-bottom: 5px;
+        }
+
+        .rawAmount {
+          font-weight: bold;
+        }
+
+        .info {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+
+          .status {
+            padding: 3px 7px;
+            transition: all 200ms ease-in-out;
+            background-color: $green;
+            border-radius: 4px;
+            margin-right: 5px;
+            &.pending {
+              background-color: $yellow;
+            }
+          }
+
+          .address {
+            margin-right: 5px;
           }
         }
 
-        .address {
-          margin-right: 5px;
+        .timestamp {
+          font-size: 8px;
+          line-height: 21px;
         }
-
-        .copyContainer {
-          z-index: 2;
-        }
-      }
-    }
-
-    .amounts {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      .rawAmount {
-        font-weight: bold;
-      }
-      .timestamp {
-        font-size: 8px;
-        line-height: 21px;
       }
     }
   }

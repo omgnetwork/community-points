@@ -26,8 +26,8 @@ module.exports = {
       throw new Error('feeUtxos is empty')
     }
 
-    spendAmount = BN.isBN(spendAmount) ? spendAmount : new BN(spendAmount)
-    feeAmount = BN.isBN(feeAmount) ? feeAmount : new BN(feeAmount)
+    spendAmount = BN.isBN(spendAmount) ? spendAmount : new BN(spendAmount.toString())
+    feeAmount = BN.isBN(feeAmount) ? feeAmount : new BN(feeAmount.toString())
 
     const spendTotal = totalAmount(spendUtxos)
     if (spendTotal.lt(spendAmount)) {
@@ -87,6 +87,6 @@ module.exports = {
 
 function totalAmount (utxos) {
   return utxos.reduce((prev, curr) => {
-    return prev.add(new BN(curr.amount))
+    return prev.add(new BN(curr.amount.toString()))
   }, new BN(0))
 }

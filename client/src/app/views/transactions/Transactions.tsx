@@ -6,9 +6,10 @@ import { useSelector } from 'react-redux';
 
 import * as locationService from 'app/services/locationService';
 import { selectTransactions } from 'app/selectors/transactionSelector';
+import { selectUserAddressMap, getUsernameFromMap } from 'app/selectors/addressSelector';
 import { logAmount } from 'app/util/amountConvert';
 
-import { ITransaction } from 'interfaces';
+import { ITransaction, IUserAddress } from 'interfaces';
 
 import omgcp_thickarrow from 'app/images/omgcp_thickarrow.svg';
 
@@ -20,20 +21,20 @@ const TRANSACTIONS_PER_PAGE = 4;
 
 function Transactions (): JSX.Element {
   const [ visibleTransactions, setVisibleTransactions ]: [ ITransaction[], any ] = useState([]);
+  const [ visibleCount, setVisibleCount ]: [ number, any ] = useState(TRANSACTIONS_PER_PAGE);
+
   const allTransactions: ITransaction[] = useSelector(selectTransactions);
+  const userAddressMap: IUserAddress[] = useSelector(selectUserAddressMap);
 
   useEffect(() => {
     if (allTransactions.length) {
-      const firstSet = allTransactions.slice(0, TRANSACTIONS_PER_PAGE);
-      setVisibleTransactions(firstSet);
+      const visibleSet = allTransactions.slice(0, visibleCount);
+      setVisibleTransactions(visibleSet);
     }
-  }, [allTransactions]);
+  }, [ visibleCount, allTransactions ]);
 
   function handleLoadMore (): void {
-    const currentIndex: number = visibleTransactions.length;
-    const nextSet = allTransactions.slice(currentIndex, currentIndex + TRANSACTIONS_PER_PAGE);
-    const newSet = [ ...visibleTransactions, ...nextSet ];
-    setVisibleTransactions(newSet);
+    setVisibleCount(visibleCount => visibleCount + TRANSACTIONS_PER_PAGE);
   }
 
   function handleTransactionClick (hash: string): void {
@@ -44,6 +45,11 @@ function Transactions (): JSX.Element {
     <div className={styles.Transactions}>
       {visibleTransactions && visibleTransactions.map((transaction: ITransaction, index: number): JSX.Element => {
         const isIncoming: boolean = transaction.direction === 'incoming';
+
+        const otherUsername: string = isIncoming
+          ? getUsernameFromMap(transaction.sender, userAddressMap)
+          : getUsernameFromMap(transaction.recipient, userAddressMap);
+
         return (
           <div
             key={index}
@@ -64,37 +70,41 @@ function Transactions (): JSX.Element {
               ].join(' ')}
               alt='arrow'
             />
+
             <div className={styles.data}>
-              <div className={styles.direction}>
-                {isIncoming
-                  ? 'Received'
-                  : 'Sent'
-                }
-              </div>
-              <div className={styles.info}>
-                <div
-                  className={[
-                    styles.status,
-                    transaction.status === 'Pending' ? styles.pending : ''
-                  ].join(' ')}
-                >
-                  {transaction.status === 'Pending' ? 'Pending' : 'Confirmed'}
-                </div>
-                <div className={styles.address}>
+              <div className={styles.row}>
+                <div className={styles.direction}>
                   {isIncoming
-                    ? truncate(transaction.sender, 6, 4, '...')
-                    : truncate(transaction.recipient, 6, 4, '...')
+                    ? 'Received'
+                    : 'Sent'
                   }
                 </div>
+                <div className={styles.rawAmount}>
+                  {`${logAmount(transaction.amount, transaction.decimals)} ${transaction.symbol}`}
+                </div>
               </div>
-            </div>
 
-            <div className={styles.amounts}>
-              <div className={styles.rawAmount}>
-                {`${logAmount(transaction.amount, transaction.decimals)} ${transaction.symbol}`}
-              </div>
-              <div className={styles.timestamp}>
-                {unix(transaction.timestamp).format('lll')}
+              <div className={styles.row}>
+                <div className={styles.info}>
+                  <div
+                    className={[
+                      styles.status,
+                      transaction.status === 'Pending' ? styles.pending : ''
+                    ].join(' ')}
+                  >
+                    {transaction.status === 'Pending' ? 'Pending' : 'Confirmed'}
+                  </div>
+                  <div className={styles.address}>
+                    {isIncoming
+                      ? otherUsername || truncate(transaction.sender, 6, 4, '...')
+                      : otherUsername || truncate(transaction.recipient, 6, 4, '...')
+                    }
+                  </div>
+                </div>
+
+                <div className={styles.timestamp}>
+                  {unix(transaction.timestamp).format('lll')}
+                </div>
               </div>
             </div>
           </div>
