@@ -1,0 +1,28 @@
+{
+  "name": "community-points-demo-contracts",
+  "version": "0.0.1",
+  "description": "subreddit point demo smart contracts",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "npx truffle test"
+  },
+  "keywords": [
+    "plasma",
+    "layer2",
+    "ethereuem",
+    "reddit"
+  ],
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@openzeppelin/contracts": "3.1.0",
+    "truffle": "5.1.33"
+  },
+  "devDependencies": {
+    "@openzeppelin/test-helpers": "^0.5.6",
+    "chai": "^4.2.0"
+  }
+}
