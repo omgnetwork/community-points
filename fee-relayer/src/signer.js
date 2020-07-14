@@ -16,18 +16,27 @@
 
 const ethUtil = require('ethereumjs-util')
 const sigUtil = require('eth-sig-util')
+const { fromPrivate } = require('eth-lib').account
 
-const feePayer = {
-  address: process.env.FEE_RELAYER_ADDRESS,
-  privateKey: process.env.FEE_RELAYER_PRIVATE_KEY
+
+function accountsFromEnv() {
+  if (!process.env.FEE_RELAYER_PRIVATE_KEYS) {
+    throw new Error('FEE_RELAYER_PRIVATE_KEYS not set')
+  }
+  const privKeys = process.env.FEE_RELAYER_PRIVATE_KEYS.split(',')
+  return privKeys.map(pk => fromPrivate(pk.startsWith('0x') ? pk : '0x' + pk))
 }
 
 module.exports = {
-  getAddress: () => {
-    return feePayer.address
+  getAccounts: () => {
+    if (!this.accounts) {
+      this.accounts = accountsFromEnv()
+    }
+    return this.accounts
   },
 
-  sign: async (toSign) => {
+  sign: async (toSign, address) => {
+    const feePayer = this.accounts.find(account => account.address === address)
     const signed = ethUtil.ecsign(
       toSign,
       Buffer.from(feePayer.privateKey.replace('0x', ''), 'hex')
