@@ -4,6 +4,7 @@ import BigNumber from 'bignumber.js';
 import truncate from 'truncate-middle';
 import { useDispatch, useSelector, batch } from 'react-redux';
 
+import Alert from 'app/components/alert/Alert';
 import Address from 'app/components/address/Address';
 import Button from 'app/components/button/Button';
 import Select from 'app/components/select/Select';
@@ -13,6 +14,7 @@ import Tabs from 'app/components/tabs/Tabs';
 
 import { ISession, IUserAddress } from 'interfaces';
 import { transfer, getSession, getTransactions, getUserAddressMap } from 'app/actions';
+import { selectError } from 'app/selectors/uiSelector';
 import { selectLoading } from 'app/selectors/loadingSelector';
 import { selectSession } from 'app/selectors/sessionSelector';
 import { selectUserAddressMap } from 'app/selectors/addressSelector';
@@ -33,6 +35,7 @@ function Home (): JSX.Element {
   const [ recipient, setRecipient ]: [ string, any ] = useState('');
   const [ amount, setAmount ]: any = useState('');
 
+  const errorMessage: string = useSelector(selectError);
   const transferLoading: boolean = useSelector(selectLoading(['TRANSACTION/CREATE']));
   const session: ISession = useSelector(selectSession);
   const isPendingTransaction: boolean = useSelector(selectIsPendingTransaction);
@@ -49,6 +52,10 @@ function Home (): JSX.Element {
       dispatch(getTransactions());
     });
   }, 20 * 1000);
+
+  function clearError () {
+    dispatch(clearError());
+  }
 
   async function handleTransfer (): Promise<any> {
     try {
@@ -104,6 +111,14 @@ function Home (): JSX.Element {
 
   return (
     <div className={styles.Home}>
+      <Alert
+        onClose={clearError}
+        open={!!errorMessage}
+        message={errorMessage}
+        title='Error'
+        type='error'
+      />
+
       <h1>{`r/${session.subReddit.name}`}</h1>
       <Address
         address={session.account}

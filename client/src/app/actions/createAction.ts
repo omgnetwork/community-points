@@ -1,3 +1,5 @@
+import * as errorService from 'app/services/errorService';
+
 export function createAction (
   key: string,
   asyncAction: Function,
@@ -13,12 +15,12 @@ export function createAction (
       // cancel loading state
       dispatch({ type: `${key}/ERROR` });
 
-      // TODO: sanitize errors
+      // TODO: sanitize cancel error
 
       // pass error message to ui
       dispatch({ type: 'UI/ERROR/UPDATE', payload: customErrorMessage || error.message });
 
-      // TODO: pass error to sentry
+      errorService.log(error);
       return false;
     }
   };

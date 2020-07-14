@@ -37,3 +37,15 @@ export function getUserAddressMap () {
     () => redditService.getUserAddressMap()
   );
 }
+
+export function clearError () {
+  return function (dispatch) {
+    return dispatch({ type: 'UI/ERROR/UPDATE', payload: null });
+  };
+}
+
+export function showError (message: string) {
+  return function (dispatch) {
+    return dispatch({ type: 'UI/ERROR/UPDATE', payload: message });
+  };
+}
