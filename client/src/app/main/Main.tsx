@@ -16,7 +16,7 @@ import * as styles from './Main.module.scss';
 
 type IViewState = 'LOADING' | 'HOME' | 'INVALID_COMMUNITY' | 'NO_PROVIDER' | 'WRONG_NETWORK';
 
-function Main () {
+function Main (): JSX.Element {
   const [ view, setView ]: [ IViewState, any ] = useState('LOADING');
 
   const [ validSubReddit, setValidSubReddit ]: [ boolean, any ] = useState(false);

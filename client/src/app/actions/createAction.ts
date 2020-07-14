@@ -10,7 +10,15 @@ export function createAction (
       dispatch({ type: `${key}/SUCCESS`, payload: response });
       return true;
     } catch (error) {
-      dispatch({ type: `${key}/ERROR`, payload: customErrorMessage || error.message });
+      // cancel loading state
+      dispatch({ type: `${key}/ERROR` });
+
+      // TODO: sanitize errors
+
+      // pass error message to ui
+      dispatch({ type: 'UI/ERROR/UPDATE', payload: customErrorMessage || error.message });
+
+      // TODO: pass error to sentry
       return false;
     }
   };

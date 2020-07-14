@@ -1,4 +1,4 @@
-import { IAction } from 'background/interfaces';
+import { IAction } from 'interfaces';
 
 interface AppState {
   [key: string]: any

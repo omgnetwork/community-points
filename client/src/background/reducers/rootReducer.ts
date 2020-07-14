@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 
-import { IAction } from 'background/interfaces';
+import { IAction } from 'interfaces';
+
 import appReducer from 'background/reducers/appReducer';
 import loadingReducer from 'background/reducers/loadingReducer';
 import transactionReducer from 'background/reducers/transactionReducer';

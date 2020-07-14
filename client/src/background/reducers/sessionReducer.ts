@@ -1,5 +1,4 @@
-import { IAction } from 'background/interfaces';
-import { ISubReddit } from 'interfaces';
+import { ISubReddit, IAction } from 'interfaces';
 
 interface SessionState {
   account: string,

@@ -36,3 +36,8 @@ export interface IUserAddress {
   address: string,
   created: number
 }
+
+export interface IAction {
+  type: string,
+  payload: any
+}
