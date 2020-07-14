@@ -15,7 +15,10 @@ export function createAction (
       // cancel loading state
       dispatch({ type: `${key}/ERROR` });
 
-      // TODO: sanitize cancel error
+      // if user denied, ignore
+      if (error.message && error.message.includes('User denied')) {
+        return false;
+      }
 
       // pass error message to ui
       dispatch({ type: 'UI/ERROR/UPDATE', payload: customErrorMessage || error.message });
