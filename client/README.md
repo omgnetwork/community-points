@@ -16,15 +16,16 @@ This project is a Chrome extension used to transfer Reddit community points dire
 
 - `nvm use` switch to correct node version
 - `yarn install` install project dependencies
-- `yarn build:dev` compile extension bundle
+- `yarn build:dev` or `yarn build:prod` compile extension bundle (with or without source maps)
 - `yarn lint` runs linter
 - `yarn test` runs tests
 
-- in a Chrome based browser, open extensions in `Developer mode`, and `Load unpacked` pointing to this projects `build` folder
+#### Installation
 
-### Production
-
-- `yarn build:prod` to compile production bundle
+- Find the latest version from the [releases page](https://github.com/omgnetwork/community-points/releases)
+- Download and unzip the `Release` bundle found in the `Assets` section
+- In a Chrome based browser (Brave or Chrome), open Extensions in `Developer mode`, and click `Load unpacked` and select the folder you just unzipped
+- Visit a supported subreddit and transfer!
 
 ### SubReddit Support
 

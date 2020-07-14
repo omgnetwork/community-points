@@ -21,11 +21,18 @@ export interface ISubReddit {
   token: string,
   name: string,
   symbol: string,
-  decimals: number
+  decimals: number,
+  feeRelay: string
 }
 
 export interface ISession {
   account: string,
   balance: string,
   subReddit: ISubReddit
+}
+
+export interface IUserAddress {
+  author: string,
+  address: string,
+  created: number
 }

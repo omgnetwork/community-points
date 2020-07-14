@@ -1,13 +1,13 @@
-import { orderBy } from 'lodash';
 import BN from 'bn.js';
+import { get } from 'lodash';
+import JSONBigNumber from 'omg-json-bigint';
 
-import { ISession, ITransaction } from 'interfaces';
+import { ISession, ITransaction, ISubReddit } from 'interfaces';
 
 import * as omgService from 'app/services/omgService';
-import * as typedDataService from 'app/services/typedDataService';
+import * as transportService from 'app/services/transportService';
 import * as messageService from 'app/services/messageService';
 import * as locationService from 'app/services/locationService';
-import config from 'config';
 
 export async function checkWeb3ProviderExists (): Promise<boolean> {
   const exists = await messageService.send({ type: 'WEB3/EXISTS' });
@@ -85,6 +85,13 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
     // - if one of the inputs owner and currency match it is outgoing, else incoming
     const isOutgoing = transaction.inputs.some(matchingCurrencyAndOwner);
 
+    // - check if merge transaction, if so ignore this tx
+    // - if outgoing and only user in outputs
+    const allUserOutputs = transaction.outputs.every(i => i.owner.toLowerCase() === user);
+    if (isOutgoing && allUserOutputs) {
+      return null;
+    }
+
     // - for outgoing, sum amount of currency going to recipient in outputs
     let amount = '0';
     let recipient;
@@ -93,10 +100,10 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
     if (isOutgoing) {
       sender = user;
       const recipientOutputs = transaction.outputs.filter(matchingCurrencyAndDifferentOwner);
-      recipient = recipientOutputs[0].owner; // naive assign recipient from first output
+      recipient = get(recipientOutputs, '[0].owner', 'N/A'); // naive assign recipient from first output
 
       const bnAmount = recipientOutputs.reduce((acc, curr) => {
-        return acc.add(new BN(curr.amount));
+        return acc.add(new BN(curr.amount.toString()));
       }, new BN(0));
       amount = bnAmount.toString();
     }
@@ -106,12 +113,12 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
       const bnAmount = transaction.outputs
         .filter(matchingCurrencyAndOwner)
         .reduce((acc, curr) => {
-          return acc.add(new BN(curr.amount));
+          return acc.add(new BN(curr.amount.toString()));
         }, new BN(0));
       amount = bnAmount.toString();
 
       const senderInputs = transaction.inputs.filter(matchingCurrencyAndDifferentOwner);
-      sender = senderInputs[0].owner; // naive assign sender from first input
+      sender = get(senderInputs, '[0].owner', 'N/A'); // naive assign sender from first input
     }
 
     return {
@@ -133,52 +140,72 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
 
 export async function transfer ({
   amount,
-  currency,
   recipient,
-  metadata,
-  symbol,
-  decimals
+  subReddit
 }: {
   amount: number,
-  currency: string,
-  decimals: number,
   recipient: string,
-  symbol: string,
-  metadata: string
+  subReddit: ISubReddit
 }): Promise<ITransaction> {
+  // fetch and pick utxos to cover amount
   const account = await getActiveAccount();
-  const _utxos = await omgService.getUtxos(account);
-  const utxos = orderBy(_utxos, i => i.amount, 'desc');
+  const allUtxos = await omgService.getUtxos(account);
+  const subRedditUtxos = allUtxos
+    .filter(utxo => utxo.currency.toLowerCase() === subReddit.token.toLowerCase())
+    .sort((a, b) => new BN(b.amount.toString()).sub(new BN(a.amount.toString())));
 
-  // TODO: pick and send utxo to fee relay
-  // sign returned data using metamask and submit it
-  // persist response to store
+  const spendableUtxos = [];
+  for (const utxo of subRedditUtxos) {
+    const spendableSum = spendableUtxos.reduce((prev, curr) => {
+      return prev.add(new BN(curr.amount.toString()));
+    }, new BN(0));
+    if (spendableSum.gte(new BN(amount.toString()))) {
+      break;
+    }
+    spendableUtxos.push(utxo);
+  }
 
-  const allFees = await omgService.getFees();
-  const feeInfo = allFees['1'].find(i => i.currency === typedDataService.ETH_ADDRESS);
-
-  const payments = [{
-    owner: recipient,
-    currency,
-    amount: new BN(amount)
-  }];
-  const fee = {
-    currency: typedDataService.ETH_ADDRESS,
-    amount: new BN(feeInfo.amount)
-  };
-  const txBody = omgService.createTransactionBody({
-    fromAddress: account,
-    fromUtxos: utxos,
-    payments,
-    fee,
-    metadata: metadata || typedDataService.NULL_METADATA
+  // post to /create-relayed-tx { utxos, amount, to }
+  const _relayedTx = await transportService.post({
+    rpc: false,
+    url: `${subReddit.feeRelay}/create-relayed-tx`,
+    body: {
+      utxos: spendableUtxos,
+      amount,
+      to: recipient
+    }
   });
+  const relayedTx = JSONBigNumber.parse(_relayedTx);
 
-  const typedData = typedDataService.getTypedData(txBody, config.plasmaContractAddress);
-  const signature = await signTypedData(account, typedData);
-  const signatures = new Array(txBody.inputs.length).fill(signature);
-  const signedTxn = omgService.buildSignedTransaction(typedData, signatures);
-  const submittedTransaction = await omgService.submitTransaction(signedTxn);
+  // sign returned typed data and get sig
+  let signature;
+  try {
+    signature = await signTypedData(account, relayedTx.typedData);
+  } catch (error) {
+    // if error or user cancels sign, post to /cancel-relayed-tx
+    await transportService.post({
+      rpc: false,
+      url: `${subReddit.feeRelay}/cancel-relayed-tx`,
+      body: { tx: relayedTx.tx }
+    });
+    throw error;
+  }
+
+  // create array of sigs based on how many inputs in typed data from client
+  const clientInputs = relayedTx.tx.inputs.filter(utxo => {
+    return utxo.owner.toLowerCase() === account.toLowerCase();
+  });
+  const signatures = new Array(clientInputs.length).fill(signature);
+
+  // post to /submit-relayed-tx { typedData, signatures }
+  const submittedTransaction = await transportService.post({
+    rpc: false,
+    url: `${subReddit.feeRelay}/submit-relayed-tx`,
+    body: {
+      typedData: relayedTx.typedData,
+      signatures
+    }
+  });
 
   return {
     direction: 'outgoing',
@@ -187,9 +214,9 @@ export async function transfer ({
     sender: account,
     recipient,
     amount,
-    currency,
-    symbol,
-    decimals,
+    currency: subReddit.token,
+    symbol: subReddit.symbol,
+    decimals: subReddit.decimals,
     timestamp: Math.round((new Date()).getTime() / 1000)
   };
 };

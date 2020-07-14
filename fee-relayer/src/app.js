@@ -24,6 +24,7 @@ const bodyParser = require('omg-body-parser')
 const JSONBigNumber = require('omg-json-bigint')
 const createMiddleware = require('@apidevtools/swagger-express-middleware');
 const pino = require('pino')
+const cors = require('cors')
 const expressPino = require('express-pino-logger')
 const BN = require('bn.js')
 
@@ -36,6 +37,7 @@ const port = process.env.FEE_RELAYER_PORT || 3333
 const spendableToken = process.env.FEE_RELAYER_SPENDABLE_TOKEN
 
 const app = express()
+app.use(cors())
 app.use(bodyParser.json())
 
 const logger = pino({ level: process.env.LOG_LEVEL || 'info' })
@@ -71,37 +73,53 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
         feeToken
       )
       res.type('application/json')
-      res.send(JSONBigNumber.stringify(tx, null, 2))
+      res.send({
+        success: true,
+        data: JSONBigNumber.stringify(tx)
+      })
     } catch (err) {
       res.status(500)
-      res.send(err.toString())
+      res.send({
+        success: false,
+        data: err.toString()
+      })
     }
   })
 
   app.post('/submit-relayed-tx', async (req, res) => {
     try {
-      // TODO validate body params
       const result = await relayTx.submit(
         childChain,
         req.body.tx,
         req.body.signatures,
         signer.sign
       )
-      res.send(result)
+      res.send({
+        success: true,
+        data: result
+      })
     } catch (err) {
       res.status(500)
-      res.send(err.toString())
+      res.send({
+        success: false,
+        data: err.toString()
+      })
     }
   })
 
   app.post('/cancel-relayed-tx', async (req, res) => {
     try {
-      // TODO validate body params
       relayTx.cancel(req.body.tx)
-      res.send('')
+      res.send({
+        success: true,
+        data: true
+      })
     } catch (err) {
       res.status(500)
-      res.send(err.toString())
+      res.send({
+        success: false,
+        data: err.toString()
+      })
     }
   })
 
