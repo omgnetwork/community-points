@@ -3,7 +3,7 @@ pragma solidity ^0.6.0;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
-import "./SubredditPoint.sol";
+import "./tokens/SubredditPoint.sol";
 
 /**
  * @notice Distribution contract for subreddit point
