@@ -188,6 +188,7 @@ export async function transfer ({
       url: `${subReddit.feeRelay}/cancel-relayed-tx`,
       body: { tx: relayedTx.tx }
     });
+
     throw error;
   }
 
