@@ -22,11 +22,10 @@ const { ChildChain } = require('@omisego/omg-js')
 const express = require('express')
 const bodyParser = require('omg-body-parser')
 const JSONBigNumber = require('omg-json-bigint')
-const createMiddleware = require('@apidevtools/swagger-express-middleware');
+const createMiddleware = require('@apidevtools/swagger-express-middleware')
 const pino = require('pino')
 const cors = require('cors')
 const expressPino = require('express-pino-logger')
-const BN = require('bn.js')
 
 const childChain = new ChildChain({
   watcherUrl: process.env.OMG_WATCHER_URL,
@@ -57,8 +56,8 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
     middleware.files(),
     middleware.metadata(),
     middleware.parseRequest(),
-    middleware.validateRequest(),
-  );
+    middleware.validateRequest()
+  )
 
   app.post('/create-relayed-tx', async (req, res) => {
     try {
@@ -125,4 +124,4 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
   })
 
   app.listen(port, () => logger.info(`Fee Relayer running on port ${port}, using account ${feePayerAddress}`))
-});
+})

@@ -18,8 +18,7 @@ const ethUtil = require('ethereumjs-util')
 const sigUtil = require('eth-sig-util')
 const { fromPrivate } = require('eth-lib').account
 
-
-function accountsFromEnv() {
+function accountsFromEnv () {
   if (!process.env.FEE_RELAYER_PRIVATE_KEYS) {
     throw new Error('FEE_RELAYER_PRIVATE_KEYS not set')
   }

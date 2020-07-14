@@ -1,7 +1,7 @@
 const { Pool } = require('pg')
 
 let pool
-function getPool() {
+function getPool () {
   if (!pool) {
     pool = new Pool()
   }
@@ -21,5 +21,5 @@ module.exports = {
   canUse: async (account) => {
     const res = await getPool().query(`update accounts set in_use=true where account='${account}' and in_use=false`)
     return res.rowCount === 1
-  },
+  }
 }
