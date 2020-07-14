@@ -8,7 +8,7 @@ import * as locationService from 'app/services/locationService';
 
 import * as styles from './InvalidCommunity.module.scss';
 
-function InvalidCommunity () {
+function InvalidCommunity (): JSX.Element {
   function handleNewTab (): void {
     locationService.openTab('https://www.reddit.com/r/omise_go');
   }

@@ -12,7 +12,7 @@ const networkMap = {
   'rinkeby': 'Rinkeby network'
 };
 
-function WrongNetwork () {
+function WrongNetwork (): JSX.Element {
   return (
     <div className={styles.WrongNetwork}>
       <img

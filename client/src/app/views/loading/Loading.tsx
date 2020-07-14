@@ -4,7 +4,7 @@ import omgcp_reddit from 'app/images/omgcp_reddit.svg';
 import omgcp_spinner from 'app/images/omgcp_spinner.png';
 import * as styles from './Loading.module.scss';
 
-function Loading () {
+function Loading (): JSX.Element {
   return (
     <div className={styles.Loading}>
       <div className={styles.icon}>

@@ -7,7 +7,6 @@ import injectBridge from 'contentscript/elements/injectBridge';
 
 // listen to ui messages and forward them to bridge
 chrome.runtime.onMessage.addListener((message: Partial<IMessage>) => {
-  // catch message from icon click
   if (message.type === 'BROWSERACTION/SHOW') {
     return injectApp();
   }
@@ -29,6 +28,7 @@ window.addEventListener('message', async function (event) {
   if (key !== 'from_bridge') {
     return;
   }
+
   chrome.runtime.sendMessage({
     type,
     status,
