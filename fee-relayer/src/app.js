@@ -51,7 +51,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
   }
 
   await accountSelector.setAccounts(await signer.getAccounts())
-  const { address: feePayerAddress} = await accountSelector.getAccount()
+  const { address: feePayerAddress } = await accountSelector.getAccount()
 
   app.use(
     middleware.files(),
@@ -73,10 +73,11 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
         feeToken
       )
       res.type('application/json')
-      res.send({
-        success: true,
-        data: JSONBigNumber.stringify(tx)
-      })
+      res.send(
+        JSONBigNumber.stringify({
+          success: true,
+          data: tx
+        }))
     } catch (err) {
       res.status(500)
       res.send({

@@ -53,8 +53,8 @@ module.exports = {
     // Sign
     const typedData = transaction.getTypedData(tx, childChain.plasmaContractAddress)
     const toSign = transaction.getToSignHash(typedData)
-    const feeSigs = await signFunc(toSign, feePayerAddress)
-    spenderSigs.push(feeSigs)
+    const feeSig = await signFunc(toSign, feePayerAddress)
+    spenderSigs.push(feeSig)
 
     // Submit the transaction
     const signedTx = childChain.buildSignedTransaction(typedData, spenderSigs)

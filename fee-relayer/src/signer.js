@@ -36,7 +36,7 @@ module.exports = {
   },
 
   sign: async (toSign, address) => {
-    const feePayer = this.accounts.find(account => account.address === address)
+    const feePayer = this.accounts.find(account => account.address.toLowerCase() === address.toLowerCase())
     const signed = ethUtil.ecsign(
       toSign,
       Buffer.from(feePayer.privateKey.replace('0x', ''), 'hex')

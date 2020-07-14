@@ -10,7 +10,7 @@ produces:
   - application/json
 
 definitions:
-  utxo:
+  tx_input:
     required:
       - amount
       - blknum
@@ -34,6 +34,38 @@ definitions:
         type: string
       txindex:
         type: integer
+
+  tx_output:
+    required:
+      - amount
+      - outputGuard
+      - outputType
+    properties:
+      amount:
+        oneOf:
+          - type: object
+          - type: integer
+          - type: string
+      outputGuard:
+        type: string
+      outputType:
+        type: integer
+
+  tx:
+    required:
+      -inputs
+      -outputs
+    properties:
+      inputs:
+        type: array
+        items:
+          $ref: "#/definitions/tx_input"
+      outputs:
+        type: array
+        items:
+          $ref: "#/definitions/tx_output"
+
+
   create-relayed-tx-body:
     required:
       - utxos
@@ -43,7 +75,7 @@ definitions:
       utxos:
         type: array
         items:
-          $ref: "#/definitions/utxo"
+          $ref: "#/definitions/tx_input"
       amount:
         oneOf:
           - type: object
@@ -51,17 +83,20 @@ definitions:
           - type: string
       to:
         type: string
+
   submit-relayed-tx-body:
     required:
-      - typedData
+      - tx
       - signatures
     properties:
-      typedData:
-        type: object
+      tx:
+        schema:
+          $ref: "#/definitions/tx"
       signatures:
         type: array
         items:
           type: string
+
   cancel-relayed-tx-body:
     required:
       - tx
