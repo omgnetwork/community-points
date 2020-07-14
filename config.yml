@@ -1,0 +1,26 @@
+version: 2
+
+workflows:
+  version: 2
+  build-master:
+    jobs:
+      - build-and-deploy:
+          filters:
+            branches:
+              only: master
+
+jobs:
+  build-and-deploy:
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run: |
+          export SHORT_GIT_HASH=
+          export DOCKER_TAG=:
+          echo  | gcloud auth activate-service-account --key-file=-
+          gcloud auth configure-docker
+          docker build -t  .
+          docker tag  
+          docker push 
