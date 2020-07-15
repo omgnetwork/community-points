@@ -20,12 +20,6 @@ workflows:
           filters:
             branches:
               ignore: master
-      - build-and-deploy:
-          requires:
-            - test-client
-          filters:
-            branches:
-              ignore: master
 
 jobs:
   test-client:
