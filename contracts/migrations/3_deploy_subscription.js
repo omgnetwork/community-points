@@ -1,6 +1,6 @@
 const Subscription = artifacts.require('Subscription');
 
-module.exports = async (deployer, _, [_deployerAddress, _subredditOwner]) => {
+module.exports = async (deployer) => {
   await deployer.deploy(
     Subscription,
     "2020 August Rock subscription",

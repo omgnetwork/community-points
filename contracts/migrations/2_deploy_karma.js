@@ -1,5 +1,5 @@
 const Karma = artifacts.require('Karma');
 
-module.exports = async (deployer, _, [_deployerAddress, _subredditOwner]) => {
+module.exports = async (deployer) => {
   await deployer.deploy(Karma);
 };

@@ -1,5 +1,5 @@
 const SubredditPoint = artifacts.require('SubredditPoint');
 
-module.exports = async (deployer, _, [_deployerAddress, _subredditOwner]) => {
+module.exports = async (deployer) => {
   await deployer.deploy(SubredditPoint);
 };

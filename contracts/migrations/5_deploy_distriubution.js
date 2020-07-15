@@ -5,9 +5,9 @@ const SUPPLY_DECAY_PERCENTAGE = 10;
 const INITIAL_DISTRIBUTION = 1000000;
 const TOTAL_KARMA_ON_INITIAL_ROUND = 100000;
 
-module.exports = async (deployer, _, [_deployerAddress, subredditOwner]) => {
+module.exports = async (deployer) => {
   const subredditPoint = await SubredditPoint.deployed();
-
+  const subredditOwner = process.env.SUBREDDIT_OWNER;
   await deployer.deploy(
     Distribution,
     subredditPoint.address,
