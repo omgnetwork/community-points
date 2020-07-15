@@ -19,7 +19,7 @@ chrome.runtime.onMessage.addListener((message: Partial<IMessage>) => {
 });
 
 // listen to bridge messages and forward them to ui
-window.addEventListener('message', async function (event) {
+window.addEventListener('message', async function bridgeMessageEventListener (event) {
   const key = get(event, 'data.key', null);
   const type = get(event, 'data.type', null);
   const status = get(event, 'data.status', null);

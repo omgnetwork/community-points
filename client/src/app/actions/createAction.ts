@@ -5,7 +5,7 @@ export function createAction (
   asyncAction: Function,
   customErrorMessage?: string
 ) {
-  return async function (dispatch) {
+  return async function dispatchCreateAction (dispatch) {
     dispatch({ type: `${key}/REQUEST` });
     try {
       const response = await asyncAction();

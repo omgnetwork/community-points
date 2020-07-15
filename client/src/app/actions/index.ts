@@ -39,13 +39,13 @@ export function getUserAddressMap () {
 }
 
 export function clearError () {
-  return function (dispatch) {
+  return function dispatchClearError (dispatch) {
     return dispatch({ type: 'UI/ERROR/UPDATE', payload: null });
   };
 }
 
 export function showError (message: string) {
-  return function (dispatch) {
+  return function dispatchShowError (dispatch) {
     return dispatch({ type: 'UI/ERROR/UPDATE', payload: message });
   };
 }

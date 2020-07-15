@@ -34,7 +34,7 @@ function respond ({ type, status, payload }: IMessage): void {
 }
 
 // handle messages sent from ui in page context
-window.addEventListener('message', async function (event) {
+window.addEventListener('message', async function uiMessageEventListener (event) {
   const key = get(event, 'data.key', null);
   const type = get(event, 'data.type', null);
   const payload = get(event, 'data.payload', null);
