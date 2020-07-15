@@ -26,6 +26,7 @@ const createMiddleware = require('@apidevtools/swagger-express-middleware')
 const pino = require('pino')
 const cors = require('cors')
 const expressPino = require('express-pino-logger')
+const process = require('process')
 
 const childChain = new ChildChain({
   watcherUrl: process.env.OMG_WATCHER_URL,
@@ -42,6 +43,35 @@ app.use(bodyParser.json())
 const logger = pino({ level: process.env.LOG_LEVEL || 'info' })
 const expressLogger = expressPino({ logger })
 app.use(expressLogger)
+
+process
+  .on('SIGTERM', shutdown('SIGTERM'))
+  .on('SIGINT', shutdown('SIGINT'))
+  .on('SIGHUP', shutdown('SIGHUP'))
+  .on('SIGQUIT', shutdown('SIGQUIT'))
+  .on('unhandledRejection', shutdown('unhandledRejection'))
+  .on('uncaughtException', shutdown('uncaughtException'))
+
+function shutdown (signal) {
+  return (err) => {
+    logger.info(`Shutting down with ${signal}.`)
+
+    process.removeListener('SIGINT', shutdown)
+    process.removeListener('SIGHUP', shutdown)
+    process.removeListener('SIGQUIT', shutdown)
+    process.removeListener('SIGTERM', shutdown)
+    process.removeListener('uncaughtException', shutdown)
+    process.removeListener('unhandledRejection', shutdown)
+
+    if (err) {
+      logger.error(err.stack || err)
+    }
+
+    accountSelector.onExit().then(() => {
+      process.exit(err ? 1 : 0)
+    })
+  }
+}
 
 createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware) {
   if (err) {

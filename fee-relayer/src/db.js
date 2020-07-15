@@ -18,8 +18,12 @@ module.exports = {
     ))
   },
 
-  canUse: async (account) => {
+  reserveAccount: async (account) => {
     const res = await getPool().query(`update accounts set in_use=true where account='${account}' and in_use=false`)
     return res.rowCount === 1
+  },
+
+  releaseAccount: async (account) => {
+    return getPool().query(`update accounts set in_use=false where account='${account}'`)
   }
 }

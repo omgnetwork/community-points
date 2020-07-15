@@ -1,29 +1,42 @@
 const db = require('./db')
 
-let accounts = []
+const USE_DB = process.env.FEE_RELAYER_USE_DB === 'true'
 
 async function canUse (account) {
-  if (process.env.FEE_RELAYER_USE_DB === 'true') {
-    return db.canUse(account.address)
+  if (USE_DB) {
+    return db.reserveAccount(account.address)
   }
   return true
 }
 
+async function findAvailableAccount (accounts) {
+  for (let i = 0; i < accounts.length; i++) {
+    if (await canUse(accounts[i])) {
+      return accounts[i]
+    }
+  }
+
+  throw new Error('No available fee payer account!')
+}
+
 module.exports = {
   setAccounts: async (acs) => {
-    accounts = acs
-    if (process.env.FEE_RELAYER_USE_DB === 'true') {
-      db.storeAccounts(accounts.map(account => account.address))
+    this.accounts = acs
+    if (USE_DB) {
+      db.storeAccounts(this.accounts.map(account => account.address))
     }
   },
 
   getAccount: async () => {
-    for (let i = 0; i < accounts.length; i++) {
-      if (await canUse(accounts[i])) {
-        return accounts[i]
-      }
+    if (!this.accountInUse) {
+      this.accountInUse = findAvailableAccount(this.accounts)
     }
+    return this.accountInUse
+  },
 
-    throw new Error('No usable account!')
+  onExit: async () => {
+    if (USE_DB) {
+      return db.releaseAccount(this.accountInUse.address)
+    }
   }
 }
