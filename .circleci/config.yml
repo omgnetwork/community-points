@@ -34,8 +34,8 @@ jobs:
     steps:
       - checkout
       - run: |
-        apk update && apk upgrade
-        apk add --no-cache git openssh make gcc g++ python
+          apk update && apk upgrade
+          apk add --no-cache git openssh make gcc g++ python
       - run: cd client && yarn install
       - run: cd client && yarn lint
       - run: cd client && yarn test
