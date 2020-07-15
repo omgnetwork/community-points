@@ -143,7 +143,7 @@ describe('relay-tx integration test', () => {
     const signatures = childChain.signTransaction(tx.typedData, [this.alice.privateKey])
 
     // call relayTx.submit()
-    await relayTx.submit(childChain, tx.typedData, signatures, this.signFunc)
+    await relayTx.submit(childChain, tx.tx, signatures, this.signFunc)
 
     // Check that the transaction succeeded
     return helper.waitForBalance(childChain, this.bob.address, spendToken, balance => new BN(balance.amount).eqn(TEST_AMOUNT))

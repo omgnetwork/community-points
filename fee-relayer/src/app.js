@@ -17,15 +17,15 @@
 require('dotenv').config()
 const relayTx = require('./relay-tx')
 const signer = require('./signer')
+const accountSelector = require('./account-selector')
 const { ChildChain } = require('@omisego/omg-js')
 const express = require('express')
 const bodyParser = require('omg-body-parser')
 const JSONBigNumber = require('omg-json-bigint')
-const createMiddleware = require('@apidevtools/swagger-express-middleware');
+const createMiddleware = require('@apidevtools/swagger-express-middleware')
 const pino = require('pino')
 const cors = require('cors')
 const expressPino = require('express-pino-logger')
-const BN = require('bn.js')
 
 const childChain = new ChildChain({
   watcherUrl: process.env.OMG_WATCHER_URL,
@@ -43,13 +43,21 @@ const logger = pino({ level: process.env.LOG_LEVEL || 'info' })
 const expressLogger = expressPino({ logger })
 app.use(expressLogger)
 
-createMiddleware('./swagger/swagger.yaml', app, function (err, middleware) {
+createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware) {
+  if (err) {
+    logger.error(`Error initialising middleware: ${err}`)
+    throw err
+  }
+
+  await accountSelector.setAccounts(await signer.getAccounts())
+  const { address: feePayerAddress } = await accountSelector.getAccount()
+
   app.use(
     middleware.files(),
     middleware.metadata(),
     middleware.parseRequest(),
-    middleware.validateRequest(),
-  );
+    middleware.validateRequest()
+  )
 
   app.post('/create-relayed-tx', async (req, res) => {
     try {
@@ -60,14 +68,15 @@ createMiddleware('./swagger/swagger.yaml', app, function (err, middleware) {
         req.body.amount,
         spendableToken,
         req.body.to,
-        signer.getAddress(),
+        feePayerAddress,
         feeToken
       )
       res.type('application/json')
-      res.send({
-        success: true,
-        data: JSONBigNumber.stringify(tx)
-      })
+      res.send(
+        JSONBigNumber.stringify({
+          success: true,
+          data: tx
+        }))
     } catch (err) {
       res.status(500)
       res.send({
@@ -81,7 +90,7 @@ createMiddleware('./swagger/swagger.yaml', app, function (err, middleware) {
     try {
       const result = await relayTx.submit(
         childChain,
-        req.body.typedData,
+        req.body.tx,
         req.body.signatures,
         signer.sign
       )
@@ -114,5 +123,5 @@ createMiddleware('./swagger/swagger.yaml', app, function (err, middleware) {
     }
   })
 
-  app.listen(port, () => logger.info('Server running on port %d', port))
-});
+  app.listen(port, () => logger.info(`Fee Relayer running on port ${port}, using account ${feePayerAddress}`))
+})

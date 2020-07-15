@@ -44,13 +44,17 @@ module.exports = {
     return { tx, typedData }
   },
 
-  submit: async function (childChain, typedData, spenderSigs, signer) {
+  submit: async function (childChain, tx, spenderSigs, signFunc) {
     logger.debug('relayTx.submit')
 
-    // Sign using the keyManager
+    // Get the fee payer address from the tx data
+    const feePayerAddress = tx.inputs[tx.inputs.length - 1].owner
+
+    // Sign
+    const typedData = transaction.getTypedData(tx, childChain.plasmaContractAddress)
     const toSign = transaction.getToSignHash(typedData)
-    const feeSigs = await signer(toSign)
-    spenderSigs.push(feeSigs)
+    const feeSig = await signFunc(toSign, feePayerAddress)
+    spenderSigs.push(feeSig)
 
     // Submit the transaction
     const signedTx = childChain.buildSignedTransaction(typedData, spenderSigs)
