@@ -4,12 +4,42 @@ workflows:
   version: 2
   build-master:
     jobs:
-      - build-and-deploy:
+      - test-client:
           filters:
             branches:
               only: master
+      - build-and-deploy:
+          requires:
+            - test-client
+          filters:
+            branches:
+              only: master
+  build-other-branches:
+    jobs:
+      - test-client:
+          filters:
+            branches:
+              ignore: master
+      - build-and-deploy:
+          requires:
+            - test-client
+          filters:
+            branches:
+              ignore: master
 
 jobs:
+  test-client:
+    docker:
+      - image: node:12.16.1-alpine3.11
+    steps:
+      - checkout
+      - run: |
+        apk update && apk upgrade
+        apk add --no-cache git openssh make gcc g++ python
+      - run: cd client && yarn install
+      - run: cd client && yarn lint
+      - run: cd client && yarn test
+
   build-and-deploy:
     docker:
       - image: google/cloud-sdk
