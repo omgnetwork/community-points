@@ -15,3 +15,10 @@ export function log (error: Error): void {
     Sentry.captureException(error);
   }
 }
+
+export function isExpectedError (error: Error): boolean {
+  if (error.message && error.message.includes('User denied')) {
+    return true;
+  }
+  return false;
+}

@@ -4,6 +4,8 @@ import BigNumber from 'bignumber.js';
 import truncate from 'truncate-middle';
 import { useDispatch, useSelector, batch } from 'react-redux';
 
+import Loading from 'app/views/loading/Loading';
+
 import Alert from 'app/components/alert/Alert';
 import Address from 'app/components/address/Address';
 import Button from 'app/components/button/Button';
@@ -13,7 +15,7 @@ import PointBalance from 'app/components/pointbalance/PointBalance';
 import Tabs from 'app/components/tabs/Tabs';
 
 import { ISession, IUserAddress } from 'interfaces';
-import { transfer, getSession, getTransactions, getUserAddressMap } from 'app/actions';
+import { transfer, getSession, getTransactions, getUserAddressMap, clearError } from 'app/actions';
 import { selectError } from 'app/selectors/uiSelector';
 import { selectLoading } from 'app/selectors/loadingSelector';
 import { selectSession } from 'app/selectors/sessionSelector';
@@ -53,10 +55,6 @@ function Home (): JSX.Element {
     });
   }, 20 * 1000);
 
-  function clearError () {
-    dispatch(clearError());
-  }
-
   async function handleTransfer (): Promise<any> {
     try {
       const result = await dispatch(transfer({
@@ -69,8 +67,6 @@ function Home (): JSX.Element {
         setView('History');
         setAmount('');
         setRecipient('');
-      } else {
-        // TODO: user ui feedback that transfer failed
       }
     } catch (error) {
       //
@@ -103,16 +99,20 @@ function Home (): JSX.Element {
     return false;
   }
 
+  function handleClearError () {
+    dispatch(clearError());
+  }
+
   if (!session) {
     return (
-      <div>Loading...</div>
+      <Loading />
     );
   }
 
   return (
     <div className={styles.Home}>
       <Alert
-        onClose={clearError}
+        onClose={handleClearError}
         open={!!errorMessage}
         message={errorMessage}
         title='Error'

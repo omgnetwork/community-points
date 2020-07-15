@@ -21,7 +21,7 @@ export function getCurrentSubReddit (): Promise<ISubReddit> {
           name
         });
       } catch (error) {
-        reject(error);
+        reject(new Error(error));
       }
     });
   });

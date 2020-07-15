@@ -11,19 +11,13 @@ export function createAction (
       const response = await asyncAction();
       dispatch({ type: `${key}/SUCCESS`, payload: response });
       return true;
-    } catch (_error) {
-      let error = _error;
-      if (typeof error === 'string') {
-        error = new Error(error);
-      }
-
+    } catch (error) {
       // cancel loading state
       dispatch({ type: `${key}/ERROR` });
 
-      // if user denied ignore
-      if (
-        (error.message && error.message.includes('User denied'))
-      ) {
+      // sanitize expected errors
+      const expectedError = errorService.isExpectedError(error);
+      if (expectedError) {
         return false;
       }
 

@@ -21,7 +21,7 @@ function Alert ({
     <div
       className={[
         styles.Alert,
-        open ? styles.open : '',
+        open ? styles.open : styles.closed,
         type === 'success' ? styles.success : styles.error
       ].join(' ')}
     >
