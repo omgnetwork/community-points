@@ -22,7 +22,15 @@ export function selectUsername (address: string) {
 }
 
 export function selectAvatarByUsername (username: string) {
-  return function selectAvatarFromState (state): string {
+  return function selectAvatarByUsernameFromState (state): string {
     return get(state, `address[${username}].avatar`, null);
+  };
+}
+
+export function selectAvatarByAddress (address: string) {
+  return function selectAvatarByAddressFromState (state): string {
+    const userAddressMap: IUserAddress[] = Object.values(state.address);
+    const user = userAddressMap.find(i => i.address.toLowerCase() === address.toLowerCase());
+    return get(user, 'avatar', null);
   };
 }
