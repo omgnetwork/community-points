@@ -89,6 +89,10 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
     middleware.validateRequest()
   )
 
+  app.get('/', async (req, res) => {
+    res.status(200).end()
+  })
+
   app.post('/create-relayed-tx', async (req, res) => {
     try {
       logger.info(`/create-relayed-tx: from ${req.body.utxos[0].owner}, to ${req.body.to}, amount ${req.body.amount}`)
