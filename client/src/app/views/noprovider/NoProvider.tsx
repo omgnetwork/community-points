@@ -9,7 +9,7 @@ import * as locationService from 'app/services/locationService';
 
 import * as styles from './NoProvider.module.scss';
 
-function NoProvider () {
+function NoProvider (): JSX.Element {
   function handleNewTab (): void {
     locationService.openTab('https://chrome.google.com/webstore/detail/metamask/nkbihfbeogaeaoehlefnkodbefgpgknn?hl=en');
   }

@@ -15,8 +15,14 @@ export function getUsernameFromMap (address: string, userAddressMap: IUserAddres
 }
 
 export function selectUsername (address: string) {
-  return function (state): string {
+  return function selectUsernameFromState (state): string {
     const userAddressMap: IUserAddress[] = Object.values(state.address);
     return getUsernameFromMap(address, userAddressMap);
+  };
+}
+
+export function selectAvatarByUsername (username: string) {
+  return function selectAvatarFromState (state): string {
+    return get(state, `address[${username}].avatar`, null);
   };
 }

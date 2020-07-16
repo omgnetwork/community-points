@@ -1,7 +1,5 @@
 import { keyBy } from 'lodash';
-import { IAction } from 'background/interfaces';
-
-import { IUserAddress } from 'interfaces';
+import { IUserAddress, IAction } from 'interfaces';
 
 interface AddressState {
   [username: string]: IUserAddress

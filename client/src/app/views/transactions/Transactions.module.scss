@@ -80,6 +80,9 @@
           }
 
           .address {
+            max-width: 100px;
+            text-overflow: ellipsis;
+            overflow-x: hidden;
             margin-right: 5px;
           }
         }

@@ -6,7 +6,7 @@ import isAddress from 'app/util/isAddress';
 import { IUserAddress } from 'interfaces';
 import config from 'config';
 
-export function parseThreadJSON (json): IUserAddress[] {
+export function parseThreadJSON (json): Partial<IUserAddress[]> {
   const rawComments = get(json, '[1].data.children', []);
 
   let userAddressMap = [];
@@ -18,7 +18,7 @@ export function parseThreadJSON (json): IUserAddress[] {
 
     for (const word of words) {
       if (isAddress(word)) {
-        const commentCandidate = {
+        const commentCandidate: Partial<IUserAddress> = {
           author: comment.data.author,
           address: word.trim().toLowerCase(),
           created: comment.data.created
@@ -54,7 +54,33 @@ export function parseThreadJSON (json): IUserAddress[] {
 
 export async function getUserAddressMap (): Promise<IUserAddress[]> {
   const rawData = await transportService.get({
-    url: `${config.userAddressUrl}.json?limit=5000`
+    url: `${config.userAddressUrl}.json?limit=10000`
   });
-  return parseThreadJSON(rawData);
+  const _userAddressMap: Partial<IUserAddress[]> = parseThreadJSON(rawData);
+
+  // fetch user avatars
+  const fetchAvatarPromises = _userAddressMap.map((user: Partial<IUserAddress>) => {
+    return getUserAvatar(user.author);
+  });
+
+  const avatars = await Promise.all(fetchAvatarPromises);
+  const userAddressMap = _userAddressMap.map((user: IUserAddress, index: number) => {
+    return {
+      ...user,
+      avatar: avatars[index]
+    };
+  });
+
+  return userAddressMap;
+}
+
+export async function getUserAvatar (username: string): Promise<string> {
+  try {
+    const userData = await transportService.get({
+      url: `https://www.reddit.com/user/${username}/about.json`
+    });
+    return get(userData, 'data.icon_img', null);
+  } catch (error) {
+    return null;
+  }
 }

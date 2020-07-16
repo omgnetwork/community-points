@@ -1,0 +1,43 @@
+@import 'app/styles/colors';
+
+.Alert {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  border-radius: 4px;
+  z-index: 1;
+  box-sizing: border-box;
+
+  &.open {
+    display: flex;
+    align-items: center;
+  }
+  &.closed {
+    display: none;
+  }
+  &.success {
+    background-color: $green;
+    color: $black;
+  }
+  &.error {
+    background-color: $red;
+    color: $white;
+  }
+  .close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    cursor: pointer;
+  }
+  .content {
+    display: flex;
+    flex-direction: column;
+    word-break: break-word;
+    padding: 15px;
+    .title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+  }
+}

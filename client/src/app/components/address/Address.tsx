@@ -1,9 +1,10 @@
 import * as React from 'react';
+import { useCallback } from 'react';
 import truncate from 'truncate-middle';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { useSelector } from 'react-redux';
 
-import { selectUsername } from 'app/selectors/addressSelector';
+import { selectUsername, selectAvatarByUsername } from 'app/selectors/addressSelector';
 
 import Option from 'app/components/option/Option';
 
@@ -19,7 +20,14 @@ function Address ({
   address,
   className
 }: AddressProps): JSX.Element {
-  const username = useSelector(selectUsername(address));
+  const username: string = useSelector(selectUsername(address));
+
+  const getAvatar = useCallback(() => {
+    if (username) {
+      return useSelector(selectAvatarByUsername(username));
+    }
+  }, [username]);
+
   return (
     <div
       className={[
@@ -30,6 +38,7 @@ function Address ({
       <Option
         title={username || 'User'}
         detail={truncate(address, 6, 4, '...')}
+        image={getAvatar()}
       />
       <CopyToClipboard text={address}>
         <img

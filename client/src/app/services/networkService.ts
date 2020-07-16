@@ -1,6 +1,5 @@
 import BN from 'bn.js';
 import { get } from 'lodash';
-import JSONBigNumber from 'omg-json-bigint';
 
 import { ISession, ITransaction, ISubReddit } from 'interfaces';
 
@@ -187,6 +186,7 @@ export async function transfer ({
       url: `${subReddit.feeRelay}/cancel-relayed-tx`,
       body: { tx: relayedTx.tx }
     });
+
     throw error;
   }
 

@@ -25,6 +25,11 @@ describe('redditService', () => {
         author: 'Ok_Swordfish6794',
         address: '0xcee05bf5b86aa9369b4676a2df518545e7e6d38f',
         created: 1594318221
+      },
+      {
+        author: 'omg_salamander',
+        address: '0x434e2863a78752166ffd5ed883607cbaf74f3858',
+        created: 1594912522
       }
     ];
     expect(result).toEqual(expected);

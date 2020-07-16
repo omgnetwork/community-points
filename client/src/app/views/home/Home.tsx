@@ -4,6 +4,9 @@ import BigNumber from 'bignumber.js';
 import truncate from 'truncate-middle';
 import { useDispatch, useSelector, batch } from 'react-redux';
 
+import Loading from 'app/views/loading/Loading';
+
+import Alert from 'app/components/alert/Alert';
 import Address from 'app/components/address/Address';
 import Button from 'app/components/button/Button';
 import Select from 'app/components/select/Select';
@@ -12,7 +15,8 @@ import PointBalance from 'app/components/pointbalance/PointBalance';
 import Tabs from 'app/components/tabs/Tabs';
 
 import { ISession, IUserAddress } from 'interfaces';
-import { transfer, getSession, getTransactions, getUserAddressMap } from 'app/actions';
+import { transfer, getSession, getTransactions, getUserAddressMap, clearError } from 'app/actions';
+import { selectError } from 'app/selectors/uiSelector';
 import { selectLoading } from 'app/selectors/loadingSelector';
 import { selectSession } from 'app/selectors/sessionSelector';
 import { selectUserAddressMap } from 'app/selectors/addressSelector';
@@ -33,6 +37,7 @@ function Home (): JSX.Element {
   const [ recipient, setRecipient ]: [ string, any ] = useState('');
   const [ amount, setAmount ]: any = useState('');
 
+  const errorMessage: string = useSelector(selectError);
   const transferLoading: boolean = useSelector(selectLoading(['TRANSACTION/CREATE']));
   const session: ISession = useSelector(selectSession);
   const isPendingTransaction: boolean = useSelector(selectIsPendingTransaction);
@@ -62,8 +67,6 @@ function Home (): JSX.Element {
         setView('History');
         setAmount('');
         setRecipient('');
-      } else {
-        // TODO: user ui feedback that transfer failed
       }
     } catch (error) {
       //
@@ -96,14 +99,26 @@ function Home (): JSX.Element {
     return false;
   }
 
+  function handleClearError () {
+    dispatch(clearError());
+  }
+
   if (!session) {
     return (
-      <div>Loading...</div>
+      <Loading />
     );
   }
 
   return (
     <div className={styles.Home}>
+      <Alert
+        onClose={handleClearError}
+        open={!!errorMessage}
+        message={errorMessage}
+        title='Error'
+        type='error'
+      />
+
       <h1>{`r/${session.subReddit.name}`}</h1>
       <Address
         address={session.account}
@@ -143,6 +158,7 @@ function Home (): JSX.Element {
                 return {
                   value: i.address,
                   title: i.author,
+                  image: i.avatar,
                   detail: truncate(i.address, 6, 4, '...')
                 };
               })}

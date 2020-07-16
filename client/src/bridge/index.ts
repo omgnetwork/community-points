@@ -13,7 +13,7 @@ function getProvider () {
   }
 }
 
-function getWeb3 () {
+function getWeb3 (): Web3 {
   const provider = getProvider();
   if (provider) {
     return new Web3(
@@ -34,7 +34,7 @@ function respond ({ type, status, payload }: IMessage): void {
 }
 
 // handle messages sent from ui in page context
-window.addEventListener('message', async function (event) {
+window.addEventListener('message', async function uiMessageEventListener (event) {
   const key = get(event, 'data.key', null);
   const type = get(event, 'data.type', null);
   const payload = get(event, 'data.payload', null);
@@ -77,11 +77,6 @@ window.addEventListener('message', async function (event) {
     if (type === 'WEB3/ENABLE') {
       if ((window as any).ethereum) {
         await (window as any).ethereum.enable();
-        return respond({
-          type,
-          status: 'success',
-          payload: true
-        });
       }
       return respond({
         type,
@@ -92,30 +87,20 @@ window.addEventListener('message', async function (event) {
 
     if (type === 'WEB3/SIGN') {
       const web3 = getWeb3();
-      try {
-        const signature = await web3.currentProvider.send(
-          'eth_signTypedData_v3',
-          [
-            web3.utils.toChecksumAddress(payload.account),
-            JSONBigNumber.stringify(payload.typedData)
-          ]
-        );
-        return respond({
-          type,
-          status: 'success',
-          payload: signature
-        });
-      } catch (error) {
-        return respond({
-          type,
-          status: 'error',
-          payload: error.message
-        });
-      }
+      const signature = await web3.currentProvider.send(
+        'eth_signTypedData_v3',
+        [
+          web3.utils.toChecksumAddress(payload.account),
+          JSONBigNumber.stringify(payload.typedData)
+        ]
+      );
+      return respond({
+        type,
+        status: 'success',
+        payload: signature
+      });
     }
   } catch (error) {
-    // TODO: send to sentry
-    console.warn('UNCAUGHT ERROR ON BRIDGE: ', error.message);
     return respond({
       type,
       status: 'error',

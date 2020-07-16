@@ -22,7 +22,7 @@ export async function send ({
           }
           if (message.status === 'error') {
             chrome.runtime.onMessage.removeListener(messageListener);
-            return reject(message.payload);
+            return reject(new Error(message.payload));
           }
         }
       }

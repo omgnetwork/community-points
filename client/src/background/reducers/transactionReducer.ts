@@ -1,7 +1,5 @@
 import { keyBy } from 'lodash';
-import { IAction } from 'background/interfaces';
-
-import { ITransaction } from 'interfaces';
+import { ITransaction, IAction } from 'interfaces';
 
 interface TransactionState {
   [key: string]: ITransaction

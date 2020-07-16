@@ -33,4 +33,4 @@ chrome.contextMenus.create({
   contexts: ['all']
 });
 
-console.log('omgcp background initialized...');
+console.log('omgcp background.js initialized...');

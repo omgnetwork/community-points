@@ -23,6 +23,7 @@
 	],
 	"rules": {
 		"semi": ["error", "always"],
+		"func-names": ["error", "always"],
 		"array-bracket-spacing": ["error", "always", { "singleValue": false }],
 		"quote-props": "off",
 		"no-unused-vars": "off",
