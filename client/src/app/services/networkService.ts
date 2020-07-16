@@ -166,7 +166,7 @@ export async function transfer ({
   }
 
   // post to /create-relayed-tx { utxos, amount, to }
-  const _relayedTx = await transportService.post({
+  const relayedTx = await transportService.post({
     rpc: false,
     url: `${subReddit.feeRelay}/create-relayed-tx`,
     body: {
@@ -175,7 +175,6 @@ export async function transfer ({
       to: recipient
     }
   });
-  const relayedTx = JSONBigNumber.parse(_relayedTx);
 
   // sign returned typed data and get sig
   let signature;
@@ -203,7 +202,7 @@ export async function transfer ({
     rpc: false,
     url: `${subReddit.feeRelay}/submit-relayed-tx`,
     body: {
-      typedData: relayedTx.typedData,
+      tx: relayedTx.tx,
       signatures
     }
   });

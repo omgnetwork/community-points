@@ -22,6 +22,7 @@
     "express-pino-logger": "^5.0.0",
     "omg-body-parser": "^1.19.0",
     "omg-json-bigint": "^1.0.0",
+    "pg": "^8.3.0",
     "pino": "^6.3.2"
   },
   "devDependencies": {
