@@ -1,6 +1,5 @@
 import BN from 'bn.js';
 import { get } from 'lodash';
-import JSONBigNumber from 'omg-json-bigint';
 
 import { ISession, ITransaction, ISubReddit } from 'interfaces';
 
