@@ -1,11 +1,26 @@
 # Reddit Community Point Contracts
 
 ## Deploy the contracts
-1. Set the `DEPLOYER_PRIVATEKEY` in the `.env` file for the private key of the account used to deploy the contracts. This address should have some ETH.
-1. Set the `SUBREDDIT_OWNER` in the `.env` file for the address of subreddit owner.
-1. (Optional) Set the `REMOTE_URL` in the `.env` for the infura or external eth client. Default to `http://127.0.0.1:8545`
-1. (Optional) Set the `GAS_PRICE` in the `.env` for the gas price used to deploy the contracts.
-1. Run the following command to deploy the contract:
+### Env var settings
+1. Set the `DEPLOYER_PRIVATEKEY` for the private key of the account used to deploy the contracts. This address should have some ETH.
+1. Set the `SUBREDDIT_OWNER` for the address of subreddit owner.
+1. (Optional) Set the `REMOTE_URL` for the infura or external eth client. Default to `http://127.0.0.1:8545`
+1. (Optional) Set the `GAS_PRICE` for the gas price used to deploy the contracts.
+
+### Deploy
+1. Barebone command:
     ```
     npx truffle migrate --network remote
+    ```
+1. Docker command:
+    ```
+    # build the docker image
+    docker build -t point-contracts-deployer .
+
+    # deploy the contract
+    docker run --rm \
+    -e SUBREDDIT_OWNER=<subreddit owner address> \
+    -e DEPLOYER_PRIVATEKEY=<private key for deployer> \
+    -e REMOTE_URL=<remote eth client url or infura url> \
+    point-contracts-deployer npx truffle migrate --network remote
     ```
