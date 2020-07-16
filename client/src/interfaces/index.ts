@@ -34,7 +34,8 @@ export interface ISession {
 export interface IUserAddress {
   author: string,
   address: string,
-  created: number
+  created: number,
+  avatar: string
 }
 
 export interface IAction {

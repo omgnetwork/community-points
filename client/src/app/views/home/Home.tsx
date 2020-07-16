@@ -158,6 +158,7 @@ function Home (): JSX.Element {
                 return {
                   value: i.address,
                   title: i.author,
+                  image: i.avatar,
                   detail: truncate(i.address, 6, 4, '...')
                 };
               })}

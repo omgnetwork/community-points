@@ -20,3 +20,9 @@ export function selectUsername (address: string) {
     return getUsernameFromMap(address, userAddressMap);
   };
 }
+
+export function selectAvatarByUsername (username: string) {
+  return function selectAvatarFromState (state): string {
+    return get(state, `address[${username}].avatar`, null);
+  };
+}
