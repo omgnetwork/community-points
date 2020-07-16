@@ -65,7 +65,6 @@ definitions:
         items:
           $ref: "#/definitions/tx_output"
 
-
   create-relayed-tx-body:
     required:
       - utxos
@@ -106,6 +105,12 @@ definitions:
 
 
 paths:
+  /:
+    get:
+      responses:
+        200:
+          description: Returns true on success
+
   /create-relayed-tx:
     post:
       description: Creates a transaction
