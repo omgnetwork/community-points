@@ -48,7 +48,7 @@ module.exports = {
   },
 
   submit: async function (childChain, tx, spenderSigs, signFunc) {
-    logger.debug('relayTx.submit')
+    logger.debug(`relayTx.submit, tx = ${JSON.stringify(tx)}`)
 
     // Get the fee payer address from the tx data
     const feePayerAddress = tx.inputs[tx.inputs.length - 1].owner

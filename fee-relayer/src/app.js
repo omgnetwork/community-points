@@ -112,6 +112,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
           data: tx
         }))
     } catch (err) {
+      logger.error(err.stack || err)
       res.status(500)
       res.send({
         success: false,
@@ -133,6 +134,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
         data: result
       })
     } catch (err) {
+      logger.error(err.stack || err)
       res.status(500)
       res.send({
         success: false,
@@ -149,6 +151,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
         data: true
       })
     } catch (err) {
+      logger.error(err.stack || err)
       res.status(500)
       res.send({
         success: false,
