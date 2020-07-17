@@ -79,7 +79,12 @@ export async function getUserAvatar (username: string): Promise<string> {
     const userData = await transportService.get({
       url: `https://www.reddit.com/user/${username}/about.json`
     });
-    return get(userData, 'data.icon_img', null);
+    const rawAssetUrl = get(userData, 'data.icon_img', null);
+    if (!rawAssetUrl) {
+      return null;
+    }
+    const rootHash = rawAssetUrl.split('?');
+    return rootHash[0];
   } catch (error) {
     return null;
   }
