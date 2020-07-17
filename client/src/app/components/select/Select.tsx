@@ -125,6 +125,7 @@ function Select ({
                   detail={option.detail}
                   image={option.image}
                   selected={option.value === get(selected, 'value')}
+                  className={styles.option}
                 />
               );
             })}

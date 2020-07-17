@@ -33,6 +33,7 @@
     }
 
     &.flash {
+      cursor: initial;
       animation-name: flash-animation;
       animation-duration: 2s;
     }

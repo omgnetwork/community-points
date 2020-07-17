@@ -8,7 +8,8 @@ interface OptionProps {
   detail: string,
   image?: string,
   onClick?: () => void,
-  selected?: boolean
+  selected?: boolean,
+  className?: string
 }
 
 function Option ({
@@ -16,14 +17,16 @@ function Option ({
   title,
   detail,
   image,
-  selected
+  selected,
+  className
 }: OptionProps): JSX.Element {
   return (
     <div
       onClick={onClick}
       className={[
         styles.Option,
-        selected ? styles.selected : ''
+        selected ? styles.selected : '',
+        className
       ].join(' ')}
     >
       <img src={image || omgcp_avatar} alt='avatar' />
