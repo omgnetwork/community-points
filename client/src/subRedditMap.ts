@@ -2,9 +2,9 @@
 
 export default {
   'omise_go': {
-    token: '0xc778417e063141139fce010982780140aa0cd5ab',
-    symbol: 'WETH',
-    decimals: 18,
+    token: '0x2d453E2a14a00F4a26714A82abfc235C2B2094d5',
+    symbol: 'KEV',
+    decimals: 0,
     feeRelay: 'http://localhost:3333'
   }
 };
