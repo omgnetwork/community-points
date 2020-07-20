@@ -8,7 +8,7 @@
 1. (Optional) Set the `GAS_PRICE` for the gas price used to deploy the contracts.
 
 ### Deploy
-1. Barebone command:
+1. Barebone command: (Before running the command, setup the env vars either directly or via an `.env` file)
     ```
     npx truffle migrate --network remote
     ```
@@ -17,7 +17,7 @@
     # build the docker image
     docker build -t point-contracts-deployer .
 
-    # deploy the contract
+    # deploy the contracts
     docker run --rm \
     -e SUBREDDIT_OWNER=<subreddit owner address> \
     -e DEPLOYER_PRIVATEKEY=<private key for deployer> \
