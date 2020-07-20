@@ -1,6 +1,6 @@
 {
   "name": "community-points",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "engines": {
     "node": "12.16.1"
   },
@@ -14,7 +14,7 @@
     "build:prod": "webpack --config config/webpack.prod.js",
     "lint": "eslint 'src/**'",
     "test": "jest src --passWithNoTests",
-    "release": "yarn lint && yarn test && yarn version && node release/bumpManifest.js && yarn build:prod && node release/createRelease.js"
+    "release": "yarn lint && yarn test && yarn version && node release/bumpManifest.js && yarn build:dev && node release/createRelease.js"
   },
   "dependencies": {
     "@sentry/react": "^5.19.1",
