@@ -9,11 +9,11 @@
 
 ### Deploy
 1. Barebone command: (Before running the command, setup the env vars either directly or via an `.env` file)
-    ```
+    ```sh
     npx truffle migrate --network remote
     ```
 1. Docker command:
-    ```
+    ```sh
     # build the docker image
     docker build -t point-contracts-deployer .
 
@@ -24,3 +24,10 @@
     -e REMOTE_URL=<remote eth client url or infura url> \
     point-contracts-deployer npx truffle migrate --network remote
     ```
+
+## Update the ABIs
+All abis should be in `abis` folder. To update the ABIs, run:
+```
+npm run export-abi
+```
+This will auto recompile all contracts and fetch the ABI part to the files in `abis` folder.
