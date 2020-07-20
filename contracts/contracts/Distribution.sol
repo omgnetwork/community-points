@@ -55,6 +55,7 @@ contract Distribution is OnlyFromAddress {
     }
 
     function initRound(uint256 initialDistribution, uint256 totalKarma) external {
+        require(currentRound == 0, "Initial round has already started");
         distribute(initialDistribution, initialDistribution, totalKarma);
     }
 
