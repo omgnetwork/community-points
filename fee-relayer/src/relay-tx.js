@@ -66,6 +66,8 @@ module.exports = {
 
   cancel: async function (tx) {
     logger.debug('relayTx.cancel')
-    // TODO Mark fee utxo as usable
+    tx.inputs.forEach(input => {
+      utxoManager.cancelPending(input)
+    })
   }
 }

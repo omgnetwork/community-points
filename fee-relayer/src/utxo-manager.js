@@ -16,10 +16,14 @@
 
 const BN = require('bn.js')
 
-const pendingUtxos = []
+let pendingUtxos = []
+
+function compareUtxo (a, b) {
+  return a.blknum === b.blknum && a.txindex === b.txindex && a.oindex === b.oindex
+}
 
 module.exports = {
-  getFeeUtxo: async function (utxos, feeToken, feeAmount) {
+  getFeeUtxo: async (utxos, feeToken, feeAmount) => {
     // Filter by currency and not pending, and sort by amount
     const validUtxos = utxos
       .filter(utxo => utxo.currency.toLowerCase() === feeToken.toLowerCase())
@@ -40,5 +44,9 @@ module.exports = {
     // TODO use utxos to clean up pending utxos so that it doesn't keep growing.
 
     return utxo
+  },
+
+  cancelPending: (utxo) => {
+    pendingUtxos = pendingUtxos.filter(item => !compareUtxo(item, utxo))
   }
 }
