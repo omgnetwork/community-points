@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react';
 
 import * as locationService from 'app/services/locationService';
 import * as networkService from 'app/services/networkService';
+import * as errorService from 'app/services/errorService';
 
 import Loading from 'app/views/loading/Loading';
+import ErrorView from 'app/views/errorview/ErrorView';
 import Home from 'app/views/home/Home';
 import InvalidCommunity from 'app/views/invalidcommunity/InvalidCommunity';
 import NoProvider from 'app/views/noprovider/NoProvider';
@@ -14,7 +16,7 @@ import config from 'config';
 
 import * as styles from './Main.module.scss';
 
-type IViewState = 'LOADING' | 'HOME' | 'INVALID_COMMUNITY' | 'NO_PROVIDER' | 'WRONG_NETWORK';
+type IViewState = 'LOADING' | 'HOME' | 'INVALID_COMMUNITY' | 'NO_PROVIDER' | 'WRONG_NETWORK' | 'ERROR';
 
 function Main (): JSX.Element {
   const [ view, setView ]: [ IViewState, any ] = useState('LOADING');
@@ -22,6 +24,17 @@ function Main (): JSX.Element {
   const [ validSubReddit, setValidSubReddit ]: [ boolean, any ] = useState(false);
   const [ providerEnabled, setProviderEnabled ]: [ boolean, any ] = useState(false);
   const [ correctNetwork, setCorrectNetwork ]: [ boolean, any ] = useState(false);
+  const [ errorMessage, setErrorMessage ]: [ string, any ] = useState('');
+
+  function withErrorHandler (action: () => void): void {
+    try {
+      action();
+    } catch (error) {
+      errorService.log(error);
+      setErrorMessage(error.message);
+      return setView('ERROR');
+    }
+  }
 
   // 1. check if valid subreddit
   useEffect(() => {
@@ -32,7 +45,7 @@ function Main (): JSX.Element {
       }
       return setValidSubReddit(true);
     }
-    checkCurrentPage();
+    withErrorHandler(checkCurrentPage);
   }, []);
 
   // 2. check if provider installed, and enable if so
@@ -46,7 +59,7 @@ function Main (): JSX.Element {
       return setProviderEnabled(true);
     }
     if (validSubReddit) {
-      checkWeb3ProviderExists();
+      withErrorHandler(checkWeb3ProviderExists);
     }
   }, [validSubReddit]);
 
@@ -60,7 +73,7 @@ function Main (): JSX.Element {
       return setCorrectNetwork(true);
     }
     if (providerEnabled) {
-      checkWeb3ProviderNetwork();
+      withErrorHandler(checkWeb3ProviderNetwork);
     }
   }, [providerEnabled]);
 
@@ -74,6 +87,7 @@ function Main (): JSX.Element {
   return (
     <div className={styles.Main}>
       { (view as any) === 'LOADING' && <Loading />}
+      { (view as any) === 'ERROR' && <ErrorView message={errorMessage} />}
       { (view as any) === 'HOME' && <Home />}
       { (view as any) === 'INVALID_COMMUNITY' && <InvalidCommunity />}
       { (view as any) === 'NO_PROVIDER' && <NoProvider />}
