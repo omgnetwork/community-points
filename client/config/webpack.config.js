@@ -20,8 +20,8 @@ module.exports = {
     filename: '[name].js'
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js', '.jsx', '.scss'],
-    modules: ['src', 'node_modules']
+    extensions: [ '.ts', '.tsx', '.js', '.jsx', '.scss' ],
+    modules: [ 'src', 'node_modules' ]
   },
   plugins: [
     new CopyPlugin({
@@ -91,10 +91,10 @@ module.exports = {
         exclude: /node_modules/,
         use: [
           {
-            loader: "ts-loader"
+            loader: 'ts-loader'
           }
         ]
       }
     ]
   }
-}
+};

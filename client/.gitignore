@@ -3,4 +3,5 @@ build
 .env
 yarn-error.log
 .DS_Store
+*.zip
 package-lock.json
