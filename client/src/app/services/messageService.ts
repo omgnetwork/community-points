@@ -16,12 +16,11 @@ export async function send ({
     chrome.runtime.onMessage.addListener(
       function messageListener (message: IMessage) {
         if (message.type === type) {
+          chrome.runtime.onMessage.removeListener(messageListener);
           if (message.status === 'success') {
-            chrome.runtime.onMessage.removeListener(messageListener);
             return resolve(message.payload);
           }
           if (message.status === 'error') {
-            chrome.runtime.onMessage.removeListener(messageListener);
             return reject(new Error(message.payload));
           }
         }

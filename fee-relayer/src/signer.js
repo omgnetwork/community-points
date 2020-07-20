@@ -17,6 +17,7 @@
 const ethUtil = require('ethereumjs-util')
 const sigUtil = require('eth-sig-util')
 const { fromPrivate } = require('eth-lib').account
+const logger = require('pino')({ level: process.env.LOG_LEVEL || 'info' })
 
 function accountsFromEnv () {
   if (!process.env.FEE_RELAYER_PRIVATE_KEYS) {
@@ -36,6 +37,11 @@ module.exports = {
 
   sign: async (toSign, address) => {
     const feePayer = this.accounts.find(account => account.address.toLowerCase() === address.toLowerCase())
+    if (!feePayer) {
+      throw new Error(`Address ${address} is not a fee payer account`)
+    }
+    logger.info(`Signing tx with fee payer account ${feePayer.address}`)
+    console.log(`Buffer ${JSON.stringify(Buffer.from(feePayer.privateKey.replace('0x', ''), 'hex'))}`)
     const signed = ethUtil.ecsign(
       toSign,
       Buffer.from(feePayer.privateKey.replace('0x', ''), 'hex')

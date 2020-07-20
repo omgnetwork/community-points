@@ -1,0 +1,13 @@
+@import 'app/styles/colors';
+
+.ErrorView {
+  display: flex;
+  flex-direction: column;
+  .icon {
+    align-self: flex-start;
+    margin-bottom: 20px;
+  }
+  .rawError {
+    color: $red;
+  }
+}
