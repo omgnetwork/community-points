@@ -12,13 +12,14 @@ This project is a Chrome extension used to transfer Reddit community points dire
   - bridge.js - listens for messages from the contentScript and interacts with the web3 provider in the context of the dom
   - background.js - listens to user actions and persists state
 
-### Development
+### Commands
 
 - `nvm use` switch to correct node version
 - `yarn install` install project dependencies
 - `yarn build:dev` or `yarn build:prod` compile extension bundle (with or without source maps)
 - `yarn lint` runs linter
 - `yarn test` runs tests
+- `yarn release` prepare bundle for release
 
 ### Installation
 
