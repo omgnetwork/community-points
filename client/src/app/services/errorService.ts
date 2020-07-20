@@ -10,7 +10,7 @@ if (config.sentryDsn) {
 }
 
 export function log (error: Error): void {
-  console.warn(error.message);
+  console.log(error.message);
   if (config.sentryDsn) {
     Sentry.captureException(error);
   }

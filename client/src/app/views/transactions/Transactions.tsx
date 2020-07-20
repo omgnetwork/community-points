@@ -43,6 +43,12 @@ function Transactions (): JSX.Element {
 
   return (
     <div className={styles.Transactions}>
+      {visibleTransactions && !visibleTransactions.length && (
+        <div className={styles.disclaimer}>
+          No transaction history
+        </div>
+      )}
+
       {visibleTransactions && visibleTransactions.map((transaction: ITransaction, index: number): JSX.Element => {
         const isIncoming: boolean = transaction.direction === 'incoming';
 

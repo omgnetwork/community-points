@@ -4,6 +4,10 @@
   display: flex;
   flex-direction: column;
 
+  .disclaimer {
+    color: $gray3;
+  }
+
   .more {
     color: $gray3;
     display: flex;
