@@ -4,6 +4,7 @@ pragma solidity ^0.6.0;
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
 import "./tokens/SubredditPoint.sol";
+import "./utils/OnlyFromAddress.sol";
 
 /**
  * @notice Distribution contract for subreddit point
@@ -16,7 +17,7 @@ import "./tokens/SubredditPoint.sol";
  * This contract should decrease some fixed percentage of distribution on each round.
  * However, 50% of the "burned" points would be re-distributed.
  */
-contract Distribution {
+contract Distribution is OnlyFromAddress {
     using SafeMath for uint256;
 
     /**
@@ -51,7 +52,6 @@ contract Distribution {
         subredditOwner = subredditOwner_;
 
         currentRound = 0;
-
     }
 
     function initRound(uint256 initialDistribution, uint256 totalKarma) external {
@@ -62,7 +62,7 @@ contract Distribution {
      * Different from original distribution contract, we passed in "burnedPoints" as an args here.
      * This is because it is not trivial to calculate the Layer2 burned point withouth waiting exit period.
      */
-    function advanceToNextRound(uint256 burnedPoints, uint256 totalKarma) external {
+    function advanceToNextRound(uint256 burnedPoints, uint256 totalKarma) external onlyFrom(subredditOwner) {
         require(currentRound > 0, "Please call initRound to initialize the first round");
 
         DistributionData memory currentRoundDistribution = distributionRounds[currentRound];

@@ -37,7 +37,7 @@ contract('Subreddit Point contract end to end', ([_, subredditOwner]) => {
 
     describe('When advanced to second round', () => {
       before(async () => {
-        await distributionContract.advanceToNextRound(BURNED_POINTS_FIRST_ROUND, TOTAL_KARMA);
+        await distributionContract.advanceToNextRound(BURNED_POINTS_FIRST_ROUND, TOTAL_KARMA, {from: subredditOwner});
       });
 
       it('should mint points of the available distribution', async () => {
