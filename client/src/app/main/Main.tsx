@@ -26,9 +26,9 @@ function Main (): JSX.Element {
   const [ correctNetwork, setCorrectNetwork ]: [ boolean, any ] = useState(false);
   const [ errorMessage, setErrorMessage ]: [ string, any ] = useState('');
 
-  function withErrorHandler (action: () => void): void {
+  async function withErrorHandler (action: () => void): Promise<void> {
     try {
-      action();
+      await action();
     } catch (error) {
       errorService.log(error);
       setErrorMessage(error.message);

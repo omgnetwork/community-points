@@ -3,14 +3,11 @@
 .ErrorView {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 300px;
   .icon {
-    width: 80px;
+    align-self: flex-start;
+    margin-bottom: 20px;
   }
   .rawError {
     color: $red;
-    font-size: 0.8em;
   }
 }
