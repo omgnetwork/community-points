@@ -9,6 +9,7 @@ const IMAGE_PATH = path.resolve(__dirname, '../build/images');
 
 module.exports = {
   mode: 'development',
+  devtool: 'source-map',
   entry: {
     background: './src/background/index.ts',
     app: './src/app/index.tsx',

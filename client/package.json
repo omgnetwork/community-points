@@ -14,7 +14,7 @@
     "build:prod": "webpack --config config/webpack.prod.js",
     "lint": "eslint 'src/**'",
     "test": "jest src --passWithNoTests",
-    "release": "yarn lint && yarn test && yarn version && node release/bumpManifest.js && yarn build:dev && node release/createRelease.js"
+    "release": "yarn lint && yarn test && yarn version && node release/bumpManifest.js && yarn build:prod && node release/createRelease.js"
   },
   "dependencies": {
     "@sentry/react": "^5.19.1",
@@ -36,6 +36,7 @@
     "webext-redux": "^2.1.7"
   },
   "devDependencies": {
+    "@sentry/webpack-plugin": "^1.12.0",
     "@types/axios": "^0.14.0",
     "@types/bn.js": "^4.11.6",
     "@types/jest": "^26.0.3",

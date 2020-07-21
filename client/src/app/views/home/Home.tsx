@@ -135,7 +135,6 @@ function Home (): JSX.Element {
         options={[ 'Transfer', 'History' ]}
         selected={view}
         onSelect={setView}
-        blockTransfer={isPendingTransaction}
       />
 
       {(view as any) === 'Transfer' && (
@@ -143,7 +142,14 @@ function Home (): JSX.Element {
           <Input
             type='number'
             value={amount}
-            onChange={e => setAmount(e.target.value)}
+            onChange={e => {
+              if (session.subReddit.decimals === 0) {
+                if (e.target.value.includes('.')) {
+                  return;
+                }
+              }
+              setAmount(e.target.value);
+            }}
             placeholder='Amount'
             className={styles.input}
             suffix={session.subReddit.symbol}
@@ -172,6 +178,11 @@ function Home (): JSX.Element {
           >
             <span>TRANSFER</span>
           </Button>
+          {isPendingTransaction && (
+            <p className={styles.disclaimer}>
+              Because you have a pending transaction, transfers will not be possible until the transaction is confirmed.
+            </p>
+          )}
         </>
       )}
 
