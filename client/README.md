@@ -16,7 +16,7 @@ This project is a Chrome extension used to transfer Reddit community points dire
 
 - `nvm use` switch to correct node version
 - `yarn install` install project dependencies
-- `yarn build:dev` or `yarn build:prod` compile extension bundle (with or without source maps)
+- `yarn build:dev` or `yarn build:prod` compile extension bundle
 - `yarn lint` runs linter
 - `yarn test` runs tests
 - `yarn release` prepare bundle for release

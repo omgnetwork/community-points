@@ -17,4 +17,5 @@ fs.rename(oldPath, newPath, function renamePaths (err) {
     throw err;
   }
   console.log(`Successfully created release bundle ${RELEASE_BUNDLE_NAME} in client/release`);
+  console.log(`Don't forget to push the tag v${package_json.version} to remote`);
 });
