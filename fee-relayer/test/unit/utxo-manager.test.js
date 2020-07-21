@@ -97,4 +97,25 @@ describe('getFeeUtxo', () => {
 
     assert.isRejected(utxoManager.getFeeUtxo(utxos, feeToken, feeAmount), `Insufficient funds to cover fee amount ${feeAmount}`)
   })
+
+  it('uses a previously pending utxo again', async () => {
+    const utxos = [{
+      amount: '100',
+      currency: feeToken,
+      blknum: 359000,
+      txindex: 123,
+      oindex: 2
+    }]
+
+    const feeAmount = 100
+
+    const utxo = await utxoManager.getFeeUtxo(utxos, feeToken, feeAmount)
+    assert(utxo === utxos[0])
+
+    assert.isRejected(utxoManager.getFeeUtxo(utxos, feeToken, feeAmount), `Insufficient funds to cover fee amount ${feeAmount}`)
+
+    await utxoManager.cancelPending(utxo)
+    const newUtxo = await utxoManager.getFeeUtxo(utxos, feeToken, feeAmount)
+    assert(newUtxo === utxos[0])
+  })
 })

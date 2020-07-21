@@ -41,7 +41,6 @@ module.exports = {
       throw new Error(`Address ${address} is not a fee payer account`)
     }
     logger.info(`Signing tx with fee payer account ${feePayer.address}`)
-    console.log(`Buffer ${JSON.stringify(Buffer.from(feePayer.privateKey.replace('0x', ''), 'hex'))}`)
     const signed = ethUtil.ecsign(
       toSign,
       Buffer.from(feePayer.privateKey.replace('0x', ''), 'hex')
