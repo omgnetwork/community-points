@@ -16,30 +16,26 @@
 
 const utxoManager = require('./utxo-manager')
 const transaction = require('./transaction')
+const BN = require('bn.js')
 const logger = require('pino')({ level: process.env.LOG_LEVEL || 'info' })
 
-let feeInfo = null
-async function getFeeInfo (childChain, currency) {
-  if (!feeInfo) {
-    const fees = (await childChain.getFees())['1']
-    feeInfo = fees.find(fee => fee.currency.toLowerCase() === currency.toLowerCase())
-    if (!feeInfo) {
-      throw new Error(`Configured FEE_TOKEN ${currency} is not a supported fee token`)
-    }
-  }
-  return feeInfo
-}
-
 module.exports = {
-  create: async function (childChain, utxos, amount, token, toAddress, feePayerAddress, feeToken) {
+  create: async (
+    childChain,
+    utxos,
+    amount,
+    token,
+    toAddress,
+    feePayerAddress,
+    feeInfo
+  ) => {
     // Find a fee utxo to spend
-    const { amount: feeAmount } = await getFeeInfo(childChain, feeToken)
     const feeUtxos = await childChain.getUtxos(feePayerAddress)
-    const feeUtxo = await utxoManager.getFeeUtxo(feeUtxos, feeToken, feeAmount)
+    const feeUtxo = await utxoManager.getFeeUtxo(feeUtxos, feeInfo.currency, feeInfo.amount)
     logger.debug(`Using fee utxo ${JSON.stringify(feeUtxo)}`)
 
     // Create the transaction
-    const tx = transaction.create(utxos[0].owner, toAddress, utxos, amount, token, [feeUtxo], feeAmount, feePayerAddress)
+    const tx = transaction.create(utxos[0].owner, toAddress, utxos, amount, token, [feeUtxo], feeInfo.amount, feePayerAddress)
     logger.debug(`Created tx ${JSON.stringify(tx)}`)
 
     // Create the transaction's typedData
@@ -47,7 +43,7 @@ module.exports = {
     return { tx, typedData }
   },
 
-  submit: async function (childChain, tx, spenderSigs, signFunc) {
+  submit: async (childChain, tx, spenderSigs, signFunc) => {
     logger.debug(`relayTx.submit, tx = ${JSON.stringify(tx)}`)
 
     // Get the fee payer address from the tx data
@@ -64,7 +60,7 @@ module.exports = {
     return childChain.submitTransaction(signedTx)
   },
 
-  cancel: async function (tx) {
+  cancel: async (tx) => {
     logger.debug('relayTx.cancel')
     tx.inputs.forEach(input => {
       utxoManager.cancelPending(input)
