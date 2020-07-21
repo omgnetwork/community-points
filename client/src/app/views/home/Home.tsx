@@ -142,7 +142,14 @@ function Home (): JSX.Element {
           <Input
             type='number'
             value={amount}
-            onChange={e => setAmount(e.target.value)}
+            onChange={e => {
+              if (session.subReddit.decimals === 0) {
+                if (e.target.value.includes('.')) {
+                  return;
+                }
+              }
+              setAmount(e.target.value);
+            }}
             placeholder='Amount'
             className={styles.input}
             suffix={session.subReddit.symbol}
