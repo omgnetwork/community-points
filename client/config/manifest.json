@@ -4,7 +4,8 @@
   "version": "0.0.5",
   "permissions": [
     "tabs",
-    "contextMenus"
+    "contextMenus",
+    "notifications"
   ],
   "content_scripts": [
     {
