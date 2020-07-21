@@ -58,14 +58,12 @@ function Select ({
   }
 
   function handleInputChange (value: string): void {
-    if (value) {
-      onSelect(null);
-      setInputValue(value);
-      const filtered = options.filter(i => {
-        return i.title.toLowerCase().includes(value.toLowerCase());
-      });
-      setFilteredOptions(filtered);
-    }
+    onSelect(null);
+    setInputValue(value);
+    const filtered = options.filter(i => {
+      return i.title.toLowerCase().includes(value.toLowerCase());
+    });
+    setFilteredOptions(filtered);
   }
 
   function handleOptionClick (option: IOption): void {
