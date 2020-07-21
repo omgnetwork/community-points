@@ -5,6 +5,7 @@ import BigNumber from 'bignumber.js';
 import truncate from 'truncate-middle';
 import { useDispatch, useSelector, batch } from 'react-redux';
 
+import Transactions from 'app/views/transactions/Transactions';
 import Loading from 'app/views/loading/Loading';
 
 import Alert from 'app/components/alert/Alert';
@@ -26,7 +27,6 @@ import { selectIsPendingTransaction, selectTransactions } from 'app/selectors/tr
 import * as omgService from 'app/services/omgService';
 import * as networkService from 'app/services/networkService';
 
-import Transactions from 'app/views/transactions/Transactions';
 import { powAmount, powAmountAsBN } from 'app/util/amountConvert';
 import useInterval from 'app/util/useInterval';
 import usePrevious from 'app/util/usePrevious';
