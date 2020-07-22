@@ -24,7 +24,7 @@ This project is a Chrome extension used to transfer Reddit community points dire
 ### Development
 
 - create a `.env` file with values shown in `.env.template`
-- create `client/src/subRedditMap.ts` with values shown in `subRedditMap.template`
+- create `src/subRedditMap.ts` with values shown in `src/subRedditMap.ts.template`
 - `yarn install` to install dependencies
 - `yarn build:dev` to compile application
 
