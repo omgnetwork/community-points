@@ -29,7 +29,7 @@ const process = require('process')
 
 const signer = process.env.CGMB_API_KEY
   ? require('./signer-curvegrid')
-  : require('./signer')
+  : require('./signer-env')
 
 const childChain = new ChildChain({
   watcherUrl: process.env.OMG_WATCHER_URL,
