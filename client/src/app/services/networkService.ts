@@ -1,5 +1,5 @@
 import BN from 'bn.js';
-import { get } from 'lodash';
+import { get, differenceBy } from 'lodash';
 
 import { ISession, ITransaction, ISubReddit } from 'interfaces';
 
@@ -48,6 +48,21 @@ export async function getSession (): Promise<ISession> {
     balance,
     subReddit
   };
+};
+
+export function checkForIncomingTransactions (prevTransactions: ITransaction[], newTransactions: ITransaction[]): ITransaction[] {
+  if (
+    (prevTransactions && prevTransactions.length) &&
+    (newTransactions && newTransactions.length)
+  ) {
+    const incomingPrev = prevTransactions.filter(i => i.direction === 'incoming');
+    const incomingNew = newTransactions.filter(i => i.direction === 'incoming');
+
+    const diff = differenceBy(incomingNew, incomingPrev, 'txhash');
+    if (diff.length) {
+      return diff;
+    }
+  }
 };
 
 export async function getAllTransactions (): Promise<Array<ITransaction>> {

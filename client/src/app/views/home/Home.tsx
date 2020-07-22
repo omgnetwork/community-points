@@ -1,9 +1,11 @@
+/* global chrome */
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import BigNumber from 'bignumber.js';
 import truncate from 'truncate-middle';
 import { useDispatch, useSelector, batch } from 'react-redux';
 
+import Transactions from 'app/views/transactions/Transactions';
 import Loading from 'app/views/loading/Loading';
 
 import Alert from 'app/components/alert/Alert';
@@ -14,18 +16,20 @@ import Input from 'app/components/input/Input';
 import PointBalance from 'app/components/pointbalance/PointBalance';
 import Tabs from 'app/components/tabs/Tabs';
 
-import { ISession, IUserAddress } from 'interfaces';
+import { ISession, IUserAddress, ITransaction } from 'interfaces';
 import { transfer, getSession, getTransactions, getUserAddressMap, clearError } from 'app/actions';
 import { selectError } from 'app/selectors/uiSelector';
 import { selectLoading } from 'app/selectors/loadingSelector';
 import { selectSession } from 'app/selectors/sessionSelector';
-import { selectUserAddressMap } from 'app/selectors/addressSelector';
-import { selectIsPendingTransaction } from 'app/selectors/transactionSelector';
-import * as omgService from 'app/services/omgService';
+import { selectUserAddressMap, getUsernameFromMap } from 'app/selectors/addressSelector';
+import { selectIsPendingTransaction, selectTransactions } from 'app/selectors/transactionSelector';
 
-import Transactions from 'app/views/transactions/Transactions';
+import * as omgService from 'app/services/omgService';
+import * as networkService from 'app/services/networkService';
+
 import { powAmount, powAmountAsBN } from 'app/util/amountConvert';
 import useInterval from 'app/util/useInterval';
+import usePrevious from 'app/util/usePrevious';
 import isAddress from 'app/util/isAddress';
 
 import * as styles from './Home.module.scss';
@@ -42,6 +46,26 @@ function Home (): JSX.Element {
   const session: ISession = useSelector(selectSession);
   const isPendingTransaction: boolean = useSelector(selectIsPendingTransaction);
   const userAddressMap: IUserAddress[] = useSelector(selectUserAddressMap);
+
+  const newTransactions: ITransaction[] = useSelector(selectTransactions);
+  const prevTransactions: ITransaction[] = usePrevious(newTransactions);
+  useEffect(() => {
+    const incomingTxs = networkService.checkForIncomingTransactions(prevTransactions, newTransactions);
+    if (incomingTxs) {
+      incomingTxs.forEach(tx => {
+        try {
+          chrome.notifications.create(tx.txhash, {
+            type: 'basic',
+            title: 'New Transaction',
+            message: `${getUsernameFromMap(tx.sender, userAddressMap) || truncate(tx.sender, 6, 4, '...')} has sent you ${tx.amount} ${tx.symbol}`,
+            iconUrl: chrome.runtime.getURL('images/favicon.png')
+          });
+        } catch (error) {
+          // safe catch in case of some issue with notification api
+        }
+      });
+    }
+  }, [newTransactions]);
 
   useEffect(() => {
     omgService.checkHash();
@@ -180,7 +204,7 @@ function Home (): JSX.Element {
           </Button>
           {isPendingTransaction && (
             <p className={styles.disclaimer}>
-              Because you have a pending transaction, transfers will not be possible until the transaction is confirmed.
+              You cannot make a second transaction, as your previous transaction is still pending confirmation.
             </p>
           )}
         </>
