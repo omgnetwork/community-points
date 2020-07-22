@@ -13,7 +13,7 @@ function getPool () {
 module.exports = {
   init: async function () {
     if (!this.initialised) {
-      await getPool().query(`create table if not exists accounts (account char(42) primary key, in_use boolean default false)`)
+      await getPool().query('create table if not exists accounts (account char(42) primary key, in_use boolean default false)')
       this.initialised = true
     }
   },
