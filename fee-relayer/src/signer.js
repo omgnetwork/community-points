@@ -19,7 +19,7 @@ const sigUtil = require('eth-sig-util')
 const { fromPrivate } = require('eth-lib').account
 const logger = require('pino')({ level: process.env.LOG_LEVEL || 'info' })
 
-function accountsFromEnv() {
+function accountsFromEnv () {
   if (!process.env.FEE_RELAYER_PRIVATE_KEYS) {
     throw new Error('FEE_RELAYER_PRIVATE_KEYS not set')
   }

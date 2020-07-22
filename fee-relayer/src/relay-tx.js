@@ -20,7 +20,7 @@ const BN = require('bn.js')
 const logger = require('pino')({ level: process.env.LOG_LEVEL || 'info' })
 
 module.exports = {
-  create: async (
+  create: async function (
     childChain,
     utxos,
     amount,
@@ -28,7 +28,7 @@ module.exports = {
     toAddress,
     feePayerAddress,
     feeInfo
-  ) => {
+  ) {
     // Find a fee utxo to spend
     const feeUtxos = await childChain.getUtxos(feePayerAddress)
     const feeUtxo = await utxoManager.getFeeUtxo(feeUtxos, feeInfo.currency, feeInfo.amount)
@@ -43,7 +43,7 @@ module.exports = {
     return { tx, typedData }
   },
 
-  submit: async (childChain, tx, spenderSigs, signFunc) => {
+  submit: async function (childChain, tx, spenderSigs, signFunc) {
     logger.debug(`relayTx.submit, tx = ${JSON.stringify(tx)}`)
 
     // Get the fee payer address from the tx data
@@ -60,10 +60,50 @@ module.exports = {
     return childChain.submitTransaction(signedTx)
   },
 
-  cancel: async (tx) => {
+  cancel: async function (tx) {
     logger.debug('relayTx.cancel')
     tx.inputs.forEach(input => {
       utxoManager.cancelPending(input)
     })
+  },
+
+  validate: function (tx, spenderSigs, spendableTokens, feeInfo) {
+    if (!tx.inputs || tx.inputs.length < 2) {
+      throw new Error('Incorrect number of transaction inputs')
+    }
+    if (!tx.outputs || tx.outputs.length === 0) {
+      throw new Error('Incorrect number of transaction outputs')
+    }
+
+    // Check spendInputs are spendableToken
+    const spendInputs = tx.inputs.filter(input => spendableTokens.find(token => token.toLowerCase() === input.currency.toLowerCase()))
+    if (spendInputs.length === 0) {
+      throw new Error('Unsupported input token')
+    }
+
+    // Check that there are enough sigs for the inputs
+    if (spendInputs.length !== spenderSigs.length) {
+      throw new Error('Wrong number of signatures')
+    }
+
+    // Check that there are feeInputs
+    const feeInputs = tx.inputs.filter(input => input.currency.toLowerCase() === feeInfo.currency.toLowerCase())
+    if (feeInputs.length === 0) {
+      throw new Error('No fee input')
+    }
+
+    // Check that the amount of feeToken spent by operator is exactly fee amount
+    const feePayerAddress = feeInputs[0].owner
+    const feePayerOutputs = tx.outputs.filter(
+      output =>
+        output.currency.toLowerCase() === feeInfo.currency.toLowerCase() &&
+        output.owner.toLowerCase() === feePayerAddress
+    )
+    const feeInputTotal = transaction.totalAmount(feeInputs)
+    const feeOutputTotal = transaction.totalAmount(feePayerOutputs)
+
+    if (!feeInputTotal.sub(feeOutputTotal).eq(new BN(feeInfo.amount.toString()))) {
+      throw new Error('Incorrect fee')
+    }
   }
 }

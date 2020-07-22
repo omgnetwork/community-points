@@ -1,5 +1,6 @@
 require('dotenv').config()
 const relayTx = require('../../src/relay-tx')
+const { getFeeInfo } = require('../../src/fee-info')
 const helper = require('../helpers/test-helper')
 const { RootChain, ChildChain } = require('@omisego/omg-js')
 const Web3 = require('web3')
@@ -128,6 +129,8 @@ describe('relay-tx integration test', () => {
 
     const TEST_AMOUNT = 4
 
+    const feeInfo = await getFeeInfo(childChain, feeToken)
+
     // Call relayTx.create()
     const tx = await relayTx.create(
       childChain,
@@ -136,7 +139,7 @@ describe('relay-tx integration test', () => {
       spendToken,
       this.bob.address,
       this.feeRelayer.address,
-      feeToken
+      feeInfo
     )
 
     // Sign with alice's key
