@@ -11,7 +11,16 @@ function getPool () {
 }
 
 module.exports = {
-  storeAccounts: async (accounts) => {
+  init: async function () {
+    if (!this.initialised) {
+      await getPool().query(`create table if not exists accounts (account char(42) primary key, in_use boolean default false)`)
+      this.initialised = true
+    }
+  },
+
+  storeAccounts: async function (accounts) {
+    await this.init()
+
     return Promise.all(accounts.map(account => getPool().query(`
       insert into accounts
       values ('${account}', false)
@@ -20,12 +29,12 @@ module.exports = {
     ))
   },
 
-  reserveAccount: async (account) => {
+  reserveAccount: async function (account) {
     const res = await getPool().query(`update accounts set in_use=true where account='${account}' and in_use=false`)
     return res.rowCount === 1
   },
 
-  releaseAccount: async (account) => {
+  releaseAccount: async function (account) {
     return getPool().query(`update accounts set in_use=false where account='${account}'`)
   }
 }

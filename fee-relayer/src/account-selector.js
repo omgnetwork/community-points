@@ -23,13 +23,13 @@ module.exports = {
   setAccounts: async (acs) => {
     this.accounts = acs
     if (USE_DB) {
-      db.storeAccounts(this.accounts.map(account => account.address))
+      return db.storeAccounts(this.accounts.map(account => account.address))
     }
   },
 
   getAccount: async () => {
     if (!this.accountInUse) {
-      this.accountInUse = findAvailableAccount(this.accounts)
+      this.accountInUse = await findAvailableAccount(this.accounts)
     }
     return this.accountInUse
   },
