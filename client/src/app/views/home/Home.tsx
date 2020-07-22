@@ -53,12 +53,16 @@ function Home (): JSX.Element {
     const incomingTxs = networkService.checkForIncomingTransactions(prevTransactions, newTransactions);
     if (incomingTxs) {
       incomingTxs.forEach(tx => {
-        chrome.notifications.create(tx.txhash, {
-          type: 'basic',
-          title: 'New Transaction',
-          message: `${getUsernameFromMap(tx.sender, userAddressMap)} has sent you ${tx.amount} ${tx.symbol}`,
-          iconUrl: chrome.runtime.getURL('images/favicon.png')
-        });
+        try {
+          chrome.notifications.create(tx.txhash, {
+            type: 'basic',
+            title: 'New Transaction',
+            message: `${getUsernameFromMap(tx.sender, userAddressMap)} has sent you ${tx.amount} ${tx.symbol}`,
+            iconUrl: chrome.runtime.getURL('images/favicon.png')
+          });
+        } catch (error) {
+          // safe catch in case of some issue with notification api
+        }
       });
     }
   }, [newTransactions]);
