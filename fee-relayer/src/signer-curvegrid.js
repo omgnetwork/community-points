@@ -21,10 +21,8 @@ const logger = require('pino')({ level: process.env.LOG_LEVEL || 'info' })
 const API_KEY = `Bearer ${process.env.CGMB_API_KEY}`
 const SIGN_URL = process.env.CGMB_SIGN_URL
 
-const SIGNER_ADDRESS = '0x697dcD14e82a0C2B084351b2542885385b181018'
-
 function accountsFromHSM () {
-  return [{ address: SIGNER_ADDRESS }]
+  return [{ address: process.env.CGMB_SIGN_ADDRESS }]
 }
 
 async function post ({ url, body }) {
