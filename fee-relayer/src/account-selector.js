@@ -20,23 +20,25 @@ async function findAvailableAccount (accounts) {
 }
 
 module.exports = {
-  setAccounts: async (acs) => {
+  setAccounts: async function (acs) {
     this.accounts = acs
     if (USE_DB) {
       return db.storeAccounts(this.accounts.map(account => account.address))
     }
   },
 
-  getAccount: async () => {
+  getAccount: async function () {
     if (!this.accountInUse) {
       this.accountInUse = await findAvailableAccount(this.accounts)
     }
     return this.accountInUse
   },
 
-  onExit: async () => {
+  onExit: async function () {
     if (USE_DB) {
-      return db.releaseAccount(this.accountInUse.address)
+      if (this.accountInUse) {
+        return db.releaseAccount(this.accountInUse.address)
+      }
     }
   }
 }
