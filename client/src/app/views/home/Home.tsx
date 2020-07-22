@@ -57,7 +57,7 @@ function Home (): JSX.Element {
           chrome.notifications.create(tx.txhash, {
             type: 'basic',
             title: 'New Transaction',
-            message: `${getUsernameFromMap(tx.sender, userAddressMap)} has sent you ${tx.amount} ${tx.symbol}`,
+            message: `${getUsernameFromMap(tx.sender, userAddressMap) || truncate(tx.sender, 6, 4, '...')} has sent you ${tx.amount} ${tx.symbol}`,
             iconUrl: chrome.runtime.getURL('images/favicon.png')
           });
         } catch (error) {
