@@ -27,10 +27,4 @@ This project is a Chrome extension used to transfer Reddit community points dire
 - create `src/subRedditMap.ts` with values shown in `src/subRedditMap.ts.template`
 - `yarn install` to install dependencies
 - `yarn build:dev` to compile application
-
-### Installation
-
-- Find the latest version from the [releases page](https://github.com/omgnetwork/community-points/releases)
-- Download and unzip the `Release_vX.X.X.zip` bundle found in the `Assets` section
-- In a Chrome based browser (Brave or Chrome), open `Extensions` (brave:://extensions or chrome:://extensions) in `Developer mode`, and click `Load unpacked` and select the folder you just unzipped
-- Visit a supported subreddit and transfer!
+- in a Chrome based browser (Brave or Chrome), open `Extensions` (brave:://extensions or chrome:://extensions) in `Developer mode`, and click `Load unpacked` and select the `build` folder
