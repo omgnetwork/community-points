@@ -17,6 +17,7 @@
 require('dotenv').config()
 const relayTx = require('./relay-tx')
 const accountSelector = require('./account-selector')
+const { getFeeInfo } = require('./fee-info')
 const { ChildChain } = require('@omisego/omg-js')
 const express = require('express')
 const bodyParser = require('omg-body-parser')
@@ -99,6 +100,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
   app.post('/create-relayed-tx', async (req, res) => {
     try {
       logger.info(`/create-relayed-tx: from ${req.body.utxos[0].owner}, to ${req.body.to}, amount ${req.body.amount}`)
+      const feeInfo = await getFeeInfo(childChain, feeToken)
       const tx = await relayTx.create(
         childChain,
         req.body.utxos,
@@ -106,7 +108,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
         spendableToken,
         req.body.to,
         feePayerAddress,
-        feeToken
+        feeInfo
       )
       res.type('application/json')
       res.send(
@@ -126,6 +128,9 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
 
   app.post('/submit-relayed-tx', async (req, res) => {
     try {
+      const feeInfo = await getFeeInfo(childChain, feeToken)
+      await relayTx.validate(req.body.tx, req.body.signatures, [spendableToken], feeInfo)
+
       const result = await relayTx.submit(
         childChain,
         req.body.tx,

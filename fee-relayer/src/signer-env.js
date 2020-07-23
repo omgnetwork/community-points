@@ -29,14 +29,14 @@ function accountsFromEnv () {
 }
 
 module.exports = {
-  getAccounts: () => {
+  getAccounts: function () {
     if (!this.accounts) {
       this.accounts = accountsFromEnv()
     }
     return this.accounts
   },
 
-  sign: async (typedData, address) => {
+  sign: async function (typedData, address) {
     const feePayer = this.accounts.find(account => account.address.toLowerCase() === address.toLowerCase())
     if (!feePayer) {
       throw new Error(`Address ${address} is not a fee payer account`)
