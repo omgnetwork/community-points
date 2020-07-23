@@ -186,7 +186,8 @@ export async function transfer ({
     body: {
       utxos: spendableUtxos,
       amount,
-      to: recipient
+      to: recipient,
+      metadata: `r/${subReddit.name} points`
     }
   });
 

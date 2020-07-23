@@ -31,7 +31,7 @@ async function getFeeInfo (childChain, currency) {
 }
 
 module.exports = {
-  create: async function (childChain, utxos, amount, token, toAddress, feePayerAddress, feeToken) {
+  create: async function (childChain, utxos, amount, metadata, token, toAddress, feePayerAddress, feeToken) {
     // Find a fee utxo to spend
     const { amount: feeAmount } = await getFeeInfo(childChain, feeToken)
     const feeUtxos = await childChain.getUtxos(feePayerAddress)
@@ -39,7 +39,7 @@ module.exports = {
     logger.debug(`Using fee utxo ${JSON.stringify(feeUtxo)}`)
 
     // Create the transaction
-    const tx = transaction.create(utxos[0].owner, toAddress, utxos, amount, token, [feeUtxo], feeAmount, feePayerAddress)
+    const tx = transaction.create(utxos[0].owner, toAddress, utxos, amount, metadata, token, [feeUtxo], feeAmount, feePayerAddress)
     logger.debug(`Created tx ${JSON.stringify(tx)}`)
 
     // Create the transaction's typedData
