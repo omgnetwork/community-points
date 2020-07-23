@@ -13,6 +13,7 @@
   "dependencies": {
     "@apidevtools/swagger-express-middleware": "^4.0.0",
     "@omisego/omg-js": "^4.0.1-1.0.0",
+    "@sentry/node": "^5.20.0",
     "bn.js": "^5.1.2",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
