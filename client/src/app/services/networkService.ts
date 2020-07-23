@@ -203,6 +203,7 @@ export async function transfer ({
     body: {
       utxos: spendableUtxos,
       amount,
+      metadata,
       to: recipient
     }
   });
