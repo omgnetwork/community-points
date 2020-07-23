@@ -39,9 +39,10 @@ module.exports = {
     if (USE_DB) {
       if (this.accountInUse) {
         try {
+          logger.info(`Releasing account ${this.accountInUse.address}`)
           return await db.releaseAccount(this.accountInUse.address)
         } catch (err) {
-          logger.error(`Error releasing account ${this.accountInUse}: ${err}`)
+          logger.error(`Error releasing account ${this.accountInUse.address}: ${err}`)
         }
       }
     }
