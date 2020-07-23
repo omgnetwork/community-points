@@ -29,7 +29,7 @@ function Alert ({
         className={styles.close}
         onClick={onClose}
       >
-        𝖷
+        {'X'}
       </div>
       <div className={styles.content}>
         <div className={styles.title}>

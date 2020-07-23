@@ -21,13 +21,10 @@ This project is a Chrome extension used to transfer Reddit community points dire
 - `yarn test` runs tests
 - `yarn release` prepare bundle for release
 
-### Installation
+### Development
 
-- Find the latest version from the [releases page](https://github.com/omgnetwork/community-points/releases)
-- Download and unzip the `Release_vX.X.X.zip` bundle found in the `Assets` section
-- In a Chrome based browser (Brave or Chrome), open `Extensions` (brave:://extensions or chrome:://extensions) in `Developer mode`, and click `Load unpacked` and select the folder you just unzipped
-- Visit a supported subreddit and transfer!
-
-### SubReddit Support
-
-- This extension keeps a map of subreddit names to erc20 addresses in `client/src/subRedditMap.ts`. To add support for another subreddit, a PR should be made modifying this file.
+- create a `.env` file with values shown in `.env.template`
+- create `src/subRedditMap.ts` with values shown in `src/subRedditMap.ts.template`
+- `yarn install` to install dependencies
+- `yarn build:dev` to compile application
+- in a Chrome based browser (Brave or Chrome), open `Extensions` (brave:://extensions or chrome:://extensions) in `Developer mode`, and click `Load unpacked` and select the `build` folder

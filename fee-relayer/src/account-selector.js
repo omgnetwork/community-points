@@ -1,4 +1,5 @@
 const db = require('./db')
+const logger = require('pino')({ level: process.env.LOG_LEVEL || 'info' })
 
 const USE_DB = process.env.FEE_RELAYER_USE_DB === 'true'
 
@@ -23,20 +24,27 @@ module.exports = {
   setAccounts: async function (acs) {
     this.accounts = acs
     if (USE_DB) {
-      db.storeAccounts(this.accounts.map(account => account.address))
+      return db.storeAccounts(this.accounts.map(account => account.address))
     }
   },
 
   getAccount: async function () {
     if (!this.accountInUse) {
-      this.accountInUse = findAvailableAccount(this.accounts)
+      this.accountInUse = await findAvailableAccount(this.accounts)
     }
     return this.accountInUse
   },
 
   onExit: async function () {
     if (USE_DB) {
-      return db.releaseAccount(this.accountInUse.address)
+      if (this.accountInUse) {
+        try {
+          logger.info(`Releasing account ${this.accountInUse.address}`)
+          return await db.releaseAccount(this.accountInUse.address)
+        } catch (err) {
+          logger.error(`Error releasing account ${this.accountInUse.address}: ${err}`)
+        }
+      }
     }
   }
 }

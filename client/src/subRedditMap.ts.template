@@ -1,0 +1,8 @@
+export default {
+  '<subreddit handle>': {
+    token: '<community point erc20 address>',
+    symbol: '<community point erc20 symbol>',
+    decimals: <community point erc20 decimals>,
+    feeRelay: '<url to fee relay service>'
+  }
+};
