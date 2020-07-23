@@ -99,10 +99,24 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
     // - if one of the inputs owner and currency match it is outgoing, else incoming
     const isOutgoing = transaction.inputs.some(matchingCurrencyAndOwner);
 
-    // - check if merge transaction, if so ignore this tx
+    // - ignore merge transactions
     // - if outgoing and only user in outputs
     const allUserOutputs = transaction.outputs.every(i => i.owner.toLowerCase() === user);
     if (isOutgoing && allUserOutputs) {
+      return null;
+    }
+
+    // outgoing and output amount to yourself is the same
+    const userOutputs = transaction.outputs.filter(i => i.owner.toLowerCase() === user);
+    const userOutputsAmount = userOutputs.reduce((acc, curr) => {
+      return acc.add(new BN(curr.amount.toString()));
+    }, new BN(0));
+    const userInputs = transaction.inputs.filter(i => i.owner.toLowerCase() === user);
+    const userInputsAmount = userInputs.reduce((acc, curr) => {
+      return acc.add(new BN(curr.amount.toString()));
+    }, new BN(0));
+    const isMerge = userInputsAmount.eq(userOutputsAmount);
+    if (isOutgoing && isMerge) {
       return null;
     }
 
