@@ -29,10 +29,19 @@ const expressPino = require('express-pino-logger')
 const process = require('process')
 const Sentry = require('@sentry/node')
 
-Sentry.init({ dsn: process.env.SENTRY_DSN });
-Sentry.configureScope(scope => {
-  scope.setTag('layer', 'fee-relayer');
-});
+if (process.env.SENTRY_DSN) {
+  Sentry.init({ dsn: process.env.SENTRY_DSN });
+  Sentry.configureScope(scope => {
+    scope.setTag('layer', 'fee-relayer');
+  });
+}
+
+function errorHandler (err) {
+  if (process.env.SENTRY_DSN) {
+    Sentry.captureException(err)
+  }
+  logger.error(err.stack || err)
+}
 
 const childChain = new ChildChain({
   watcherUrl: process.env.OMG_WATCHER_URL,
@@ -123,8 +132,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
           data: tx
         }))
     } catch (err) {
-      logger.error(err.stack || err)
-      Sentry.captureException(err)
+      errorHandler(err)
       res.status(500)
       res.send({
         success: false,
@@ -146,8 +154,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
         data: result
       })
     } catch (err) {
-      logger.error(err.stack || err)
-      Sentry.captureException(err)
+      errorHandler(err)
       res.status(500)
       res.send({
         success: false,
@@ -164,8 +171,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
         data: true
       })
     } catch (err) {
-      logger.error(err.stack || err)
-      Sentry.captureException(err)
+      errorHandler(err)
       res.status(500)
       res.send({
         success: false,
