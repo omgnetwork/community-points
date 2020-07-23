@@ -45,12 +45,12 @@ function Merch ({
       }));
 
       if (result) {
+        setTransferLoading(false);
+        setSignatureAlert(false);
         setFlair(null);
         onSuccess();
       }
     } catch (error) {
-      //
-    } finally {
       setTransferLoading(false);
       setSignatureAlert(false);
     }
