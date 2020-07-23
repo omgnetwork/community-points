@@ -16,7 +16,6 @@
 
 require('dotenv').config()
 const relayTx = require('./relay-tx')
-const signer = require('./signer')
 const accountSelector = require('./account-selector')
 const { getFeeInfo } = require('./fee-info')
 const { ChildChain } = require('@omisego/omg-js')
@@ -28,6 +27,10 @@ const pino = require('pino')
 const cors = require('cors')
 const expressPino = require('express-pino-logger')
 const process = require('process')
+
+const signer = process.env.CGMB_API_KEY
+  ? require('./signer-curvegrid')
+  : require('./signer-env')
 
 const childChain = new ChildChain({
   watcherUrl: process.env.OMG_WATCHER_URL,

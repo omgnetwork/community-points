@@ -1,5 +1,6 @@
 require('dotenv').config()
 const relayTx = require('../../src/relay-tx')
+const transaction = require('../../src/transaction')
 const { getFeeInfo } = require('../../src/fee-info')
 const helper = require('../helpers/test-helper')
 const { RootChain, ChildChain } = require('@omisego/omg-js')
@@ -114,7 +115,8 @@ describe('relay-tx integration test', () => {
     // create bob account
     this.bob = web3.eth.accounts.create()
 
-    this.signFunc = async (toSign) => {
+    this.signFunc = async (typedData) => {
+      const toSign = transaction.getToSignHash(typedData)
       const signed = ethUtil.ecsign(
         toSign,
         Buffer.from(this.feeRelayer.privateKey.replace('0x', ''), 'hex')

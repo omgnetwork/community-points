@@ -3,7 +3,7 @@ const { Client } = require('pg')
 const connectionString = process.env.DATABASE_URL
 
 let dbClient
-async function getClient() {
+async function getClient () {
   if (!dbClient) {
     dbClient = new Client({ connectionString })
     await dbClient.connect()
@@ -15,7 +15,7 @@ module.exports = {
   init: async function () {
     if (!this.initialised) {
       const client = await getClient()
-      await client.query(`create table if not exists accounts (account char(42) primary key, in_use boolean default false)`)
+      await client.query('create table if not exists accounts (account char(42) primary key, in_use boolean default false)')
       this.initialised = true
     }
   },
