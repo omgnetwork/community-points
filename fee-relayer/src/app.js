@@ -29,13 +29,6 @@ const expressPino = require('express-pino-logger')
 const process = require('process')
 const Sentry = require('@sentry/node')
 
-if (process.env.SENTRY_DSN) {
-  Sentry.init({ dsn: process.env.SENTRY_DSN });
-  Sentry.configureScope(scope => {
-    scope.setTag('layer', 'fee-relayer');
-  });
-}
-
 const childChain = new ChildChain({
   watcherUrl: process.env.OMG_WATCHER_URL,
   plasmaContractAddress: process.env.OMG_PLASMA_CONTRACT
@@ -46,8 +39,15 @@ const spendableToken = process.env.FEE_RELAYER_SPENDABLE_TOKEN
 
 const app = express()
 
-app.use(Sentry.Handlers.requestHandler());
-app.use(Sentry.Handlers.errorHandler());
+if (process.env.SENTRY_DSN) {
+  Sentry.init({ dsn: process.env.SENTRY_DSN });
+  Sentry.configureScope(scope => {
+    scope.setTag('layer', 'fee-relayer');
+  });
+
+  app.use(Sentry.Handlers.requestHandler());
+  app.use(Sentry.Handlers.errorHandler());
+}
 
 app.use(cors())
 app.use(bodyParser.json())
