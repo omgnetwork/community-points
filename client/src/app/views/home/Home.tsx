@@ -2,6 +2,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import BigNumber from 'bignumber.js';
+import { truncate as _truncate } from 'lodash';
 import truncate from 'truncate-middle';
 import { useDispatch, useSelector, batch } from 'react-redux';
 
@@ -87,7 +88,7 @@ function Home (): JSX.Element {
       const result = await dispatch(transfer({
         amount: powAmount(amount, session.subReddit.decimals),
         recipient,
-        metadata: `r/${session.subReddit.name} points`,
+        metadata: `r/${_truncate(session.subReddit.name, { length: 10 })} points`,
         subReddit: session.subReddit
       }));
 

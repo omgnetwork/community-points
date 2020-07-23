@@ -1,7 +1,7 @@
 import { orderBy, get } from 'lodash';
 
 import { powAmount } from 'app/util/amountConvert';
-import { ITransaction, ISubReddit, IFlairMap } from 'interfaces';
+import { ITransaction, IFlairMap } from 'interfaces';
 
 export function selectTransactions (state): ITransaction[] {
   const transactions: ITransaction[] = Object.values(state.transaction);
