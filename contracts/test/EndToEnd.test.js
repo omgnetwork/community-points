@@ -8,7 +8,6 @@ contract('Subreddit Point contract end to end', ([_, subredditOwner]) => {
   const SUPPLY_DECAY_PERCENT = 10;
   const INITIAL_DISTRIBUTION = 100000;
   const BURNED_POINTS_FIRST_ROUND = 100;
-  const TOTAL_KARMA = 100000;
 
   let pointContract;
   let distributionContract;
@@ -27,7 +26,7 @@ contract('Subreddit Point contract end to end', ([_, subredditOwner]) => {
     let totalSupplyAfterInitialRound;
 
     before(async () => {
-      await distributionContract.initRound(INITIAL_DISTRIBUTION, TOTAL_KARMA);
+      await distributionContract.initRound(INITIAL_DISTRIBUTION);
     });
 
     it('should mint the INITIAL_DISTRIBUTION of points', async () => {
@@ -37,7 +36,7 @@ contract('Subreddit Point contract end to end', ([_, subredditOwner]) => {
 
     describe('When advanced to second round', () => {
       before(async () => {
-        await distributionContract.advanceToNextRound(BURNED_POINTS_FIRST_ROUND, TOTAL_KARMA, {from: subredditOwner});
+        await distributionContract.advanceToNextRound(BURNED_POINTS_FIRST_ROUND);
       });
 
       it('should mint points of the available distribution', async () => {

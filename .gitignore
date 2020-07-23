@@ -10,6 +10,3 @@ contracts/build
 
 # VS code workspace setting
 *.code-workspace
-
-# environment settings
-.env
