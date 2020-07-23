@@ -14,7 +14,9 @@ const initialState: SessionState = {
     name: null,
     symbol: null,
     decimals: null,
-    feeRelay: null
+    feeRelay: null,
+    flairAddress: null,
+    flairMap: null
   }
 };
 

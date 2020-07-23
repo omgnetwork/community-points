@@ -12,14 +12,16 @@ export function getSession () {
 export function transfer ({
   amount,
   recipient,
-  subReddit
+  subReddit,
+  metadata
 }) {
   return createAction(
     'TRANSACTION/CREATE',
     () => networkService.transfer({
       amount,
       recipient,
-      subReddit
+      subReddit,
+      metadata
     })
   );
 }

@@ -1,5 +1,6 @@
 import * as React from 'react';
 import { useState } from 'react';
+import { get } from 'lodash';
 import BigNumber from 'bignumber.js';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -39,6 +40,7 @@ function Merch ({
       const result = await dispatch(transfer({
         amount: powAmount(flair.price, session.subReddit.decimals),
         recipient: session.subReddit.flairAddress,
+        metadata: flair.metaId,
         subReddit: session.subReddit
       }));
 
@@ -85,7 +87,7 @@ function Merch ({
               key={index}
               className={[
                 styles.flair,
-                _flair.metaId === flair.metaId ? styles.selected : '',
+                _flair.metaId === get(flair, 'metaId') ? styles.selected : '',
                 purchasedFlairs[_flair.metaId] ? styles.disabled : ''
               ].join(' ')}
               onClick={() => setFlair(_flair)}
@@ -109,7 +111,7 @@ function Merch ({
       </Button>
       {isPendingTransaction && (
         <p className={styles.disclaimer}>
-          You cannot buy another flair, as your previous purchase is still pending confirmation.
+          You currently cannot buy a flair, as your previous purchase is still pending confirmation.
         </p>
       )}
     </div>

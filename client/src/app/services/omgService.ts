@@ -32,3 +32,8 @@ export async function getPointBalance (address, currency): Promise<string> {
   }
   return pointBalance.amount.toString();
 }
+
+export function decodeMetadata (metadata: string): string {
+  const unpad = metadata.replace('0x', '').replace(/^0*/, '');
+  return Buffer.from(unpad, 'hex').toString();
+}

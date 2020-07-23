@@ -85,6 +85,7 @@ function Home (): JSX.Element {
       const result = await dispatch(transfer({
         amount: powAmount(amount, session.subReddit.decimals),
         recipient,
+        metadata: `r/${session.subReddit.name} points`,
         subReddit: session.subReddit
       }));
 
@@ -205,7 +206,7 @@ function Home (): JSX.Element {
           </Button>
           {isPendingTransaction && (
             <p className={styles.disclaimer}>
-              You cannot make a second transaction, as your previous transaction is still pending confirmation.
+              You currently cannot make a second transaction, as your previous transaction is still pending confirmation.
             </p>
           )}
         </>

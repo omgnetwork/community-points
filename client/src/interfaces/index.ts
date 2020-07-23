@@ -11,7 +11,7 @@ export interface ITransaction {
   sender: string,
   recipient: string,
   amount: any,
-  metadata?: string,
+  metadata: string,
   currency: string,
   symbol: string,
   decimals: number,
