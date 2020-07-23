@@ -17,8 +17,10 @@
 const BN = require('bn.js')
 const { transaction } = require('@omisego/omg-js-util')
 
+const NULL_METADATA = '0x0000000000000000000000000000000000000000000000000000000000000000'
+
 module.exports = {
-  create: function (from, to, spendUtxos, spendAmount, spendToken, feeUtxos, feeAmount, feeOwner) {
+  create: function (from, to, spendUtxos, spendAmount, metadata, spendToken, feeUtxos, feeAmount, feeOwner) {
     if (!spendUtxos || spendUtxos.length === 0) {
       throw new Error('spendUtxos is empty')
     }
@@ -40,6 +42,10 @@ module.exports = {
       throw new Error('Insufficient fee inputs to cover fee')
     }
 
+    const encodedMetadata = metadata
+      ? transaction.encodeMetadata(metadata)
+      : NULL_METADATA
+
     // Construct the tx body
     const txBody = {
       inputs: [...spendUtxos, ...feeUtxos],
@@ -48,7 +54,8 @@ module.exports = {
         outputGuard: to,
         currency: spendToken,
         amount: spendAmount
-      }]
+      }],
+      metadata: encodedMetadata
     }
 
     // Check if we need to add a change output for the spend token

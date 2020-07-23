@@ -6,6 +6,7 @@ const chaiAsPromised = require('chai-as-promised')
 chai.use(chaiAsPromised)
 const assert = chai.assert
 
+const NULL_METADATA = '0x0000000000000000000000000000000000000000000000000000000000000000'
 const feeToken = '0x0000000000000000000000000000000000000000'
 const spendToken = '0x08g0000000000000000000000000000000000000'
 const alice = 'alice'
@@ -26,7 +27,7 @@ describe('create transaction', () => {
       currency: feeToken
     }]
 
-    const tx = transaction.create(alice, bob, utxos, spendAmount, spendToken, feeUtxos, feeAmount, fred)
+    const tx = transaction.create(alice, bob, utxos, spendAmount, null, spendToken, feeUtxos, feeAmount, fred)
     assert.deepEqual(tx, {
       inputs: [{
         amount: spendAmount,
@@ -40,7 +41,8 @@ describe('create transaction', () => {
         outputGuard: bob,
         currency: spendToken,
         amount: new BN(spendAmount)
-      }]
+      }],
+      metadata: NULL_METADATA
     })
   })
 
@@ -57,7 +59,7 @@ describe('create transaction', () => {
       currency: feeToken
     }]
 
-    const tx = transaction.create(alice, bob, utxos, spendAmount, spendToken, feeUtxos, feeAmount, fred)
+    const tx = transaction.create(alice, bob, utxos, spendAmount, null, spendToken, feeUtxos, feeAmount, fred)
     assert.deepEqual(tx, {
       inputs: [{
         amount: utxos[0].amount,
@@ -76,7 +78,8 @@ describe('create transaction', () => {
         outputGuard: alice,
         currency: spendToken,
         amount: new BN(1)
-      }]
+      }],
+      metadata: NULL_METADATA
     })
   })
 
@@ -93,7 +96,7 @@ describe('create transaction', () => {
       currency: feeToken
     }]
 
-    const tx = transaction.create(alice, bob, utxos, spendAmount, spendToken, feeUtxos, feeAmount, fred)
+    const tx = transaction.create(alice, bob, utxos, spendAmount, null, spendToken, feeUtxos, feeAmount, fred)
     assert.deepEqual(tx, {
       inputs: [{
         amount: utxos[0].amount,
@@ -117,7 +120,8 @@ describe('create transaction', () => {
         outputGuard: fred,
         currency: feeToken,
         amount: new BN(1)
-      }]
+      }],
+      metadata: NULL_METADATA
     })
   })
 
@@ -139,7 +143,7 @@ describe('create transaction', () => {
       currency: feeToken
     }]
 
-    const tx = transaction.create(alice, bob, utxos, spendAmount, spendToken, feeUtxos, feeAmount, fred)
+    const tx = transaction.create(alice, bob, utxos, spendAmount, null, spendToken, feeUtxos, feeAmount, fred)
     assert.deepEqual(tx, {
       inputs: [{
         amount: utxos[0].amount,
@@ -166,7 +170,8 @@ describe('create transaction', () => {
         outputGuard: fred,
         currency: feeToken,
         amount: new BN(1)
-      }]
+      }],
+      metadata: NULL_METADATA
     })
   })
 
@@ -193,7 +198,7 @@ describe('create transaction', () => {
 
     const expectedFeeChange = feeUtxos[0].amount + feeUtxos[1].amount - feeAmount
 
-    const tx = transaction.create(alice, bob, utxos, spendAmount, spendToken, feeUtxos, feeAmount, fred)
+    const tx = transaction.create(alice, bob, utxos, spendAmount, null, spendToken, feeUtxos, feeAmount, fred)
     assert.deepEqual(tx, {
       inputs: [{
         amount: utxos[0].amount,
@@ -223,7 +228,8 @@ describe('create transaction', () => {
         outputGuard: fred,
         currency: feeToken,
         amount: new BN(expectedFeeChange)
-      }]
+      }],
+      metadata: NULL_METADATA
     })
   })
 
@@ -248,7 +254,7 @@ describe('create transaction', () => {
     }]
     const expectedFeeChange = feeUtxos[0].amount.add(feeUtxos[1].amount).sub(feeAmount)
 
-    const tx = transaction.create(alice, bob, utxos, spendAmount, spendToken, feeUtxos, feeAmount, fred)
+    const tx = transaction.create(alice, bob, utxos, spendAmount, null, spendToken, feeUtxos, feeAmount, fred)
     assert.deepEqual(tx, {
       inputs: [{
         amount: utxos[0].amount,
@@ -278,7 +284,8 @@ describe('create transaction', () => {
         outputGuard: fred,
         currency: feeToken,
         amount: new BN(expectedFeeChange)
-      }]
+      }],
+      metadata: NULL_METADATA
     })
   })
 })
@@ -295,7 +302,7 @@ describe('create transaction failures', () => {
     }]
 
     assert.throws(
-      () => transaction.create(alice, bob, utxos, spendAmount, spendToken, feeUtxos, feeAmount, fred),
+      () => transaction.create(alice, bob, utxos, spendAmount, null, spendToken, feeUtxos, feeAmount, fred),
       'spendUtxos is empty'
     )
   })
@@ -311,7 +318,7 @@ describe('create transaction failures', () => {
     const feeUtxos = []
 
     assert.throws(
-      () => transaction.create(alice, bob, utxos, spendAmount, spendToken, feeUtxos, feeAmount, fred),
+      () => transaction.create(alice, bob, utxos, spendAmount, null, spendToken, feeUtxos, feeAmount, fred),
       'feeUtxos is empty'
     )
   })
@@ -330,7 +337,7 @@ describe('create transaction failures', () => {
     }]
 
     assert.throws(
-      () => transaction.create(alice, bob, utxos, spendAmount, spendToken, feeUtxos, feeAmount, fred),
+      () => transaction.create(alice, bob, utxos, spendAmount, null, spendToken, feeUtxos, feeAmount, fred),
       'Insufficient inputs to cover amount'
     )
   })
@@ -349,7 +356,7 @@ describe('create transaction failures', () => {
     }]
 
     assert.throws(
-      () => transaction.create(alice, bob, utxos, spendAmount, spendToken, feeUtxos, feeAmount, fred),
+      () => transaction.create(alice, bob, utxos, spendAmount, null, spendToken, feeUtxos, feeAmount, fred),
       'Insufficient fee inputs to cover fee'
     )
   })

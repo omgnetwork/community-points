@@ -124,6 +124,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
         childChain,
         req.body.utxos,
         req.body.amount,
+        req.body.metadata,
         spendableToken,
         req.body.to,
         feePayerAddress,
