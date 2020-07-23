@@ -29,12 +29,12 @@ module.exports = {
     spendAmount = BN.isBN(spendAmount) ? spendAmount : new BN(spendAmount.toString())
     feeAmount = BN.isBN(feeAmount) ? feeAmount : new BN(feeAmount.toString())
 
-    const spendTotal = totalAmount(spendUtxos)
+    const spendTotal = this.totalAmount(spendUtxos)
     if (spendTotal.lt(spendAmount)) {
       throw new Error('Insufficient inputs to cover amount')
     }
 
-    const feeTotal = totalAmount(feeUtxos)
+    const feeTotal = this.totalAmount(feeUtxos)
 
     if (feeTotal.lt(feeAmount)) {
       throw new Error('Insufficient fee inputs to cover fee')
@@ -82,11 +82,11 @@ module.exports = {
 
   getToSignHash: (typedData) => {
     return transaction.getToSignHash(typedData)
-  }
-}
+  },
 
-function totalAmount (utxos) {
-  return utxos.reduce((prev, curr) => {
-    return prev.add(new BN(curr.amount.toString()))
-  }, new BN(0))
+  totalAmount: (utxos) => {
+    return utxos.reduce((prev, curr) => {
+      return prev.add(new BN(curr.amount.toString()))
+    }, new BN(0))
+  }
 }

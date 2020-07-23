@@ -16,30 +16,26 @@
 
 const utxoManager = require('./utxo-manager')
 const transaction = require('./transaction')
+const BN = require('bn.js')
 const logger = require('pino')({ level: process.env.LOG_LEVEL || 'info' })
 
-let feeInfo = null
-async function getFeeInfo (childChain, currency) {
-  if (!feeInfo) {
-    const fees = (await childChain.getFees())['1']
-    feeInfo = fees.find(fee => fee.currency.toLowerCase() === currency.toLowerCase())
-    if (!feeInfo) {
-      throw new Error(`Configured FEE_TOKEN ${currency} is not a supported fee token`)
-    }
-  }
-  return feeInfo
-}
-
 module.exports = {
-  create: async function (childChain, utxos, amount, token, toAddress, feePayerAddress, feeToken) {
+  create: async function (
+    childChain,
+    utxos,
+    amount,
+    token,
+    toAddress,
+    feePayerAddress,
+    feeInfo
+  ) {
     // Find a fee utxo to spend
-    const { amount: feeAmount } = await getFeeInfo(childChain, feeToken)
     const feeUtxos = await childChain.getUtxos(feePayerAddress)
-    const feeUtxo = await utxoManager.getFeeUtxo(feeUtxos, feeToken, feeAmount)
+    const feeUtxo = await utxoManager.getFeeUtxo(feeUtxos, feeInfo.currency, feeInfo.amount)
     logger.debug(`Using fee utxo ${JSON.stringify(feeUtxo)}`)
 
     // Create the transaction
-    const tx = transaction.create(utxos[0].owner, toAddress, utxos, amount, token, [feeUtxo], feeAmount, feePayerAddress)
+    const tx = transaction.create(utxos[0].owner, toAddress, utxos, amount, token, [feeUtxo], feeInfo.amount, feePayerAddress)
     logger.debug(`Created tx ${JSON.stringify(tx)}`)
 
     // Create the transaction's typedData
@@ -55,8 +51,7 @@ module.exports = {
 
     // Sign
     const typedData = transaction.getTypedData(tx, childChain.plasmaContractAddress)
-    const toSign = transaction.getToSignHash(typedData)
-    const feeSig = await signFunc(toSign, feePayerAddress)
+    const feeSig = await signFunc(typedData, feePayerAddress)
     spenderSigs.push(feeSig)
 
     // Submit the transaction
@@ -69,5 +64,45 @@ module.exports = {
     tx.inputs.forEach(input => {
       utxoManager.cancelPending(input)
     })
+  },
+
+  validate: function (tx, spenderSigs, spendableTokens, feeInfo) {
+    if (!tx.inputs || tx.inputs.length < 2) {
+      throw new Error('Incorrect number of transaction inputs')
+    }
+    if (!tx.outputs || tx.outputs.length === 0) {
+      throw new Error('Incorrect number of transaction outputs')
+    }
+
+    // Check spendInputs are spendableToken
+    const spendInputs = tx.inputs.filter(input => spendableTokens.find(token => token.toLowerCase() === input.currency.toLowerCase()))
+    if (spendInputs.length === 0) {
+      throw new Error('Unsupported input token')
+    }
+
+    // Check that there are enough sigs for the inputs
+    if (spendInputs.length !== spenderSigs.length) {
+      throw new Error('Wrong number of signatures')
+    }
+
+    // Check that there are feeInputs
+    const feeInputs = tx.inputs.filter(input => input.currency.toLowerCase() === feeInfo.currency.toLowerCase())
+    if (feeInputs.length === 0) {
+      throw new Error('No fee input')
+    }
+
+    // Check that the amount of feeToken spent by operator is exactly fee amount
+    const feePayerAddress = feeInputs[0].owner
+    const feePayerOutputs = tx.outputs.filter(
+      output =>
+        output.currency.toLowerCase() === feeInfo.currency.toLowerCase() &&
+        output.owner.toLowerCase() === feePayerAddress.toLowerCase()
+    )
+    const feeInputTotal = transaction.totalAmount(feeInputs)
+    const feeOutputTotal = transaction.totalAmount(feePayerOutputs)
+
+    if (!feeInputTotal.sub(feeOutputTotal).eq(new BN(feeInfo.amount.toString()))) {
+      throw new Error('Incorrect fee')
+    }
   }
 }

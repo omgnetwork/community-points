@@ -16,8 +16,8 @@
 
 require('dotenv').config()
 const relayTx = require('./relay-tx')
-const signer = require('./signer')
 const accountSelector = require('./account-selector')
+const { getFeeInfo } = require('./fee-info')
 const { ChildChain } = require('@omisego/omg-js')
 const express = require('express')
 const bodyParser = require('omg-body-parser')
@@ -27,6 +27,11 @@ const pino = require('pino')
 const cors = require('cors')
 const expressPino = require('express-pino-logger')
 const process = require('process')
+const Sentry = require('@sentry/node')
+
+const signer = process.env.CGMB_API_KEY
+  ? require('./signer-curvegrid')
+  : require('./signer-env')
 
 const childChain = new ChildChain({
   watcherUrl: process.env.OMG_WATCHER_URL,
@@ -37,6 +42,17 @@ const port = process.env.FEE_RELAYER_PORT || 3333
 const spendableToken = process.env.FEE_RELAYER_SPENDABLE_TOKEN
 
 const app = express()
+
+if (process.env.SENTRY_DSN) {
+  Sentry.init({ dsn: process.env.SENTRY_DSN });
+  Sentry.configureScope(scope => {
+    scope.setTag('layer', 'fee-relayer');
+  });
+
+  app.use(Sentry.Handlers.requestHandler());
+  app.use(Sentry.Handlers.errorHandler());
+}
+
 app.use(cors())
 app.use(bodyParser.json())
 
@@ -52,6 +68,13 @@ process
   .on('unhandledRejection', shutdown('unhandledRejection'))
   .on('uncaughtException', shutdown('uncaughtException'))
 
+function errorHandler (err) {
+  if (process.env.SENTRY_DSN) {
+    Sentry.captureException(err)
+  }
+  logger.error(err.stack || err)
+}
+
 function shutdown (signal) {
   return (err) => {
     logger.info(`Shutting down with ${signal}.`)
@@ -64,7 +87,7 @@ function shutdown (signal) {
     process.removeListener('unhandledRejection', shutdown)
 
     if (err) {
-      logger.error(err.stack || err)
+      errorHandler(err)
     }
 
     accountSelector.onExit().then(() => {
@@ -96,6 +119,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
   app.post('/create-relayed-tx', async (req, res) => {
     try {
       logger.info(`/create-relayed-tx: from ${req.body.utxos[0].owner}, to ${req.body.to}, amount ${req.body.amount}`)
+      const feeInfo = await getFeeInfo(childChain, feeToken)
       const tx = await relayTx.create(
         childChain,
         req.body.utxos,
@@ -103,7 +127,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
         spendableToken,
         req.body.to,
         feePayerAddress,
-        feeToken
+        feeInfo
       )
       res.type('application/json')
       res.send(
@@ -112,7 +136,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
           data: tx
         }))
     } catch (err) {
-      logger.error(err.stack || err)
+      errorHandler(err)
       res.status(500)
       res.send({
         success: false,
@@ -123,6 +147,9 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
 
   app.post('/submit-relayed-tx', async (req, res) => {
     try {
+      const feeInfo = await getFeeInfo(childChain, feeToken)
+      await relayTx.validate(req.body.tx, req.body.signatures, [spendableToken], feeInfo)
+
       const result = await relayTx.submit(
         childChain,
         req.body.tx,
@@ -134,7 +161,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
         data: result
       })
     } catch (err) {
-      logger.error(err.stack || err)
+      errorHandler(err)
       res.status(500)
       res.send({
         success: false,
@@ -151,7 +178,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
         data: true
       })
     } catch (err) {
-      logger.error(err.stack || err)
+      errorHandler(err)
       res.status(500)
       res.send({
         success: false,
