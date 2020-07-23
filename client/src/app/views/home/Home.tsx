@@ -19,7 +19,6 @@ import Tabs from 'app/components/tabs/Tabs';
 import { ISession, IUserAddress, ITransaction } from 'interfaces';
 import { transfer, getSession, getTransactions, getUserAddressMap, clearError } from 'app/actions';
 import { selectError } from 'app/selectors/uiSelector';
-import { selectLoading } from 'app/selectors/loadingSelector';
 import { selectSession } from 'app/selectors/sessionSelector';
 import { selectUserAddressMap, getUsernameFromMap } from 'app/selectors/addressSelector';
 import { selectIsPendingTransaction, selectTransactions } from 'app/selectors/transactionSelector';
@@ -40,9 +39,10 @@ function Home (): JSX.Element {
   const [ view, setView ]: [ 'Transfer' | 'History', any ] = useState('Transfer');
   const [ recipient, setRecipient ]: [ string, any ] = useState('');
   const [ amount, setAmount ]: any = useState('');
+  const [ transferLoading, setTransferLoading ]: [ boolean, any ] = useState(false);
+  const [ signatureAlert, setSignatureAlert ]: [ boolean, any ] = useState(false);
 
   const errorMessage: string = useSelector(selectError);
-  const transferLoading: boolean = useSelector(selectLoading(['TRANSACTION/CREATE']));
   const session: ISession = useSelector(selectSession);
   const isPendingTransaction: boolean = useSelector(selectIsPendingTransaction);
   const userAddressMap: IUserAddress[] = useSelector(selectUserAddressMap);
@@ -81,6 +81,8 @@ function Home (): JSX.Element {
 
   async function handleTransfer (): Promise<any> {
     try {
+      setTransferLoading(true);
+      setSignatureAlert(true);
       const result = await dispatch(transfer({
         amount: powAmount(amount, session.subReddit.decimals),
         recipient,
@@ -94,6 +96,9 @@ function Home (): JSX.Element {
       }
     } catch (error) {
       //
+    } finally {
+      setTransferLoading(false);
+      setSignatureAlert(false);
     }
   }
 
@@ -141,6 +146,13 @@ function Home (): JSX.Element {
         message={errorMessage}
         title='Error'
         type='error'
+      />
+      <Alert
+        onClose={() => setSignatureAlert(false)}
+        open={signatureAlert}
+        message='A signature request has been created. Please check the Metamask extension if you were not prompted.'
+        title='Signature Request'
+        type='success'
       />
 
       <h1>{`r/${session.subReddit.name}`}</h1>
