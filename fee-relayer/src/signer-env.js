@@ -14,6 +14,7 @@
   limitations under the License.
 */
 
+const transaction = require('./transaction')
 const ethUtil = require('ethereumjs-util')
 const sigUtil = require('eth-sig-util')
 const { fromPrivate } = require('eth-lib').account
@@ -28,19 +29,20 @@ function accountsFromEnv () {
 }
 
 module.exports = {
-  getAccounts: () => {
+  getAccounts: function () {
     if (!this.accounts) {
       this.accounts = accountsFromEnv()
     }
     return this.accounts
   },
 
-  sign: async (toSign, address) => {
+  sign: async function (typedData, address) {
     const feePayer = this.accounts.find(account => account.address.toLowerCase() === address.toLowerCase())
     if (!feePayer) {
       throw new Error(`Address ${address} is not a fee payer account`)
     }
     logger.info(`Signing tx with fee payer account ${feePayer.address}`)
+    const toSign = transaction.getToSignHash(typedData)
     const signed = ethUtil.ecsign(
       toSign,
       Buffer.from(feePayer.privateKey.replace('0x', ''), 'hex')

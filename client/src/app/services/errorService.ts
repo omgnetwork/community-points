@@ -8,7 +8,7 @@ if (config.sentryDsn) {
   const { version } = chrome.runtime.getManifest();
 
   Sentry.configureScope(scope => {
-    scope.setTag('layer', 'browser extension');
+    scope.setTag('layer', 'browser-extension');
     scope.setTag('extension-version', version);
   });
 }
