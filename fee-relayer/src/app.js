@@ -29,12 +29,10 @@ const expressPino = require('express-pino-logger')
 const process = require('process')
 const Sentry = require('@sentry/node')
 
-if (process.env.SENTRY_DSN) {
-  Sentry.init({ dsn: process.env.SENTRY_DSN });
-  Sentry.configureScope(scope => {
-    scope.setTag('layer', 'fee-relayer');
-  });
-}
+Sentry.init({ dsn: process.env.SENTRY_DSN });
+Sentry.configureScope(scope => {
+  scope.setTag('layer', 'fee-relayer');
+});
 
 const childChain = new ChildChain({
   watcherUrl: process.env.OMG_WATCHER_URL,
