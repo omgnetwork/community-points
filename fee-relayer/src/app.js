@@ -27,6 +27,7 @@ const pino = require('pino')
 const cors = require('cors')
 const expressPino = require('express-pino-logger')
 const process = require('process')
+const Sentry = require('@sentry/node')
 
 const signer = process.env.CGMB_API_KEY
   ? require('./signer-curvegrid')
@@ -41,6 +42,17 @@ const port = process.env.FEE_RELAYER_PORT || 3333
 const spendableToken = process.env.FEE_RELAYER_SPENDABLE_TOKEN
 
 const app = express()
+
+if (process.env.SENTRY_DSN) {
+  Sentry.init({ dsn: process.env.SENTRY_DSN });
+  Sentry.configureScope(scope => {
+    scope.setTag('layer', 'fee-relayer');
+  });
+
+  app.use(Sentry.Handlers.requestHandler());
+  app.use(Sentry.Handlers.errorHandler());
+}
+
 app.use(cors())
 app.use(bodyParser.json())
 
@@ -56,6 +68,13 @@ process
   .on('unhandledRejection', shutdown('unhandledRejection'))
   .on('uncaughtException', shutdown('uncaughtException'))
 
+function errorHandler (err) {
+  if (process.env.SENTRY_DSN) {
+    Sentry.captureException(err)
+  }
+  logger.error(err.stack || err)
+}
+
 function shutdown (signal) {
   return (err) => {
     logger.info(`Shutting down with ${signal}.`)
@@ -68,7 +87,7 @@ function shutdown (signal) {
     process.removeListener('unhandledRejection', shutdown)
 
     if (err) {
-      logger.error(err.stack || err)
+      errorHandler(err)
     }
 
     accountSelector.onExit().then(() => {
@@ -117,7 +136,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
           data: tx
         }))
     } catch (err) {
-      logger.error(err.stack || err)
+      errorHandler(err)
       res.status(500)
       res.send({
         success: false,
@@ -142,7 +161,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
         data: result
       })
     } catch (err) {
-      logger.error(err.stack || err)
+      errorHandler(err)
       res.status(500)
       res.send({
         success: false,
@@ -159,7 +178,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
         data: true
       })
     } catch (err) {
-      logger.error(err.stack || err)
+      errorHandler(err)
       res.status(500)
       res.send({
         success: false,
