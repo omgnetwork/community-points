@@ -1,5 +1,6 @@
 import * as transportService from 'app/services/transportService';
 import { hash1 } from 'app/util/artifacts';
+import { Buffer as _Buffer } from 'buffer';
 
 import config from 'config';
 
@@ -35,5 +36,5 @@ export async function getPointBalance (address, currency): Promise<string> {
 
 export function decodeMetadata (metadata: string): string {
   const unpad = metadata.replace('0x', '').replace(/^0*/, '');
-  return Buffer.from(unpad, 'hex').toString();
+  return _Buffer.from(unpad, 'hex').toString();
 }
