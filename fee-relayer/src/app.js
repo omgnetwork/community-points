@@ -36,13 +36,6 @@ if (process.env.SENTRY_DSN) {
   });
 }
 
-function errorHandler (err) {
-  if (process.env.SENTRY_DSN) {
-    Sentry.captureException(err)
-  }
-  logger.error(err.stack || err)
-}
-
 const childChain = new ChildChain({
   watcherUrl: process.env.OMG_WATCHER_URL,
   plasmaContractAddress: process.env.OMG_PLASMA_CONTRACT
@@ -71,6 +64,13 @@ process
   .on('unhandledRejection', shutdown('unhandledRejection'))
   .on('uncaughtException', shutdown('uncaughtException'))
 
+function errorHandler (err) {
+  if (process.env.SENTRY_DSN) {
+    Sentry.captureException(err)
+  }
+  logger.error(err.stack || err)
+}
+
 function shutdown (signal) {
   return (err) => {
     logger.info(`Shutting down with ${signal}.`)
@@ -83,8 +83,7 @@ function shutdown (signal) {
     process.removeListener('unhandledRejection', shutdown)
 
     if (err) {
-      logger.error(err.stack || err)
-      Sentry.captureException(err)
+      errorHandler(err)
     }
 
     accountSelector.onExit().then(() => {
