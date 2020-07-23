@@ -1,4 +1,5 @@
 const db = require('./db')
+const logger = require('pino')({ level: process.env.LOG_LEVEL || 'info' })
 
 const USE_DB = process.env.FEE_RELAYER_USE_DB === 'true'
 
@@ -37,7 +38,11 @@ module.exports = {
   onExit: async function () {
     if (USE_DB) {
       if (this.accountInUse) {
-        return db.releaseAccount(this.accountInUse.address)
+        try {
+          return await db.releaseAccount(this.accountInUse.address)
+        } catch (err) {
+          logger.error(`Error releasing account ${this.accountInUse}: ${err}`)
+        }
       }
     }
   }
