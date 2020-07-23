@@ -37,7 +37,8 @@ module.exports = {
   },
 
   sign: async function (typedData, address) {
-    const feePayer = this.accounts.find(account => account.address.toLowerCase() === address.toLowerCase())
+    const accounts = accountsFromEnv()
+    const feePayer = accounts.find(account => account.address.toLowerCase() === address.toLowerCase())
     if (!feePayer) {
       throw new Error(`Address ${address} is not a fee payer account`)
     }

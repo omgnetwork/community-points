@@ -117,8 +117,8 @@ describe('validate', () => {
         { owner: 'fee payer', currency: feeToken, amount: feeAmount * 2 }
       ],
       outputs: [
-        { owner: 'spender', currency: spendableToken, amount: 10 },
-        { owner: 'spender', currency: feeToken, amount: feeAmount }
+        { outputGuard: 'spender', currency: spendableToken, amount: 10 },
+        { outputGuard: 'spender', currency: feeToken, amount: feeAmount }
       ]
     }
     const sigs = ['']
