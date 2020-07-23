@@ -36,7 +36,7 @@ module.exports = {
     logger.debug(`Using fee utxo ${JSON.stringify(feeUtxo)}`)
 
     // Create the transaction
-    const tx = transaction.create(utxos[0].owner, toAddress, utxos, amount, metadata, token, [feeUtxo], feeAmount, feePayerAddress)
+    const tx = transaction.create(utxos[0].owner, toAddress, utxos, amount, metadata, token, [feeUtxo], feeInfo.amount, feePayerAddress)
     logger.debug(`Created tx ${JSON.stringify(tx)}`)
 
     // Create the transaction's typedData
