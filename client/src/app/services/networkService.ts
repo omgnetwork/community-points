@@ -115,8 +115,8 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
     const userInputsAmount = userInputs.reduce((acc, curr) => {
       return acc.add(new BN(curr.amount.toString()));
     }, new BN(0));
-    const isPseudoMerge = userInputsAmount.eq(userOutputsAmount);
-    if (isOutgoing && isPseudoMerge) {
+    const isMerge = userInputsAmount.eq(userOutputsAmount);
+    if (isOutgoing && isMerge) {
       return null;
     }
 
