@@ -40,6 +40,7 @@ function Home (): JSX.Element {
   const [ recipient, setRecipient ]: [ string, any ] = useState('');
   const [ amount, setAmount ]: any = useState('');
   const [ transferLoading, setTransferLoading ]: [ boolean, any ] = useState(false);
+  const [ signatureAlert, setSignatureAlert ]: [ boolean, any ] = useState(false);
 
   const errorMessage: string = useSelector(selectError);
   const session: ISession = useSelector(selectSession);
@@ -81,6 +82,7 @@ function Home (): JSX.Element {
   async function handleTransfer (): Promise<any> {
     try {
       setTransferLoading(true);
+      setSignatureAlert(true);
       const result = await dispatch(transfer({
         amount: powAmount(amount, session.subReddit.decimals),
         recipient,
@@ -96,6 +98,7 @@ function Home (): JSX.Element {
       //
     } finally {
       setTransferLoading(false);
+      setSignatureAlert(false);
     }
   }
 
@@ -143,6 +146,13 @@ function Home (): JSX.Element {
         message={errorMessage}
         title='Error'
         type='error'
+      />
+      <Alert
+        onClose={() => setSignatureAlert(false)}
+        open={signatureAlert}
+        message='A signature request has been created. Please check the Metamask extension if you were not prompted.'
+        title='Signature Request'
+        type='success'
       />
 
       <h1>{`r/${session.subReddit.name}`}</h1>
