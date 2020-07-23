@@ -97,7 +97,7 @@ module.exports = {
     const feePayerOutputs = tx.outputs.filter(
       output =>
         output.currency.toLowerCase() === feeInfo.currency.toLowerCase() &&
-        output.owner.toLowerCase() === feePayerAddress.toLowerCase()
+        output.outputGuard.toLowerCase() === feePayerAddress.toLowerCase()
     )
     const feeInputTotal = transaction.totalAmount(feeInputs)
     const feeOutputTotal = transaction.totalAmount(feePayerOutputs)
