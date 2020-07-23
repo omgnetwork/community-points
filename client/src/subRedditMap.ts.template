@@ -3,6 +3,15 @@ export default {
     token: '<community point erc20 address>',
     symbol: '<community point erc20 symbol>',
     decimals: <community point erc20 decimals>,
-    feeRelay: '<url to fee relay service>'
+    feeRelay: '<url to fee relay service>',
+    flairAddress: '<address receiving payments for flairs>',
+    flairMap: {
+      '<flair meta>': {
+        icon: '<url of flair icon>',
+        price: <largest denomiation price of flair>,
+        meta: '<flair meta, unique identifier>'
+      },
+      ...
+    }
   }
 };

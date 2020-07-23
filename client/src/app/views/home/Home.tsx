@@ -6,6 +6,7 @@ import truncate from 'truncate-middle';
 import { useDispatch, useSelector, batch } from 'react-redux';
 
 import Transactions from 'app/views/transactions/Transactions';
+import Merch from 'app/views/merch/Merch';
 import Loading from 'app/views/loading/Loading';
 
 import Alert from 'app/components/alert/Alert';
@@ -37,7 +38,7 @@ import * as styles from './Home.module.scss';
 function Home (): JSX.Element {
   const dispatch = useDispatch();
 
-  const [ view, setView ]: [ 'Transfer' | 'History', any ] = useState('Transfer');
+  const [ view, setView ]: [ 'Transfer' | 'History' | 'Merch', any ] = useState('Transfer');
   const [ recipient, setRecipient ]: [ string, any ] = useState('');
   const [ amount, setAmount ]: any = useState('');
 
@@ -156,7 +157,7 @@ function Home (): JSX.Element {
       />
 
       <Tabs
-        options={[ 'Transfer', 'History' ]}
+        options={[ 'Transfer', 'History', 'Merch' ]}
         selected={view}
         onSelect={setView}
       />
@@ -211,6 +212,13 @@ function Home (): JSX.Element {
       )}
 
       {(view as any) === 'History' && <Transactions />}
+
+      {(view as any) === 'Merch' && (
+        <Merch
+          onSuccess={() => setView('History')}
+          session={session}
+        />
+      )}
     </div>
   );
 }

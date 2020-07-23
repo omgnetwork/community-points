@@ -11,6 +11,7 @@ export interface ITransaction {
   sender: string,
   recipient: string,
   amount: any,
+  metadata?: string,
   currency: string,
   symbol: string,
   decimals: number,
@@ -22,7 +23,9 @@ export interface ISubReddit {
   name: string,
   symbol: string,
   decimals: number,
-  feeRelay: string
+  feeRelay: string,
+  flairAddress: string,
+  flairMap: IFlairMap
 }
 
 export interface ISession {
@@ -41,4 +44,14 @@ export interface IUserAddress {
 export interface IAction {
   type: string,
   payload: any
+}
+
+export interface IFlair {
+  icon: string,
+  price: number,
+  metaId: string
+}
+
+export interface IFlairMap {
+  [metaId: string]: IFlair
 }
