@@ -42,7 +42,10 @@ export async function getActiveAccount (): Promise<string> {
 export async function getSession (): Promise<ISession> {
   const account = await getActiveAccount();
   const subReddit = await locationService.getCurrentSubReddit();
-  const balance = await omgService.getPointBalance(account, subReddit.token);
+  let balance = '0';
+  if (subReddit) {
+    balance = await omgService.getPointBalance(account, subReddit.token);
+  }
   return {
     account,
     balance,
