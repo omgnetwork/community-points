@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node src/app.js",
     "test": "mocha test/unit",
+    "lint": "standard",
     "integration-test": "mocha --timeout=0 test/integration"
   },
   "author": "",
