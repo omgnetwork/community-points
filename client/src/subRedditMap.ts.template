@@ -1,17 +1,33 @@
+/* global chrome */
+
 export default {
-  '<subreddit handle>': {
-    token: '<community point erc20 address>',
-    symbol: '<community point erc20 symbol>',
-    decimals: <community point erc20 decimals>,
-    feeRelay: '<url to fee relay service>',
-    flairAddress: '<address receiving payments for flairs>',
+  'omise_go': {
+    token: '<community point erc20>',
+    symbol: 'ROCK',
+    decimals: 0,
+    feeRelay: 'http://localhost:3333',
+    flairAddress: '<zero address for flair purchases>',
     flairMap: {
-      '<flair meta>': {
-        icon: '<url of flair icon>',
-        price: <largest denomiation price of flair>,
-        meta: '<flair meta, unique identifier>'
+      'flair_omg': {
+        icon: chrome.runtime.getURL('images/flair_omg.png'),
+        price: 10,
+        metaId: 'flair_omg'
       },
-      ...
+      'flair_go': {
+        icon: chrome.runtime.getURL('images/flair_go.png'),
+        price: 25,
+        metaId: 'flair_go'
+      },
+      'flair_rock': {
+        icon: chrome.runtime.getURL('images/flair_rock.png'),
+        price: 50,
+        metaId: 'flair_rock'
+      },
+      'flair_salamander': {
+        icon: chrome.runtime.getURL('images/flair_salamander.jpg'),
+        price: 100,
+        metaId: 'flair_salamander'
+      }
     }
   }
 };

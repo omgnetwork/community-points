@@ -44,9 +44,9 @@ function Merch ({
         subReddit: session.subReddit
       }));
 
+      setTransferLoading(false);
+      setSignatureAlert(false);
       if (result) {
-        setTransferLoading(false);
-        setSignatureAlert(false);
         setFlair(null);
         onSuccess();
       }
@@ -82,19 +82,23 @@ function Merch ({
 
       <div className={styles.flairList}>
         {Object.values(session.subReddit.flairMap).map((_flair: IFlair, index: number) => {
+          const purchased = purchasedFlairs[_flair.metaId];
           return (
             <div
               key={index}
               className={[
                 styles.flair,
                 _flair.metaId === get(flair, 'metaId') ? styles.selected : '',
-                purchasedFlairs[_flair.metaId] ? styles.disabled : ''
+                purchased ? styles.disabled : ''
               ].join(' ')}
               onClick={() => setFlair(_flair)}
             >
               <img src={_flair.icon} alt='flair-icon' />
               <div className={styles.price}>
-                {_flair.price} {session.subReddit.symbol}
+                {purchased
+                  ? 'OWNED'
+                  : `${_flair.price} ${session.subReddit.symbol}`
+                }
               </div>
             </div>
           );
