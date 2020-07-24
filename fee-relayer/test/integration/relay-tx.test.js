@@ -27,8 +27,8 @@ const ETH = '0x0000000000000000000000000000000000000000'
 async function initFaucet () {
   // Init the faucet
   // Deposit fee token
-  const FAUCET_FEE_TOPUP = new BN(6000000000000000).muln(20)
-  const FAUCET_SPEND_TOPUP = 100
+  const FAUCET_FEE_TOPUP = new BN(6000000000000000).muln(1000)
+  const FAUCET_SPEND_TOPUP = 10000
 
   if (feeToken !== ETH) {
     await rootChain.approveToken({
@@ -138,6 +138,7 @@ describe('relay-tx integration test', () => {
       childChain,
       aliceUtxos,
       TEST_AMOUNT,
+      null,
       spendToken,
       this.bob.address,
       this.feeRelayer.address,
