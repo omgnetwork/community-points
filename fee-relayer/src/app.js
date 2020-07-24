@@ -44,13 +44,13 @@ const spendableToken = process.env.FEE_RELAYER_SPENDABLE_TOKEN
 const app = express()
 
 if (process.env.SENTRY_DSN) {
-  Sentry.init({ dsn: process.env.SENTRY_DSN });
+  Sentry.init({ dsn: process.env.SENTRY_DSN })
   Sentry.configureScope(scope => {
-    scope.setTag('layer', 'fee-relayer');
-  });
+    scope.setTag('layer', 'fee-relayer')
+  })
 
-  app.use(Sentry.Handlers.requestHandler());
-  app.use(Sentry.Handlers.errorHandler());
+  app.use(Sentry.Handlers.requestHandler())
+  app.use(Sentry.Handlers.errorHandler())
 }
 
 app.use(cors())

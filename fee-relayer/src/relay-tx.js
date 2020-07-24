@@ -16,6 +16,7 @@
 
 const utxoManager = require('./utxo-manager')
 const transaction = require('./transaction')
+const JSONBigNumber = require('omg-json-bigint')
 const BN = require('bn.js')
 const logger = require('pino')({ level: process.env.LOG_LEVEL || 'info' })
 
@@ -33,11 +34,11 @@ module.exports = {
     // Find a fee utxo to spend
     const feeUtxos = await childChain.getUtxos(feePayerAddress)
     const feeUtxo = await utxoManager.getFeeUtxo(feeUtxos, feeInfo.currency, feeInfo.amount)
-    logger.debug(`Using fee utxo ${JSON.stringify(feeUtxo)}`)
+    logger.debug(`Using fee utxo ${JSONBigNumber.stringify(feeUtxo)}`)
 
     // Create the transaction
     const tx = transaction.create(utxos[0].owner, toAddress, utxos, amount, metadata, token, [feeUtxo], feeInfo.amount, feePayerAddress)
-    logger.debug(`Created tx ${JSON.stringify(tx)}`)
+    logger.debug(`Created tx ${JSONBigNumber.stringify(tx)}`)
 
     // Create the transaction's typedData
     const typedData = transaction.getTypedData(tx, childChain.plasmaContractAddress)
@@ -45,7 +46,7 @@ module.exports = {
   },
 
   submit: async function (childChain, tx, spenderSigs, signFunc) {
-    logger.debug(`relayTx.submit, tx = ${JSON.stringify(tx)}`)
+    logger.debug(`relayTx.submit, tx = ${JSONBigNumber.stringify(tx)}`)
 
     // Get the fee payer address from the tx data
     const feePayerAddress = tx.inputs[tx.inputs.length - 1].owner
