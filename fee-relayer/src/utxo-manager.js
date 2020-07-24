@@ -22,12 +22,17 @@ function compareUtxo (a, b) {
   return a.blknum === b.blknum && a.txindex === b.txindex && a.oindex === b.oindex
 }
 
+async function cleanPending (utxos) {
+  // Only hold on to pendingUtxos that are also in utxos. Any that are not have already been spent.
+  pendingUtxos = pendingUtxos.filter(pending => utxos.some(utxo => compareUtxo(utxo, pending)))
+}
+
 module.exports = {
   getFeeUtxo: async (utxos, feeToken, feeAmount) => {
     // Filter by currency and not pending, and sort by amount
     const validUtxos = utxos
       .filter(utxo => utxo.currency.toLowerCase() === feeToken.toLowerCase())
-      .filter(utxo => !pendingUtxos.includes(utxo))
+      .filter(utxo => !pendingUtxos.some(pending => compareUtxo(utxo, pending)))
       .sort((a, b) => new BN(b.amount).sub(new BN(a.amount)))
 
     // Use the highest value valid utxo
@@ -41,7 +46,8 @@ module.exports = {
     // Mark utxo as 'pending'
     pendingUtxos.push(utxo)
 
-    // TODO use utxos to clean up pending utxos so that it doesn't keep growing.
+    // Clean up pending utxos.
+    cleanPending(utxos)
 
     return utxo
   },
