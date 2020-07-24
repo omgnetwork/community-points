@@ -8,15 +8,24 @@ workflows:
           filters:
             branches:
               only: master
+      - test-fee-relayer:
+          filters:
+            branches:
+              only: master
       - build-and-deploy:
           requires:
             - test-client
+            - test-fee-relayer
           filters:
             branches:
               only: master
   build-other-branches:
     jobs:
       - test-client:
+          filters:
+            branches:
+              ignore: master
+      - test-fee-relayer:
           filters:
             branches:
               ignore: master
@@ -33,6 +42,18 @@ jobs:
       - run: cd client && yarn install
       - run: cd client && yarn lint
       - run: cd client && yarn test
+
+  test-fee-relayer:
+    docker:
+      - image: node:12.16.1-alpine3.11
+    steps:
+      - checkout
+      - run: |
+          apk update && apk upgrade
+          apk add --no-cache git openssh make gcc g++ python
+      - run: cd fee-relayer && npm i
+      - run: cd fee-relayer && npm run lint
+      - run: cd fee-relayer && npm run test
 
   build-and-deploy:
     docker:

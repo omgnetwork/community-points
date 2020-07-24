@@ -9,6 +9,10 @@ const feeToken = '0x0000000000000000000000000000000000000000'
 const notFeeToken = '0xdeadfee000000000000000000000000000000000'
 
 describe('getFeeUtxo', () => {
+  beforeEach(async () => {
+    return utxoManager.cleanPending([])
+  })
+
   it('throws error if no utxo', async () => {
     const feeAmount = 1
     assert.isRejected(utxoManager.getFeeUtxo([], feeToken, feeAmount),
