@@ -18,7 +18,7 @@ const BN = require('bn.js')
 
 let pendingUtxos = []
 
-function compareUtxo(a, b) {
+function compareUtxo (a, b) {
   return a.blknum === b.blknum && a.txindex === b.txindex && a.oindex === b.oindex
 }
 
