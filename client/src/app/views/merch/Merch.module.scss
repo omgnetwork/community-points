@@ -1,0 +1,52 @@
+@import 'app/styles/colors';
+
+.Merch {
+  display: flex;
+  flex-direction: column;
+
+  .flairList {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    height: 150px;
+    overflow-y: scroll;
+    .flair {
+      height: 50px;
+      width: calc(25% - 25px);
+      cursor: pointer;
+      padding: 5px;
+      margin: 5px;
+      transition: all 200ms ease-in-out;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border: 2px solid transparent;
+      &.selected {
+        border: 2px solid $gray2;
+        border-radius: 4px;
+      }
+      &.disabled {
+        pointer-events: none;
+        opacity: 0.5;
+        .price {
+          color: $orange;
+        }
+      }
+      img {
+        margin-bottom: 5px;
+        height: 30px;
+        width: 30px;
+        object-fit: cover;
+      }
+      .price {
+        color: $gray4;
+        font-size: 10px;
+      }
+    }
+  }
+
+  .disclaimer {
+    color: $gray4;
+  }
+}

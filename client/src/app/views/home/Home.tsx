@@ -2,10 +2,12 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import BigNumber from 'bignumber.js';
+import { truncate as _truncate } from 'lodash';
 import truncate from 'truncate-middle';
 import { useDispatch, useSelector, batch } from 'react-redux';
 
 import Transactions from 'app/views/transactions/Transactions';
+import Merch from 'app/views/merch/Merch';
 import Loading from 'app/views/loading/Loading';
 
 import Alert from 'app/components/alert/Alert';
@@ -36,7 +38,7 @@ import * as styles from './Home.module.scss';
 function Home (): JSX.Element {
   const dispatch = useDispatch();
 
-  const [ view, setView ]: [ 'Transfer' | 'History', any ] = useState('Transfer');
+  const [ view, setView ]: [ 'Transfer' | 'History' | 'Merch', any ] = useState('Transfer');
   const [ recipient, setRecipient ]: [ string, any ] = useState('');
   const [ amount, setAmount ]: any = useState('');
   const [ transferLoading, setTransferLoading ]: [ boolean, any ] = useState(false);
@@ -86,6 +88,7 @@ function Home (): JSX.Element {
       const result = await dispatch(transfer({
         amount: powAmount(amount, session.subReddit.decimals),
         recipient,
+        metadata: `r/${_truncate(session.subReddit.name, { length: 10 })} points`,
         subReddit: session.subReddit
       }));
 
@@ -168,7 +171,7 @@ function Home (): JSX.Element {
       />
 
       <Tabs
-        options={[ 'Transfer', 'History' ]}
+        options={[ 'Transfer', 'History', 'Merch' ]}
         selected={view}
         onSelect={setView}
       />
@@ -216,13 +219,20 @@ function Home (): JSX.Element {
           </Button>
           {isPendingTransaction && (
             <p className={styles.disclaimer}>
-              You cannot make a second transaction, as your previous transaction is still pending confirmation.
+              You currently cannot make a second transaction, as your previous transaction is still pending confirmation.
             </p>
           )}
         </>
       )}
 
       {(view as any) === 'History' && <Transactions />}
+
+      {(view as any) === 'Merch' && (
+        <Merch
+          onSuccess={() => setView('History')}
+          session={session}
+        />
+      )}
     </div>
   );
 }
