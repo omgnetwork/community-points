@@ -1,5 +1,6 @@
 import { get } from 'lodash';
 
+import subRedditMap from 'subRedditMap';
 import { IUserAddress } from 'interfaces';
 
 export function selectUserAddressMap (state): IUserAddress[] {
@@ -7,6 +8,15 @@ export function selectUserAddressMap (state): IUserAddress[] {
 }
 
 export function getUsernameFromMap (address: string, userAddressMap: IUserAddress[]): string {
+  if (!address) {
+    return null;
+  }
+
+  const flairAddresses = Object.values(subRedditMap).map(i => i.flairAddress.toLowerCase());
+  if (flairAddresses.includes(address.toLowerCase())) {
+    return 'Flair Purchase';
+  }
+
   const userCandidate: IUserAddress[] = userAddressMap.filter(i => i.address.toLowerCase() === address.toLowerCase());
   const username = userCandidate.length === 1
     ? get(userCandidate, '[0].author', null)

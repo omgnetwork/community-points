@@ -7,14 +7,16 @@ interface SessionState {
 }
 
 const initialState: SessionState = {
-  account: null,
+  account: '',
   balance: null,
   subReddit: {
-    token: null,
+    token: '',
     name: null,
     symbol: null,
     decimals: null,
-    feeRelay: null
+    feeRelay: null,
+    flairAddress: '',
+    flairMap: null
   }
 };
 

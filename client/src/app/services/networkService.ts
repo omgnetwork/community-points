@@ -42,7 +42,10 @@ export async function getActiveAccount (): Promise<string> {
 export async function getSession (): Promise<ISession> {
   const account = await getActiveAccount();
   const subReddit = await locationService.getCurrentSubReddit();
-  const balance = await omgService.getPointBalance(account, subReddit.token);
+  let balance = '0';
+  if (subReddit) {
+    balance = await omgService.getPointBalance(account, subReddit.token);
+  }
   return {
     account,
     balance,
@@ -156,6 +159,7 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
       sender,
       recipient,
       amount,
+      metadata: omgService.decodeMetadata(transaction.metadata),
       currency: session.subReddit.token,
       symbol: session.subReddit.symbol,
       decimals: session.subReddit.decimals,
@@ -169,10 +173,12 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
 export async function transfer ({
   amount,
   recipient,
+  metadata,
   subReddit
 }: {
   amount: number,
   recipient: string,
+  metadata: string,
   subReddit: ISubReddit
 }): Promise<ITransaction> {
   // fetch and pick utxos to cover amount
@@ -200,6 +206,7 @@ export async function transfer ({
     body: {
       utxos: spendableUtxos,
       amount,
+      metadata,
       to: recipient
     }
   });
@@ -242,6 +249,7 @@ export async function transfer ({
     sender: account,
     recipient,
     amount,
+    metadata,
     currency: subReddit.token,
     symbol: subReddit.symbol,
     decimals: subReddit.decimals,
