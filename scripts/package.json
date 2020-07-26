@@ -1,0 +1,19 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node flair/index.js"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@omisego/omg-js-childchain": "^4.0.1-1.0.0",
+    "@omisego/omg-js-util": "^4.0.1-1.0.0",
+    "dotenv": "^8.2.0",
+    "lodash": "^4.17.19",
+    "node-fetch": "^2.6.0",
+    "snoowrap": "^1.21.0"
+  }
+}
