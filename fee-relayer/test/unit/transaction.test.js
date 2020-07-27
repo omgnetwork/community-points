@@ -288,6 +288,100 @@ describe('create transaction', () => {
       metadata: NULL_METADATA
     })
   })
+
+  it('creates a valid tx and splits the fee outputs into 2', async () => {
+    const spendAmount = 100
+    const utxos = [{
+      amount: spendAmount + 1,
+      currency: spendToken
+    }]
+
+    const feeAmount = 10
+    const feeUtxos = [{
+      amount: feeAmount * 3,
+      currency: feeToken
+    }]
+
+    const tx = transaction.create(alice, bob, utxos, spendAmount, null, spendToken, feeUtxos, feeAmount, fred, true)
+    assert.deepEqual(tx, {
+      inputs: [{
+        amount: utxos[0].amount,
+        currency: spendToken
+      }, {
+        amount: feeUtxos[0].amount,
+        currency: feeToken
+      }],
+      outputs: [{
+        outputType: 1,
+        outputGuard: bob,
+        currency: spendToken,
+        amount: new BN(spendAmount)
+      }, {
+        outputType: 1,
+        outputGuard: alice,
+        currency: spendToken,
+        amount: new BN(1)
+      }, {
+        outputType: 1,
+        outputGuard: fred,
+        currency: feeToken,
+        amount: new BN(feeAmount)
+      }, {
+        outputType: 1,
+        outputGuard: fred,
+        currency: feeToken,
+        amount: new BN(feeAmount)
+      }],
+      metadata: NULL_METADATA
+    })
+  })
+
+  it('creates a valid tx and splits the fee outputs into 3', async () => {
+    const spendAmount = 100
+    const utxos = [{
+      amount: spendAmount,
+      currency: spendToken
+    }]
+
+    const feeAmount = 10
+    const feeUtxos = [{
+      amount: feeAmount * 4,
+      currency: feeToken
+    }]
+
+    const tx = transaction.create(alice, bob, utxos, spendAmount, null, spendToken, feeUtxos, feeAmount, fred, true)
+    assert.deepEqual(tx, {
+      inputs: [{
+        amount: utxos[0].amount,
+        currency: spendToken
+      }, {
+        amount: feeUtxos[0].amount,
+        currency: feeToken
+      }],
+      outputs: [{
+        outputType: 1,
+        outputGuard: bob,
+        currency: spendToken,
+        amount: new BN(spendAmount)
+      }, {
+        outputType: 1,
+        outputGuard: fred,
+        currency: feeToken,
+        amount: new BN(feeAmount)
+      }, {
+        outputType: 1,
+        outputGuard: fred,
+        currency: feeToken,
+        amount: new BN(feeAmount)
+      }, {
+        outputType: 1,
+        outputGuard: fred,
+        currency: feeToken,
+        amount: new BN(feeAmount)
+      }],
+      metadata: NULL_METADATA
+    })
+  })
 })
 
 describe('create transaction failures', () => {
