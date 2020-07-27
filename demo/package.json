@@ -12,6 +12,9 @@
     "@openzeppelin/contracts": "^3.1.0",
     "@truffle/hdwallet-provider": "^1.0.40",
     "dotenv": "^8.2.0",
+    "pino": "^6.4.1",
+    "pino-pretty": "^4.1.0",
+    "prettier": "^2.0.5",
     "web3": "^1.2.11"
   }
 }
