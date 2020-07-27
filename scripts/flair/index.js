@@ -15,14 +15,22 @@ require('dotenv').config()
 const { transaction } = require('@omisego/omg-js-util')
 const { get, find, orderBy, difference } = require('lodash')
 const fetch = require('node-fetch');
-// const snoowrap = require('snoowrap');
+const snoowrap = require('snoowrap');
 const burnAddr = process.env.BURN_ADDR
-const curr = process.env.CURRENCY 
-const metadata = process.env.FLAIR_NAME 
+const curr = process.env.CURRENCY
+const metadata = process.env.FLAIR_NAME
 const watcher = process.env.WATCHER
 const userAddressUrl = process.env.USER_THREAD
+const subreddit = process.env.SUB
 
 const price = parseInt( process.env.FLAIR_PRICE )
+const r = new snoowrap({
+  userAgent: process.env.USER_AGENT,
+  clientId: process.env.CLIENT_ID,
+  clientSecret: process.env.CLIENT_SECRET,
+  username: process.env.USERNAME,
+  password: process.env.PASSWORD
+});
 
 async function getAllTransactions({watcher, burnAddr, curr, limit}, page = 1, transactions = []) {
   const body = {address: burnAddr, currency: curr, limit: limit, page: page};
@@ -37,7 +45,7 @@ async function getAllTransactions({watcher, burnAddr, curr, limit}, page = 1, tr
   } else {
     return await getAllTransactions({watcher, burnAddr, curr, limit}, page +1, [ ...transactions, ...data ])
   }
-}
+};
 
 function isAddress (address) {
   if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) {
@@ -48,19 +56,21 @@ function isAddress (address) {
 
 function validPurchase(tx, price, curr, burnAddr, flairName) {
   return tx.outputs.reduce(function(accu, output) {
-    const isCorrectOutputAddr = output.owner === burnAddr 
-    const isCorrectAmount = output.amount === price
-    const isCorrectCurr = output.currency === curr
-    const isCorrectFlair = tx.metadata === transaction.encodeMetadata(flairName)
-    if (isCorrectOutputAddr && isCorrectFlair && isCorrectAmount && isCorrectCurr) {
+    const valid = [
+      output.owner === burnAddr,
+      tx.metadata === transaction.encodeMetadata(flairName),
+      output.currency === curr,
+      output.amount === price
+    ]
+    if (!valid.includes(false)) {
       return true
     }
   })
-}
+};
 
 function getOwner(tx, curr) {
   return tx.inputs.find(input => input.currency === curr).owner
-}
+};
 
 function flairGetter({ curr, burnAddr}, txs, purchaseVerifier) {
   return function (flairName, flairText, price) {
@@ -74,7 +84,7 @@ function flairGetter({ curr, burnAddr}, txs, purchaseVerifier) {
     }, [])
     return { flairName: flairName, flairText: flairText, addresses: new Set(res) }
   }
-}
+};
 
 function parseThreadJSON (json) {
   const rawComments = get(json, '[1].data.children', []);
@@ -162,6 +172,10 @@ function buildMultipleUserFlairs (allusers, ...flairs) {
   return flairArrays
 }
 
+async function setFlairs (updates, subreddit) {
+  return await subreddit.setMultipleUserFlairs(updates)
+}
+
 (async () => {
 	try {
     const txconfig = {
@@ -174,9 +188,12 @@ function buildMultipleUserFlairs (allusers, ...flairs) {
     const getFlair = flairGetter(txconfig, txs, validPurchase)
     const rUsers = await getUserMap()
     const flairArrays = buildMultipleUserFlairs(rUsers, getFlair('flair_omg', ':omg:', price))
-    console.log(flairArrays)
+    const update = await setFlairs(
+      flairArrays,
+      r.getSubreddit(subreddit)
+    )
+    console.log(update)
   } catch(err) {
-    console.log('error')
     console.log(err)
   }
 })();
