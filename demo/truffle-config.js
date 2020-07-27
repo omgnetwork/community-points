@@ -23,7 +23,6 @@ require("dotenv").config()
 
 
 const { DISTRIBUTION_ADDRESS_MNEMONIC, WEB3_PROVIDER } = process.env
-console.log(DISTRIBUTION_ADDRESS_MNEMONIC)
 // const infuraKey = "fj4jll3k.....";
 //
 // const fs = require('fs');
