@@ -6,4 +6,8 @@ module.exports = async (deployer) => {
     "2020 August Rock subscription",
     "AUGROCK",
   );
+
+  const subscriptionContract = await Subscription.deployed();
+  const subredditOwner = process.env.SUBREDDIT_OWNER;
+  await subscriptionContract.transferOwnership(subredditOwner);
 };
