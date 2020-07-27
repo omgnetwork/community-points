@@ -1,17 +1,39 @@
-const { Distributor, KarmaPointsContract, Provider } = require("./utils/config")
-const { getPointBalance, mint } = require("./utils/helpers")
+const pino = require('pino')({ prettyPrint: true })
+const { getPointBalance, Logger, mint } = require('./utils/helpers')
+
+const {
+  Distributor,
+  KarmaPointsContract: KRP,
+  CommunityPointsContract: RCP,
+  Provider
+} = require('./utils/config')
 
 const executeClaimFlow = async () => {
-    console.log(`Karma Points contract address is ${KarmaPointsContract._address}`)
+  Logger.logContractAddress('Karma Points', KRP._address)
 
-    let balance = await getPointBalance(KarmaPointsContract, Distributor.address)
-    console.log(`Distributor KRT balance on Ethereum Network is now ${balance}`)
+  let balance = await getPointBalance(KRP, Distributor.address)
+  Logger.logBalance('Distributor', 'KRP', 'Ethereum Network', balance)
 
-    console.log("Distributor will mint 100 KRT ...")
+  Logger.logMinting('Distributor', 100, 'KRP')
 
-    const receipt = await mint(Provider, KarmaPointsContract, Distributor, Distributor, 100)
-    console.log(`Minting transaction: ${receipt.transactionHash}`)
+  let receipt = await mint(Provider, KRP, Distributor, Distributor, 100)
+  Logger.logTransactionHash(receipt.transactionHash)
 
-    balance = await getPointBalance(KarmaPointsContract, Distributor.address)
-    console.log(`Distributor KRT balance on Ethereum Network is now ${balance}`)
+  balance = await getPointBalance(KRP, Distributor.address)
+  Logger.logBalance('Distributor', 'KRP', 'Ethereum Network', balance)
+
+  Logger.logContractAddress('Community Points', RCP._address)
+
+  balance = await getPointBalance(RCP, Distributor.address)
+  Logger.logBalance('Distributor', 'RCP', 'Ethereum Network', balance)
+
+  Logger.logMinting('Distributor', 100, 'RCP')
+
+  receipt = await mint(Provider, RCP, Distributor, Distributor, 100)
+  Logger.logTransactionHash(receipt.transactionHash)
+
+  balance = await getPointBalance(RCP, Distributor.address)
+  Logger.logBalance('Distributor', 'RCP', 'Ethereum Network', balance)
 }
+
+executeClaimFlow()

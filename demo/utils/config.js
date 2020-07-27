@@ -1,12 +1,25 @@
-require("dotenv").config()
+require('dotenv').config()
 
-const { getAccount, getProvider, getContract } = require("./helpers")
-const { abi: KarmaPointContractABI } = require("../build/contracts/KarmaPoint.json")
+const { getAccount, getProvider, getContract } = require('./helpers')
 
-const { DISTRIBUTION_ADDRESS_PRIVATE_KEY, WEB3_PROVIDER, KARMA_POINTS_CONTRACT_ADDRESS } = process.env
+const { abi: KRP } = require('../build/contracts/KarmaPoint.json')
+const { abi: RCP } = require('../build/contracts/RedditCommunityPoint.json')
+
+const {
+  DISTRIBUTION_ADDRESS_PRIVATE_KEY,
+  WEB3_PROVIDER,
+  CONTRACT_ADDRESS_KRP,
+  CONTRACT_ADDRESS_RCP
+} = process.env
 
 const Provider = getProvider(WEB3_PROVIDER)
+const KarmaPointsContract = getContract(Provider, KRP, CONTRACT_ADDRESS_KRP)
+const CommunityPointsContract = getContract(Provider, RCP, CONTRACT_ADDRESS_RCP)
 const Distributor = getAccount(Provider, DISTRIBUTION_ADDRESS_PRIVATE_KEY)
-const KarmaPointsContract = getContract(Provider, KarmaPointContractABI, KARMA_POINTS_CONTRACT_ADDRESS)
 
-module.exports = { Distributor, Provider, KarmaPointsContract }
+module.exports = {
+  Distributor,
+  Provider,
+  CommunityPointsContract,
+  KarmaPointsContract
+}
