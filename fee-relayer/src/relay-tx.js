@@ -20,10 +20,6 @@ const JSONBigNumber = require('omg-json-bigint')
 const BN = require('bn.js')
 const logger = require('pino')({ level: process.env.LOG_LEVEL || 'info' })
 
-function needMoreUtxos (actual) {
-  return actual < process.env.FEE_RELAYER_DESIRED_NUM_UTXOS
-}
-
 module.exports = {
   create: async function (
     childChain,
@@ -36,7 +32,7 @@ module.exports = {
     feeInfo
   ) {
     // Find a fee utxo to spend
-    const feeUtxos = await childChain.getUtxos(feePayerAddress)
+    const feeUtxos = await utxoManager.getUtxos(childChain, feePayerAddress)
     logger.debug(`Fee relayer has ${feeUtxos.length} utxos`)
 
     const feeUtxo = await utxoManager.getFeeUtxo(feeUtxos, feeInfo.currency, feeInfo.amount)
@@ -53,7 +49,7 @@ module.exports = {
       [feeUtxo],
       feeInfo.amount,
       feePayerAddress,
-      needMoreUtxos(utxos.length)
+      utxoManager.needMoreUtxos()
     )
 
     logger.debug(`Created tx ${JSONBigNumber.stringify(tx)}`)

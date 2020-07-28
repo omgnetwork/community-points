@@ -15,7 +15,10 @@
 */
 
 const BN = require('bn.js')
+const axios = require('axios')
+const JSONBigNumber = require('omg-json-bigint')
 
+let currentNumUtxos = 0
 let pendingUtxos = []
 
 function compareUtxo (a, b) {
@@ -54,5 +57,42 @@ module.exports = {
   cleanPending: async function (utxos) {
     // Only hold on to pendingUtxos that are also in utxos. Any that are not have already been spent.
     pendingUtxos = pendingUtxos.filter(pending => utxos.some(utxo => compareUtxo(utxo, pending)))
+  },
+
+  getUtxos: async function (childChain, address, utxos = [], page = 1) {
+    const options = {
+      method: 'POST',
+      url: `${childChain.watcherUrl}/account.get_utxos`,
+      headers: { 'Content-Type': 'application/json' },
+      data: JSONBigNumber.stringify({
+        address,
+        limit: 200,
+        page
+      }),
+      transformResponse: [(data) => data]
+    }
+    const res = await axios.request(options)
+
+    let data
+    try {
+      data = JSONBigNumber.parse(res.data)
+    } catch (err) {
+      throw new Error(`Unable to parse response from server: ${err}`)
+    }
+
+    if (data.success) {
+      utxos = utxos.concat(data.data)
+      if (data.data.length < data.data_paging.limit) {
+        currentNumUtxos = utxos.length
+        return utxos
+      }
+      return this.getUtxos(childChain, address, utxos, data.data_paging.page + 1)
+    }
+
+    throw new Error(data.data)
+  },
+
+  needMoreUtxos: function () {
+    return currentNumUtxos < process.env.FEE_RELAYER_DESIRED_NUM_UTXOS
   }
 }
