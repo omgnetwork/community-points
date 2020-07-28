@@ -32,10 +32,8 @@ module.exports = {
     feeInfo
   ) {
     // Find a fee utxo to spend
-    const feeUtxos = await utxoManager.getUtxos(childChain, feePayerAddress)
-    logger.debug(`Fee relayer has ${feeUtxos.length} utxos`)
 
-    const feeUtxo = await utxoManager.getFeeUtxo(feeUtxos, feeInfo.currency, feeInfo.amount)
+    const feeUtxo = await utxoManager.getFeeUtxo(childChain, feePayerAddress, feeInfo.currency, feeInfo.amount)
     logger.debug(`Using fee utxo ${JSONBigNumber.stringify(feeUtxo)}`)
 
     // Create the transaction
