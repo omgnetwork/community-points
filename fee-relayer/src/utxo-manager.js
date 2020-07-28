@@ -81,7 +81,7 @@ module.exports = {
       // Get utxos from the network
       cachedUtxos = await getAllFeeUtxos(childChain, address, feeToken)
       currentNumUtxos = cachedUtxos.length
-      logger.debug(`Fee relayer has ${currentNumUtxos} fee utxos`)
+      logger.debug(`Refreshed cached utxos, fee relayer has ${currentNumUtxos} fee utxos`)
 
       // Clean up pending utxos.
       this.cleanPending(cachedUtxos)
@@ -92,7 +92,7 @@ module.exports = {
 
   refresh: async function (childChain, address, feeToken, numValid) {
     if (numValid < (process.env.FEE_RELAYER_DESIRED_NUM_UTXOS / 2)) {
-      console.log(`Have ${numValid} valid utxos. Refreshing cache..................`)
+      logger.debug(`Have ${numValid} valid utxos. Refreshing cache..................`)
       shouldRefreshUtxoCache = true
     }
     this.getUtxos(childChain, address, feeToken)
