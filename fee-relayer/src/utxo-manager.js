@@ -42,7 +42,7 @@ module.exports = {
 
     // Check that it can cover the fee
     if (!utxo || new BN(utxo.amount).lt(new BN(feeAmount))) {
-      throw new Error(`Insufficient funds to cover fee amount ${feeAmount}`)
+      throw new Error(`Address ${feePayerAddress} has insufficient funds in ${validUtxos.length} valid utxos to cover fee amount ${feeAmount}`)
     }
 
     // Mark utxo as 'pending'
@@ -92,9 +92,14 @@ module.exports = {
     return cachedUtxos
   },
 
+  initCache: async function (childChain, address, feeToken) {
+    shouldRefreshUtxoCache = true
+    return this.getUtxos(childChain, address, feeToken)
+  },
+
   refresh: async function (childChain, address, feeToken, numValid) {
-    if (numValid < (process.env.FEE_RELAYER_DESIRED_NUM_UTXOS / 2)) {
-      logger.debug(`Have ${numValid} valid utxos. Refreshing cache..................`)
+    if (numValid < (FEE_RELAYER_DESIRED_NUM_UTXOS / 2)) {
+      logger.debug(`Address ${address} only has ${numValid} valid utxos. Refreshing cache.`)
       shouldRefreshUtxoCache = true
     }
     this.getUtxos(childChain, address, feeToken)
