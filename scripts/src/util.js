@@ -22,11 +22,11 @@ module.exports = {
   },
 
   validPurchase: function (tx, price, curr, burnAddr, flairName) {
-    return tx.outputs.reduce(function(accu, output) {
+    return tx.outputs.find(function(output) {
       const valid = [
         output.owner === burnAddr,
         tx.metadata === transaction.encodeMetadata(flairName),
-        output.currency === curr,
+        output.currency.toLowerCase() === curr.toLowerCase(),
         output.amount === price
       ]
       if (!valid.includes(false)) {
@@ -36,6 +36,6 @@ module.exports = {
   },
 
   getOwner: function (tx, curr) {
-    return tx.inputs.find(input => input.currency === curr).owner
+    return tx.inputs.find(input => input.currency.toLowerCase() === curr.toLowerCase()).owner
   }
 }

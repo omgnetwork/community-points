@@ -45,9 +45,9 @@ const r = new snoowrap({
     const rUsers = await flair.getUserMap(userAddressUrl)
     const flairArrays = flair.buildMultipleUserFlairs(
       rUsers,
-      getFlair('flair_omg', ':omg:', price),
-      getFlair('flair_orly', ':orly:', price),
-      getFlair('flair_snoo', ':snoo:', price)
+      getFlair('flair_rock', ':rock:', price),
+      getFlair('flair_salamander', ':salamander:', 7000),
+      getFlair('flair_soon', ':soon:', 10000)
     )
     const update = await flair.setFlairs(
       flairArrays,
