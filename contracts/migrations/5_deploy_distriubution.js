@@ -19,4 +19,7 @@ module.exports = async (deployer) => {
   await subredditPoint.transferOwnership(distribution.address);
 
   await distribution.initRound(INITIAL_DISTRIBUTION, TOTAL_KARMA_ON_INITIAL_ROUND);
+
+  // no need to keep the ownership anymore after initRound
+  await distribution.renounceOwnership();
 };

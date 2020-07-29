@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.6.0;
 
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
 import "./tokens/SubredditPoint.sol";
@@ -17,7 +18,7 @@ import "./utils/OnlyFromAddress.sol";
  * This contract should decrease some fixed percentage of distribution on each round.
  * However, 50% of the "burned" points would be re-distributed.
  */
-contract Distribution is OnlyFromAddress {
+contract Distribution is OnlyFromAddress, Ownable {
     using SafeMath for uint256;
 
     /**
@@ -54,7 +55,11 @@ contract Distribution is OnlyFromAddress {
         currentRound = 0;
     }
 
-    function initRound(uint256 initialDistribution, uint256 totalKarma) external {
+    /**
+     * Make sure only the deployer of the contract can call this function to avoid others from running
+     * this function outside our deployment script.
+     */
+    function initRound(uint256 initialDistribution, uint256 totalKarma) external onlyOwner {
         require(currentRound == 0, "Initial round has already started");
         distribute(initialDistribution, initialDistribution, totalKarma);
     }
