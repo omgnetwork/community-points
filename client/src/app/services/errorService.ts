@@ -23,7 +23,7 @@ export function log (error: Error): void {
 export function isExpectedError (error: Error): boolean {
   if (
     (error.message && error.message.includes('User denied')) ||
-    (error.message && error.message.includes('Extension context invalidated'))
+    (error.message && error.message.includes('Extension context'))
   ) {
     return true;
   }

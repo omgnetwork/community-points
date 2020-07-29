@@ -24,6 +24,8 @@ let pendingUtxos = []
 let cachedUtxos = []
 let shouldRefreshUtxoCache = true
 
+const FEE_RELAYER_DESIRED_NUM_UTXOS = process.env.FEE_RELAYER_DESIRED_NUM_UTXOS || 100
+
 function compareUtxo (a, b) {
   return a.blknum === b.blknum && a.txindex === b.txindex && a.oindex === b.oindex
 }
@@ -96,6 +98,10 @@ module.exports = {
       shouldRefreshUtxoCache = true
     }
     this.getUtxos(childChain, address, feeToken)
+  },
+
+  needMoreUtxos: function () {
+    return currentNumUtxos < FEE_RELAYER_DESIRED_NUM_UTXOS
   }
 }
 
