@@ -17,9 +17,12 @@
 const BN = require('bn.js')
 const axios = require('axios')
 const JSONBigNumber = require('omg-json-bigint')
+const logger = require('pino')({ level: process.env.LOG_LEVEL || 'info' })
 
 let currentNumUtxos = 0
 let pendingUtxos = []
+let cachedUtxos = []
+let shouldRefreshUtxoCache = true
 
 const FEE_RELAYER_DESIRED_NUM_UTXOS = process.env.FEE_RELAYER_DESIRED_NUM_UTXOS || 100
 
@@ -28,12 +31,11 @@ function compareUtxo (a, b) {
 }
 
 module.exports = {
-  getFeeUtxo: async function (utxos, feeToken, feeAmount) {
-    // Filter by currency and not pending, and sort by amount
-    const validUtxos = utxos
-      .filter(utxo => utxo.currency.toLowerCase() === feeToken.toLowerCase())
-      .filter(utxo => !pendingUtxos.some(pending => compareUtxo(utxo, pending)))
-      .sort((a, b) => new BN(b.amount).sub(new BN(a.amount)))
+  getFeeUtxo: async function (childChain, feePayerAddress, feeToken, feeAmount) {
+    let validUtxos = await this.getValidUtxos(childChain, feePayerAddress, feeToken.toLowerCase())
+
+    // Sort by value
+    validUtxos = validUtxos.sort((a, b) => new BN(b.amount).sub(new BN(a.amount)))
 
     // Use the highest value valid utxo
     const utxo = validUtxos[0]
@@ -46,9 +48,6 @@ module.exports = {
     // Mark utxo as 'pending'
     pendingUtxos.push(utxo)
 
-    // Clean up pending utxos.
-    this.cleanPending(utxos)
-
     return utxo
   },
 
@@ -56,45 +55,80 @@ module.exports = {
     pendingUtxos = pendingUtxos.filter(item => !compareUtxo(item, utxo))
   },
 
-  cleanPending: async function (utxos) {
+  cleanPending: function (utxos) {
     // Only hold on to pendingUtxos that are also in utxos. Any that are not have already been spent.
     pendingUtxos = pendingUtxos.filter(pending => utxos.some(utxo => compareUtxo(utxo, pending)))
   },
 
-  getUtxos: async function (childChain, address, utxos = [], page = 1) {
-    const options = {
-      method: 'POST',
-      url: `${childChain.watcherUrl}/account.get_utxos`,
-      headers: { 'Content-Type': 'application/json' },
-      data: JSONBigNumber.stringify({
-        address,
-        limit: 200,
-        page
-      }),
-      transformResponse: [(data) => data]
-    }
-    const res = await axios.request(options)
-
-    let data
-    try {
-      data = JSONBigNumber.parse(res.data)
-    } catch (err) {
-      throw new Error(`Unable to parse response from server: ${err}`)
-    }
-
-    if (data.success) {
-      utxos = utxos.concat(data.data)
-      if (data.data.length < data.data_paging.limit) {
-        currentNumUtxos = utxos.length
-        return utxos
-      }
-      return this.getUtxos(childChain, address, utxos, data.data_paging.page + 1)
-    }
-
-    throw new Error(data.data)
-  },
-
   needMoreUtxos: function () {
     return currentNumUtxos < FEE_RELAYER_DESIRED_NUM_UTXOS
+  },
+
+  getValidUtxos: async function (childChain, address, feeToken) {
+    const utxos = await this.getUtxos(childChain, address, feeToken)
+
+    // Remove pending utxos
+    const validUtxos = utxos.filter(utxo => !pendingUtxos.some(pending => compareUtxo(utxo, pending)))
+
+    // Refresh the cache asynchronously if necessary
+    this.refresh(childChain, address, feeToken.toLowerCase(), validUtxos.length)
+
+    return validUtxos
+  },
+
+  getUtxos: async function (childChain, address, feeToken) {
+    if (shouldRefreshUtxoCache) {
+      shouldRefreshUtxoCache = false
+
+      // Get utxos from the network
+      cachedUtxos = await getAllFeeUtxos(childChain, address, feeToken)
+      currentNumUtxos = cachedUtxos.length
+      logger.debug(`Refreshed cached utxos, fee relayer has ${currentNumUtxos} fee utxos`)
+
+      // Clean up pending utxos.
+      this.cleanPending(cachedUtxos)
+    }
+
+    return cachedUtxos
+  },
+
+  refresh: async function (childChain, address, feeToken, numValid) {
+    if (numValid < (process.env.FEE_RELAYER_DESIRED_NUM_UTXOS / 2)) {
+      logger.debug(`Have ${numValid} valid utxos. Refreshing cache..................`)
+      shouldRefreshUtxoCache = true
+    }
+    this.getUtxos(childChain, address, feeToken)
   }
+}
+
+async function getAllFeeUtxos (childChain, address, feeToken, utxos = [], page = 1) {
+  const options = {
+    method: 'POST',
+    url: `${childChain.watcherUrl}/account.get_utxos`,
+    headers: { 'Content-Type': 'application/json' },
+    data: JSONBigNumber.stringify({
+      address,
+      limit: 200,
+      page
+    }),
+    transformResponse: [(data) => data]
+  }
+  const res = await axios.request(options)
+
+  let data
+  try {
+    data = JSONBigNumber.parse(res.data)
+  } catch (err) {
+    throw new Error(`Unable to parse response from server: ${err}`)
+  }
+
+  if (data.success) {
+    utxos = utxos.concat(data.data.filter(utxo => utxo.currency === feeToken))
+    if (data.data.length < data.data_paging.limit) {
+      return utxos
+    }
+    return getAllFeeUtxos(childChain, address, feeToken, utxos, data.data_paging.page + 1)
+  }
+
+  throw new Error(data.data)
 }
