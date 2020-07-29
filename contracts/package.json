@@ -22,7 +22,8 @@
     "@openzeppelin/contracts": "3.1.0",
     "@truffle/hdwallet-provider": "^1.0.38",
     "dotenv": "^8.2.0",
-    "truffle": "5.1.33"
+    "truffle": "5.1.33",
+    "truffle-flattener": "^1.4.4"
   },
   "devDependencies": {
     "@openzeppelin/test-helpers": "^0.5.6",
