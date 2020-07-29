@@ -1,10 +1,10 @@
 const BigNumber = require('bn.js')
 const { OmgUtil } = require('@omisego/omg-js')
 const { Clients, Config } = require(`../config`)
-const { convertToSubunit } = require('../helpers')
+const { subunitToUnit, unitToSubunit } = require('../util')
 
 async function transfer(sender, recipient, amount, currency) {
-  const subunitAmount = convertToSubunit(amount)
+  const subunitAmount = unitToSubunit(amount)
 
   /* construct a transaction body */
   const transactionBody = await Clients.Plasma.ChildChain.createTransaction({
@@ -54,8 +54,8 @@ const waitForTransfer = async (
   transferAmount,
   currency
 ) => {
-  const subunitInitialBalance = new BigNumber(convertToSubunit(initialBalance))
-  const subunitTransferAmount = new BigNumber(convertToSubunit(transferAmount))
+  const subunitInitialBalance = new BigNumber(unitToSubunit(initialBalance))
+  const subunitTransferAmount = new BigNumber(unitToSubunit(transferAmount))
   const expectedAmount = subunitInitialBalance.add(subunitTransferAmount)
 
   await OmgUtil.waitForChildchainBalance({
@@ -66,4 +66,13 @@ const waitForTransfer = async (
   })
 }
 
-module.exports = { transfer, waitForTransfer }
+const getBalance = async (address, currency) => {
+  const balances = await Clients.Plasma.ChildChain.getBalance(address)
+  const balance = balances.find(balance => {
+    return balance.currency.toLowerCase() === currency.toLowerCase()
+  })
+
+  return balance ? subunitToUnit(balance.amount) : '0'
+}
+
+module.exports = { getBalance, transfer, waitForTransfer }

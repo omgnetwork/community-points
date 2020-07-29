@@ -13,6 +13,7 @@
     "@openzeppelin/contracts": "^3.1.0",
     "@truffle/hdwallet-provider": "^1.0.40",
     "bignumber.js": "^9.0.0",
+    "bn.js": "^5.1.2",
     "dotenv": "^8.2.0",
     "pino": "^6.4.1",
     "pino-pretty": "^4.1.0",

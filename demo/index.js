@@ -1,122 +1,164 @@
-const {
-  approveErc20,
-  depositEth,
-  depositErc20,
-  getPointBalance,
-  getChildChainBalance,
-  Logger,
-  mint,
-  wait
-} = require('./utils/helpers')
+const { OmgUtil } = require('@omisego/omg-js')
 
-const {
-  distributor,
-  KarmaPointsContract: KRP,
-  CommunityPointsContract: RCP,
-  provider,
-  rootchain,
-  childchain
-} = require('./utils/config')
+const { Accounts, Contracts, Clients } = require('./src/config')
+const ChildChain = require('./src/childchain')
+const RootChain = require('./src/rootchain')
+const Logger = require('./src/util/logger')
 
-const { currency } = require('./utils/constants')
+const { KARMA, RCP } = Contracts
+const { Alice, Distributor, SubRedditServer } = Accounts
 
 const executeClaimFlow = async () => {
-  Logger.logContractAddress('Karma Points', KRP._address)
+  Logger.logContractAddress(KARMA.symbol, KARMA._address)
 
-  balance = await getPointBalance(KRP, distributor.address)
-  Logger.logBalance('Distributor', 'KRP', 'Ethereum Network', balance)
+  balance = await RootChain.getBalance(KARMA, Distributor.address)
+  Logger.logBalance(Distributor.name, KARMA.symbol, 'Ethereum Network', balance)
 
-  Logger.logMinting('Distributor', 100, 'KRP')
+  Logger.logMinting(Distributor.name, 100, KARMA.symbol)
 
-  let receipt = await mint(provider, KRP, distributor, distributor, 100)
-  Logger.logTransactionHash(receipt.transactionHash)
-
-  balance = await getPointBalance(KRP, distributor.address)
-
-  Logger.logBalance('Distributor', 'KRP', 'Ethereum Network', balance)
-
-  Logger.logContractAddress('Community Points', RCP._address)
-
-  balance = await getPointBalance(RCP, distributor.address)
-  Logger.logBalance('Distributor', 'RCP', 'Ethereum Network', balance)
-
-  Logger.logMinting('Distributor', 100, 'RCP')
-
-  receipt = await mint(provider, RCP, distributor, distributor, 100)
-  Logger.logTransactionHash(receipt.transactionHash)
-
-  balance = await getPointBalance(RCP, distributor.address)
-  Logger.logBalance('Distributor', 'RCP', 'Ethereum Network', balance)
-
-  balance = await getChildChainBalance(
-    childchain,
-    distributor.address,
-    currency.ETH
+  let receipt = await RootChain.callMint(
+    KARMA,
+    Distributor,
+    Distributor,
+    100,
+    Clients.Ethereum.Provider
   )
-  Logger.logBalance('Distributor', 'ETH', 'OMG Network', balance)
-
-  receipt = await depositEth(rootchain, provider, distributor, '0.01')
-
-  balance = await getChildChainBalance(
-    childchain,
-    distributor.address,
-    currency.ETH
-  )
-  Logger.logBalance('Distributor', 'ETH', 'OMG Network', balance)
-
-  Logger.logApprovingErc20('KRP', '100')
-  receipt = await approveErc20(rootchain, KRP._address, distributor, 100)
   Logger.logTransactionHash(receipt.transactionHash)
 
-  Logger.logApprovingErc20('RCP', 100)
-  receipt = await approveErc20(rootchain, RCP._address, distributor, 100)
+  balance = await RootChain.getBalance(KARMA, Distributor.address)
+
+  Logger.logBalance(Distributor.name, KARMA.symbol, 'Ethereum Network', balance)
+
+  Logger.logContractAddress(RCP.symbol, RCP._address)
+
+  balance = await RootChain.getBalance(RCP, Distributor.address)
+  Logger.logBalance(Distributor.name, RCP.symbol, 'Ethereum Network', balance)
+
+  Logger.logMinting(Distributor.name, 100, RCP.symbol)
+
+  receipt = await RootChain.callMint(
+    RCP,
+    Distributor,
+    Distributor,
+    100,
+    Clients.Ethereum.Provider
+  )
   Logger.logTransactionHash(receipt.transactionHash)
 
-  balance = await getChildChainBalance(
-    childchain,
-    distributor.address,
-    currency.KRP
-  )
-  Logger.logBalance('Distributor', 'KRP', 'OMG Network', balance)
+  balance = await RootChain.getBalance(RCP, Distributor.address)
+  Logger.logBalance(Distributor.name, RCP.symbol, 'Ethereum Network', balance)
 
-  receipt = await depositErc20(
-    rootchain,
-    provider,
-    distributor,
+  balance = await ChildChain.getBalance(
+    Distributor.address,
+    OmgUtil.transaction.ETH_CURRENCY
+  )
+
+  Logger.logBalance(Distributor.name, 'ETH', 'OMG Network', balance)
+
+  receipt = await RootChain.depositEth(
+    Distributor,
+    '0.01',
+    Clients.Ethereum.Provider,
+    Clients.Plasma.RootChain
+  )
+
+  balance = await ChildChain.getBalance(
+    Distributor.address,
+    OmgUtil.transaction.ETH_CURRENCY
+  )
+  Logger.logBalance(Distributor.name, 'ETH', 'OMG Network', balance)
+
+  Logger.logApprovingErc20(KARMA.symbol, '100')
+  receipt = await RootChain.approveErc20(
+    KARMA._address,
+    Distributor,
+    100,
+    Clients.Plasma.RootChain
+  )
+  Logger.logTransactionHash(receipt.transactionHash)
+
+  Logger.logApprovingErc20(RCP.symbol, 100)
+  receipt = await RootChain.approveErc20(
+    RCP._address,
+    Distributor,
+    100,
+    Clients.Plasma.RootChain
+  )
+  Logger.logTransactionHash(receipt.transactionHash)
+
+  balance = await ChildChain.getBalance(Distributor.address, KARMA._address)
+  Logger.logBalance(Distributor.name, KARMA.symbol, 'OMG Network', balance)
+
+  receipt = await RootChain.depositErc20(
+    Distributor,
     '100',
-    currency.KRP,
-    'KRP'
+    KARMA,
+    Clients.Plasma.RootChain,
+    Clients.Ethereum.Provider
   )
 
-  balance = await getChildChainBalance(
-    childchain,
-    distributor.address,
-    currency.KRP
-  )
-  Logger.logBalance('Distributor', 'KRP', 'OMG Network', balance)
+  balance = await ChildChain.getBalance(Distributor.address, KARMA._address)
+  Logger.logBalance(Distributor.name, KARMA.symbol, 'OMG Network', balance)
 
-  balance = await getChildChainBalance(
-    childchain,
-    distributor.address,
-    currency.RCP
-  )
-  Logger.logBalance('Distributor', 'RCP', 'OMG Network', balance)
+  balance = await ChildChain.getBalance(Distributor.address, RCP._address)
+  Logger.logBalance(Distributor.name, RCP.symbol, 'OMG Network', balance)
 
-  receipt = await depositErc20(
-    rootchain,
-    provider,
-    distributor,
+  receipt = await RootChain.depositErc20(
+    Distributor,
     '100',
-    currency.RCP,
-    'RCP'
+    RCP,
+    Clients.Plasma.RootChain,
+    Clients.Ethereum.Provider
   )
 
-  balance = await getChildChainBalance(
-    childchain,
-    distributor.address,
-    currency.RCP
+  balance = await ChildChain.getBalance(Distributor.address, RCP._address)
+  Logger.logBalance(Distributor.name, RCP.symbol, 'OMG Network', balance)
+
+  balance = await ChildChain.getBalance(Alice.address, KARMA._address)
+  Logger.logBalance(Alice.name, KARMA.symbol, 'OMG Network', balance)
+
+  Logger.logTransfering(Distributor.name, Alice.name, '100', KARMA.symbol)
+  receipt = await ChildChain.transfer(Distributor, Alice, '100', KARMA._address)
+  Logger.logTransactionHash(receipt.txhash)
+
+  Logger.logWaitingForWatcher()
+  await ChildChain.waitForTransfer(
+    Alice.address,
+    balance,
+    '100',
+    KARMA._address
   )
-  Logger.logBalance('Distributor', 'RCP', 'OMG Network', balance)
+
+  balance = await ChildChain.getBalance(Alice.address, KARMA._address)
+  Logger.logBalance(Alice.name, KARMA.symbol, 'OMG Network', balance)
+
+  balance = await ChildChain.getBalance(SubRedditServer.address, RCP._address)
+  Logger.logBalance(SubRedditServer.name, RCP.symbol, 'OMG Network', balance)
+
+  Logger.logTransfering(
+    Distributor.name,
+    SubRedditServer.name,
+    '100',
+    RCP.symbol
+  )
+  receipt = await ChildChain.transfer(
+    Distributor,
+    SubRedditServer,
+    '100',
+    RCP._address
+  )
+  Logger.logTransactionHash(receipt.txhash)
+
+  Logger.logWaitingForWatcher()
+  await ChildChain.waitForTransfer(
+    SubRedditServer.address,
+    balance,
+    '100',
+    RCP._address
+  )
+
+  balance = await ChildChain.getBalance(SubRedditServer.address, RCP._address)
+  Logger.logBalance(SubRedditServer.name, RCP.symbol, 'OMG Network', balance)
 }
 
 executeClaimFlow()
