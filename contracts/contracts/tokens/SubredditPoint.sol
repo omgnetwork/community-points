@@ -6,7 +6,7 @@ import "./OwnerMintableERC20.sol";
 /**
  * @notice Subreddit point ERC20 implementation contract
  *
- * Owner of this contract can mint the token. As a result, the ownership should be transfered to the distribution contract.
+ * Owner of this contract can mint the token. As a result, the ownership should be transferred to the distribution contract.
  * We will mint the point in L1 and distribute in L2.
  */
 contract SubredditPoint is OwnerMintableERC20 {
