@@ -1,5 +1,8 @@
 import * as React from 'react';
 import { useEffect, useState } from 'react';
+import { useDispatch } from 'react-redux';
+
+import { saveSubReddit } from 'app/actions';
 
 import * as locationService from 'app/services/locationService';
 import * as networkService from 'app/services/networkService';
@@ -19,6 +22,7 @@ import * as styles from './Main.module.scss';
 type IViewState = 'LOADING' | 'HOME' | 'INVALID_COMMUNITY' | 'NO_PROVIDER' | 'WRONG_NETWORK' | 'ERROR';
 
 function Main (): JSX.Element {
+  const dispatch = useDispatch();
   const [ view, setView ]: [ IViewState, any ] = useState('LOADING');
 
   const [ validSubReddit, setValidSubReddit ]: [ boolean, any ] = useState(false);
@@ -43,6 +47,7 @@ function Main (): JSX.Element {
       if (!validSubReddit) {
         return setView('INVALID_COMMUNITY');
       }
+      dispatch(saveSubReddit(validSubReddit));
       return setValidSubReddit(true);
     }
     withErrorHandler(checkCurrentPage);
