@@ -21,9 +21,15 @@ export function createAction (
         return false;
       }
 
+      // handle busy fee relayer
+      if (error.message && error.message.includes('Insufficient funds to cover fee amount')) {
+        // pass custom message to ui
+        dispatch({ type: 'UI/ERROR/UPDATE', payload: 'Server is busy, please try again later' });
+        return false;
+      }
+
       // pass error message to ui
       dispatch({ type: 'UI/ERROR/UPDATE', payload: customErrorMessage || error.message });
-
       errorService.log(error);
       return false;
     }
