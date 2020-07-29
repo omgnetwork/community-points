@@ -12,10 +12,21 @@ export async function getUtxos (address: string) {
 }
 
 export async function getTransactions (address: string) {
-  return transportService.post({
-    url: `${config.watcherUrl}/transaction.all`,
-    body: { address }
-  });
+  let allTransactions = [];
+
+  async function recursiveFetch (page: number): Promise<void> {
+    const transactionSet = await transportService.post({
+      url: `${config.watcherUrl}/transaction.all`,
+      body: { address, page, limit: 200 }
+    });
+    allTransactions = [ ...allTransactions, ...transactionSet ];
+    if (transactionSet.length === 200) {
+      recursiveFetch(page + 1);
+    }
+  }
+
+  await recursiveFetch(1);
+  return allTransactions;
 }
 
 export function checkHash (): void {
