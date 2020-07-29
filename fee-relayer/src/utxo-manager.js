@@ -21,6 +21,8 @@ const JSONBigNumber = require('omg-json-bigint')
 let currentNumUtxos = 0
 let pendingUtxos = []
 
+const FEE_RELAYER_DESIRED_NUM_UTXOS = process.env.FEE_RELAYER_DESIRED_NUM_UTXOS || 100
+
 function compareUtxo (a, b) {
   return a.blknum === b.blknum && a.txindex === b.txindex && a.oindex === b.oindex
 }
@@ -93,6 +95,6 @@ module.exports = {
   },
 
   needMoreUtxos: function () {
-    return currentNumUtxos < process.env.FEE_RELAYER_DESIRED_NUM_UTXOS
+    return currentNumUtxos < FEE_RELAYER_DESIRED_NUM_UTXOS
   }
 }
