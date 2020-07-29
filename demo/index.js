@@ -159,6 +159,15 @@ const executeClaimFlow = async () => {
 
   balance = await ChildChain.getBalance(SubRedditServer.address, RCP._address)
   Logger.logBalance(SubRedditServer.name, RCP.symbol, 'OMG Network', balance)
+
+  receipt = await ChildChain.claimCommunityPoints(
+    Alice,
+    SubRedditServer,
+    '100',
+    Distributor,
+    OmgUtil.transaction.ETH_CURRENCY
+  )
+  Logger.logTransactionHash(receipt.txhash)
 }
 
 executeClaimFlow()

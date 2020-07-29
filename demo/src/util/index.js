@@ -1,4 +1,5 @@
 const BigNumber = require('bignumber.js')
+const BN = require('bn.js')
 
 const subunitToUnit = (amount, decimals = 18) => {
   const divider = new BigNumber(10).pow(decimals)
@@ -10,4 +11,9 @@ const unitToSubunit = (amount, decimals = 18) => {
   return new BigNumber(amount).times(multiplier).toFixed()
 }
 
-module.exports = { subunitToUnit, unitToSubunit }
+const unitToBN = (amount, decimals = 18) => {
+  const subunit = unitToSubunit(amount, decimals)
+  return new BN(subunit)
+}
+
+module.exports = { subunitToUnit, unitToBN, unitToSubunit }
