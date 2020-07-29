@@ -14,15 +14,14 @@ const {
   WATCHER_URL: watcherUrl
 } = process.env
 
-const provider = getProvider(WEB3_PROVIDER)
 const Provider = getProvider(WEB3_PROVIDER)
-const KarmaPointsContract = getContract(provider, KARMA, CONTRACT_ADDRESS_KARMA)
-const CommunityPointsContract = getContract(provider, RCP, CONTRACT_ADDRESS_RCP)
-const Distributor = getAccount(provider, distributorPrivateKey)
-const rootchain = new RootChain({ web3: provider, plasmaContractAddress })
-const childchain = new ChildChain({ watcherUrl, plasmaContractAddress })
-const Alice = provider.eth.accounts.create()
-const SubRedditServer = provider.eth.accounts.create()
+const KarmaPointsContract = getContract(Provider, KARMA, CONTRACT_ADDRESS_KARMA)
+const CommunityPointsContract = getContract(Provider, RCP, CONTRACT_ADDRESS_RCP)
+const Distributor = getAccount(Provider, distributorPrivateKey)
+const rootChain = new RootChain({ web3: Provider, plasmaContractAddress })
+const childChain = new ChildChain({ watcherUrl, plasmaContractAddress })
+const Alice = Provider.eth.accounts.create()
+const SubRedditServer = Provider.eth.accounts.create()
 
 KarmaPointsContract.symbol = 'KARMA'
 CommunityPointsContract.symbol = 'RCP'
@@ -42,8 +41,8 @@ const Clients = {
     Provider
   },
   Plasma: {
-    ChildChain: new ChildChain({ watcherUrl, plasmaContractAddress }),
-    RootChain: new RootChain({ web3: Provider, plasmaContractAddress })
+    ChildChain: childChain,
+    RootChain: rootChain
   }
 }
 
@@ -58,8 +57,5 @@ module.exports = {
   Accounts,
   Clients,
   Config,
-  Contracts,
-  childchain,
-  provider,
-  rootchain
+  Contracts
 }
