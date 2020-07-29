@@ -61,7 +61,7 @@ module.exports = {
   },
 
   needMoreUtxos: function () {
-    return currentNumUtxos < process.env.FEE_RELAYER_DESIRED_NUM_UTXOS
+    return currentNumUtxos < FEE_RELAYER_DESIRED_NUM_UTXOS
   },
 
   getValidUtxos: async function (childChain, address, feeToken) {
@@ -98,10 +98,6 @@ module.exports = {
       shouldRefreshUtxoCache = true
     }
     this.getUtxos(childChain, address, feeToken)
-  },
-
-  needMoreUtxos: function () {
-    return currentNumUtxos < FEE_RELAYER_DESIRED_NUM_UTXOS
   }
 }
 
