@@ -17,12 +17,14 @@
 const BN = require('bn.js')
 const axios = require('axios')
 const JSONBigNumber = require('omg-json-bigint')
+const { Mutex } = require('async-mutex')
 const logger = require('pino')({ level: process.env.LOG_LEVEL || 'info' })
 
 let currentNumUtxos = 0
 let pendingUtxos = []
 let cachedUtxos = []
 let shouldRefreshUtxoCache = true
+const cacheMutex = new Mutex()
 
 const FEE_RELAYER_DESIRED_NUM_UTXOS = process.env.FEE_RELAYER_DESIRED_NUM_UTXOS || 100
 
@@ -42,7 +44,7 @@ module.exports = {
 
     // Check that it can cover the fee
     if (!utxo || new BN(utxo.amount).lt(new BN(feeAmount))) {
-      throw new Error(`Insufficient funds to cover fee amount ${feeAmount}`)
+      throw new Error(`Address ${feePayerAddress} has insufficient funds in ${validUtxos.length} valid utxos to cover fee amount ${feeAmount}`)
     }
 
     // Mark utxo as 'pending'
@@ -78,23 +80,35 @@ module.exports = {
 
   getUtxos: async function (childChain, address, feeToken) {
     if (shouldRefreshUtxoCache) {
-      shouldRefreshUtxoCache = false
+      const release = await cacheMutex.acquire()
+      try {
+        if (shouldRefreshUtxoCache) {
+          shouldRefreshUtxoCache = false
 
-      // Get utxos from the network
-      cachedUtxos = await getAllFeeUtxos(childChain, address, feeToken)
-      currentNumUtxos = cachedUtxos.length
-      logger.debug(`Refreshed cached utxos, fee relayer has ${currentNumUtxos} fee utxos`)
+          // Get utxos from the network
+          cachedUtxos = await getAllFeeUtxos(childChain, address, feeToken)
+          currentNumUtxos = cachedUtxos.length
+          logger.debug(`Refreshed cached utxos, fee relayer has ${currentNumUtxos} fee utxos`)
 
-      // Clean up pending utxos.
-      this.cleanPending(cachedUtxos)
+          // Clean up pending utxos.
+          this.cleanPending(cachedUtxos)
+        }
+      } finally {
+        release()
+      }
     }
 
     return cachedUtxos
   },
 
+  initCache: async function (childChain, address, feeToken) {
+    shouldRefreshUtxoCache = true
+    return this.getUtxos(childChain, address, feeToken)
+  },
+
   refresh: async function (childChain, address, feeToken, numValid) {
-    if (numValid < (process.env.FEE_RELAYER_DESIRED_NUM_UTXOS / 2)) {
-      logger.debug(`Have ${numValid} valid utxos. Refreshing cache..................`)
+    if (numValid < (FEE_RELAYER_DESIRED_NUM_UTXOS / 2)) {
+      logger.debug(`Address ${address} only has ${numValid} valid utxos. Will refresh cache.`)
       shouldRefreshUtxoCache = true
     }
     this.getUtxos(childChain, address, feeToken)
