@@ -20,7 +20,7 @@ export async function getTransactions (address: string) {
       body: { address, page, limit: 200 }
     });
     allTransactions = [ ...allTransactions, ...transactionSet ];
-    if (transactionSet.length === 200) {
+    if (transactionSet.length === 200 && page < 5) {
       recursiveFetch(page + 1);
     }
   }
