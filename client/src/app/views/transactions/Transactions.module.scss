@@ -40,6 +40,9 @@
       cursor: initial;
       animation-name: flash-animation;
       animation-duration: 2s;
+      &:hover {
+        background-color: initial;
+      }
     }
 
     .arrow {
