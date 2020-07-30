@@ -1,5 +1,5 @@
-const Karma = artifacts.require("KarmaPoint");
+const Karma = artifacts.require('Karma')
 
 module.exports = function (deployer) {
-    deployer.deploy(Karma);
-};
+  deployer.deploy(Karma)
+}

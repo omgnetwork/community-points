@@ -1,1 +1,9 @@
 # Community Points
+
+# Contract Addresses
+
+## Rinkeby
+
+`KARMA`: 0xdE3FFa88958B6722376bD21365b593b12CC7De30
+
+`RCP`: 0x3F442d1a3802b06927f0Dc7b721706345eAA6DA6
