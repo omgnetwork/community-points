@@ -126,6 +126,13 @@ const getUsableUtxos = async (owner, currency, spendAmount, filterEqual) => {
         : new BN(utxo.amount.toString())
       return filterEqual ? amount.eq(spendAmount) : amount.gte(spendAmount)
     })
+    .map(utxo => {
+      const amount = BN.isBN(utxo.amount)
+        ? utxo.amount
+        : new BN(utxo.amount.toString())
+
+      return { ...utxo, amount }
+    })
 }
 
 const getExchangeRate = () => {

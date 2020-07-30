@@ -90,7 +90,9 @@ const depositEth = async (depositor, ethAmount, provider, rootchain) => {
     web3: provider,
     transactionHash: receipt.transactionHash,
     checkIntervalMs: 1000,
-    blocksToWait: DEPOSIT_FINALITY_MARGIN
+    blocksToWait: DEPOSIT_FINALITY_MARGIN,
+    onCountdown: remaining =>
+      logger.info(`${remaining} blocks remaining before confirmation`)
   })
 
   logger.info('Deposit confirmed')
@@ -135,7 +137,9 @@ const depositErc20 = async (depositor, amount, erc20, rootchain, provider) => {
     web3: provider,
     transactionHash: receipt.transactionHash,
     checkIntervalMs: 1000,
-    blocksToWait: DEPOSIT_FINALITY_MARGIN
+    blocksToWait: DEPOSIT_FINALITY_MARGIN,
+    onCountdown: remaining =>
+      logger.info(`${remaining} blocks remaining before confirmation`)
   })
   logger.info('Deposit confirmed')
 }
