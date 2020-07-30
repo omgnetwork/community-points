@@ -15,6 +15,7 @@
     "@apidevtools/swagger-express-middleware": "^4.0.0",
     "@omisego/omg-js": "^4.0.1-1.0.0",
     "@sentry/node": "^5.20.0",
+    "async-mutex": "^0.2.4",
     "axios": "^0.19.2",
     "bn.js": "^5.1.2",
     "cors": "^2.8.5",
@@ -34,6 +35,7 @@
     "mocha": "^8.0.1",
     "node-fetch": "^2.6.0",
     "pino-pretty": "^4.0.0",
+    "sinon": "^9.0.2",
     "standard": "^14.3.4",
     "web3": "^1.2.9"
   },

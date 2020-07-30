@@ -25,6 +25,11 @@ function sessionReducer (
   action: IAction
 ): SessionState {
   switch (action.type) {
+    case 'SUBREDDIT/GET/SUCCESS':
+      return {
+        ...state,
+        subReddit: action.payload
+      };
     case 'SESSION/GET/SUCCESS':
       return { ...state, ...action.payload };
     default:
