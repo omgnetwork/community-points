@@ -1,10 +1,10 @@
 {
   "name": "community-points",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "engines": {
     "node": "12.16.1"
   },
-  "description": "Chrome Extension for Reddit Community Points",
+  "description": "Extension to transfer community points",
   "main": "index.js",
   "author": "nicholas@omg.network",
   "license": "MIT",
