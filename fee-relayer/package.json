@@ -23,7 +23,6 @@
     "eth-sig-util": "^2.5.3",
     "ethereumjs-util": "^7.0.2",
     "express": "^4.17.1",
-    "express-pino-logger": "^5.0.0",
     "omg-body-parser": "^1.19.0",
     "omg-json-bigint": "^1.0.0",
     "pg": "^8.3.0",

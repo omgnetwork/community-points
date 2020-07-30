@@ -115,7 +115,7 @@ function Merch ({
       </Button>
       {isPendingTransaction && (
         <p className={styles.disclaimer}>
-          You currently cannot buy a flair, as your previous purchase is still pending confirmation.
+          You currently cannot buy a flair, as your previous transaction is still pending confirmation.
         </p>
       )}
     </div>
