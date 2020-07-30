@@ -15,11 +15,10 @@
 */
 
 const BN = require('bn.js')
-const ethUtil = require('ethereumjs-util')
-const sigUtil = require('eth-sig-util')
-const logger = require('pino')({ prettyPrint: true })
-const { OmgUtil } = require('@omisego/omg-js')
-const { Accounts, Clients, Config, Contracts } = require(`../config`)
+const OmgUtil = require('@omisego/omg-js-util')
+
+const AtomicSwap = require('./atomic-swap')
+const { Accounts, Clients, Config } = require(`../config`)
 const { subunitToUnit, unitToSubunit, unitToBN } = require('../util')
 
 const { Distributor, Alice, SubRedditServer } = Accounts
@@ -119,133 +118,94 @@ const getUsableUtxos = async (owner, currency, spendAmount, filterEqual) => {
 }
 
 const getExchangeRate = () => {
+  /* Hard-coded for simplicity */
   return new BN(1)
 }
 
-const getSignature = (toSign, signer) => {
-  logger.info(`Getting signature from ${signer.name}`)
-  const signature = ethUtil.ecsign(
-    toSign,
-    Buffer.from(signer.privateKey.replace('0x', ''), 'hex')
-  )
-  return sigUtil.concatSig(signature.v, signature.r, signature.s)
-}
-
 const claimCommunityPoints = async (
-  user,
-  server,
-  karmaPoints,
+  redeemer,
+  redeemableCurrency,
+  redeemableAmount,
+  claimProcessor,
+  claimableCurrency,
   feePayer,
   feeCurrency
 ) => {
-  logger.info(`${user.name} is now claiming RCP`)
-  const KARMA = Contracts.KARMA._address
-  const RCP = Contracts.RCP._address
-
-  logger.info('Getting transaction fees ...')
+  /* Retrieve fees for given currency. */
   const feeAmount = await getFeeAmount(feeCurrency)
-  const usableFeeUtxos = await getUsableUtxos(
+
+  /* Derive UTXOs usable for fee payment. */
+  const feeUtxos = await getUsableUtxos(
     feePayer.address,
     feeCurrency,
     feeAmount,
     false
   )
 
-  const karmaAmount = unitToBN(karmaPoints)
-  const usableKarmaUtxos = await getUsableUtxos(
-    user.address,
-    KARMA,
-    karmaAmount,
+  redeemableAmount = unitToBN(redeemableAmount)
+
+  /* Derive UTXOs for the redemption given the amount */
+  const redeemableUtxos = await getUsableUtxos(
+    redeemer.address,
+    redeemableCurrency,
+    redeemableAmount,
     true
   )
 
-  logger.info('Getting exchange rate ...')
+  /* Derive UTXOs sendable to the user for given redemption amount and "exchange rate" */
   const exchangeRate = getExchangeRate()
-  const rcpAmount = karmaAmount.div(exchangeRate)
-  const usableRcpUtxos = await getUsableUtxos(
-    server.address,
-    RCP,
-    rcpAmount,
+  const claimableAmount = redeemableAmount.div(exchangeRate)
+  const claimableUtxos = await getUsableUtxos(
+    claimProcessor.address,
+    claimableCurrency,
+    claimableAmount,
     true
   )
 
-  const atomicSwapBody = createAtomicSwapBody(
-    user.address,
-    usableKarmaUtxos[0],
-    server.address,
-    usableRcpUtxos[0],
+  /* Create the transaction body - maximum 1 UTXO for currency being swapped */
+  const atomicSwapBody = AtomicSwap.createTransactionBody(
+    redeemer.address,
+    redeemableUtxos[0],
+    claimProcessor.address,
+    claimableUtxos[0],
     feePayer.address,
     feeAmount,
-    usableFeeUtxos[0]
+    feeUtxos[0]
   )
 
+  /* Get typed data for atomic swap */
   const typedData = OmgUtil.transaction.getTypedData(
     atomicSwapBody,
     Config.plasmaContractAddress
   )
 
-  const toSign = OmgUtil.transaction.getToSignHash(typedData)
+  /* Collect signatures */
+  const signatures = AtomicSwap.getSignatures(
+    typedData,
+    redeemer,
+    claimProcessor,
+    feePayer
+  )
 
-  const userSignature = getSignature(toSign, user)
-  const serverSignature = getSignature(toSign, server)
-  const feePayerSignature = getSignature(toSign, feePayer)
-
-  const signatures = [userSignature, serverSignature, feePayerSignature]
-
+  /* Build signed transaction */
   const signedTx = Clients.Plasma.ChildChain.buildSignedTransaction(
     typedData,
     signatures
   )
 
-  const result = await Clients.Plasma.ChildChain.submitTransaction(signedTx)
-  return result
+  /* Submit signed transaction */
+  return Clients.Plasma.ChildChain.submitTransaction(signedTx)
 }
 
-const createAtomicSwapBody = (
-  user,
-  karmaUtxo,
-  server,
-  rcpUtxo,
-  feePayer,
-  feeAmount,
-  feeUtxo
-) => {
-  const inputs = [karmaUtxo, rcpUtxo, feeUtxo]
-  const outputs = [
-    {
-      outputType: 1,
-      outputGuard: server,
-      currency: karmaUtxo.currency,
-      amount: karmaUtxo.amount
-    },
-    {
-      outputType: 1,
-      outputGuard: user,
-      currency: rcpUtxo.currency,
-      amount: rcpUtxo.amount
-    }
-  ]
-
-  if (!feeUtxo) {
-    throw new Error('No fee UTXO provided')
-  }
-
-  if (feeUtxo.amount.gt(feeAmount)) {
-    const changeAmount = feeUtxo.amount.sub(feeAmount)
-    outputs.push({
-      outputType: 1,
-      outputGuard: feePayer,
-      currency: feeUtxo.currency,
-      amount: changeAmount
-    })
-  }
-
-  return {
-    inputs,
-    outputs,
-    metadata: OmgUtil.transaction.NULL_METADATA
-  }
-}
+// claimCommunityPoints(
+//   Distributor,
+//   Contracts.KARMA._address,
+//   '100',
+//   Distributor,
+//   Contracts.RCP._address,
+//   Distributor,
+//   OmgUtil.transaction.ETH_CURRENCY
+// )
 
 // claimCommunityPoints(
 //   Distributor,
