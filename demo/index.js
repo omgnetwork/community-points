@@ -1,173 +1,128 @@
-const { OmgUtil } = require('@omisego/omg-js')
+/*
+  Copyright 2019 OmiseGO Pte Ltd
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+const { transaction } = require('@omisego/omg-js-util')
+const logger = require('pino')({ prettyPrint: true })
 
 const { Accounts, Contracts, Clients } = require('./src/config')
 const ChildChain = require('./src/childchain')
 const RootChain = require('./src/rootchain')
-const Logger = require('./src/util/logger')
 
 const { KARMA, RCP } = Contracts
 const { Alice, Distributor, SubRedditServer } = Accounts
+const ETH = { symbol: 'ETH', address: transaction.ETH_CURRENCY }
 
-const executeClaimFlow = async () => {
-  Logger.logContractAddress(KARMA.symbol, KARMA._address)
+const runClaimScript = async () => {
+  logger.info(`${KARMA.symbol} contract address is ${KARMA.address}`)
+  logger.info(`${RCP.symbol} contract address is ${RCP.address}`)
+  logger.info(`${Distributor.name} address is ${Distributor.address}`)
 
-  balance = await RootChain.getBalance(KARMA, Distributor.address)
-  Logger.logBalance(Distributor.name, KARMA.symbol, 'Ethereum Network', balance)
-
-  Logger.logMinting(Distributor.name, 100, KARMA.symbol)
-
-  let receipt = await RootChain.callMint(
+  /* Minting KARMA */
+  await RootChain.getBalance(KARMA, Distributor)
+  await RootChain.callMint(
     KARMA,
     Distributor,
     Distributor,
-    100,
+    '100',
     Clients.Ethereum.Provider
   )
-  Logger.logTransactionHash(receipt.transactionHash)
+  await RootChain.getBalance(KARMA, Distributor)
 
-  balance = await RootChain.getBalance(KARMA, Distributor.address)
-
-  Logger.logBalance(Distributor.name, KARMA.symbol, 'Ethereum Network', balance)
-
-  Logger.logContractAddress(RCP.symbol, RCP._address)
-
-  balance = await RootChain.getBalance(RCP, Distributor.address)
-  Logger.logBalance(Distributor.name, RCP.symbol, 'Ethereum Network', balance)
-
-  Logger.logMinting(Distributor.name, 100, RCP.symbol)
-
-  receipt = await RootChain.callMint(
+  /* Minting RCP */
+  await RootChain.getBalance(RCP, Distributor)
+  await RootChain.callMint(
     RCP,
     Distributor,
     Distributor,
-    100,
+    '100',
     Clients.Ethereum.Provider
   )
-  Logger.logTransactionHash(receipt.transactionHash)
+  await RootChain.getBalance(RCP, Distributor)
 
-  balance = await RootChain.getBalance(RCP, Distributor.address)
-  Logger.logBalance(Distributor.name, RCP.symbol, 'Ethereum Network', balance)
-
-  balance = await ChildChain.getBalance(
-    Distributor.address,
-    OmgUtil.transaction.ETH_CURRENCY
-  )
-
-  Logger.logBalance(Distributor.name, 'ETH', 'OMG Network', balance)
-
-  receipt = await RootChain.depositEth(
+  /* Depositing ETH for use as trransaction fees*/
+  await ChildChain.getBalance(Distributor, ETH)
+  await RootChain.depositEth(
     Distributor,
     '0.01',
     Clients.Ethereum.Provider,
     Clients.Plasma.RootChain
   )
+  await ChildChain.getBalance(Distributor, ETH)
 
-  balance = await ChildChain.getBalance(
-    Distributor.address,
-    OmgUtil.transaction.ETH_CURRENCY
-  )
-  Logger.logBalance(Distributor.name, 'ETH', 'OMG Network', balance)
-
-  Logger.logApprovingErc20(KARMA.symbol, '100')
-  receipt = await RootChain.approveErc20(
-    KARMA._address,
+  /* Approving ERC-20s for deposit */
+  await RootChain.approveErc20(
+    KARMA,
     Distributor,
     100,
     Clients.Plasma.RootChain
   )
-  Logger.logTransactionHash(receipt.transactionHash)
+  await RootChain.approveErc20(RCP, Distributor, 100, Clients.Plasma.RootChain)
 
-  Logger.logApprovingErc20(RCP.symbol, 100)
-  receipt = await RootChain.approveErc20(
-    RCP._address,
-    Distributor,
-    100,
-    Clients.Plasma.RootChain
-  )
-  Logger.logTransactionHash(receipt.transactionHash)
-
-  balance = await ChildChain.getBalance(Distributor.address, KARMA._address)
-  Logger.logBalance(Distributor.name, KARMA.symbol, 'OMG Network', balance)
-
-  receipt = await RootChain.depositErc20(
+  /* Depositing ERC-20s */
+  await ChildChain.getBalance(Distributor, KARMA)
+  await RootChain.depositErc20(
     Distributor,
     '100',
     KARMA,
     Clients.Plasma.RootChain,
     Clients.Ethereum.Provider
   )
+  await ChildChain.getBalance(Distributor, KARMA)
 
-  balance = await ChildChain.getBalance(Distributor.address, KARMA._address)
-  Logger.logBalance(Distributor.name, KARMA.symbol, 'OMG Network', balance)
-
-  balance = await ChildChain.getBalance(Distributor.address, RCP._address)
-  Logger.logBalance(Distributor.name, RCP.symbol, 'OMG Network', balance)
-
-  receipt = await RootChain.depositErc20(
+  await ChildChain.getBalance(Distributor, RCP)
+  await RootChain.depositErc20(
     Distributor,
     '100',
     RCP,
     Clients.Plasma.RootChain,
     Clients.Ethereum.Provider
   )
+  await ChildChain.getBalance(Distributor, RCP)
 
-  balance = await ChildChain.getBalance(Distributor.address, RCP._address)
-  Logger.logBalance(Distributor.name, RCP.symbol, 'OMG Network', balance)
+  let balance
+  /* Transfering KARMA to Alice on the OMG Network */
+  balance = await ChildChain.getBalance(Alice, KARMA)
+  await ChildChain.transfer(Distributor, Alice, '100', KARMA)
+  await ChildChain.waitForTransfer(Alice, balance, '100', KARMA)
+  await ChildChain.getBalance(Alice, KARMA)
 
-  balance = await ChildChain.getBalance(Alice.address, KARMA._address)
-  Logger.logBalance(Alice.name, KARMA.symbol, 'OMG Network', balance)
+  /* Transfering RCP to the SubReddit Server on the OMG Network */
+  balance = await ChildChain.getBalance(SubRedditServer, RCP)
+  await ChildChain.transfer(Distributor, SubRedditServer, '100', RCP)
+  await ChildChain.waitForTransfer(SubRedditServer, balance, '100', RCP)
+  await ChildChain.getBalance(SubRedditServer, RCP)
 
-  Logger.logTransfering(Distributor.name, Alice.name, '100', KARMA.symbol)
-  receipt = await ChildChain.transfer(Distributor, Alice, '100', KARMA._address)
-  Logger.logTransactionHash(receipt.txhash)
+  /* Executing claim/redeem atomic swap */
 
-  Logger.logWaitingForWatcher()
-  await ChildChain.waitForTransfer(
-    Alice.address,
-    balance,
-    '100',
-    KARMA._address
+  logger.info(
+    `${Alice.name} would now like to redeem her KARMA for Reddit Community Points`
   )
-
-  balance = await ChildChain.getBalance(Alice.address, KARMA._address)
-  Logger.logBalance(Alice.name, KARMA.symbol, 'OMG Network', balance)
-
-  balance = await ChildChain.getBalance(SubRedditServer.address, RCP._address)
-  Logger.logBalance(SubRedditServer.name, RCP.symbol, 'OMG Network', balance)
-
-  Logger.logTransfering(
-    Distributor.name,
-    SubRedditServer.name,
-    '100',
-    RCP.symbol
-  )
-  receipt = await ChildChain.transfer(
-    Distributor,
-    SubRedditServer,
-    '100',
-    RCP._address
-  )
-  Logger.logTransactionHash(receipt.txhash)
-
-  Logger.logWaitingForWatcher()
-  await ChildChain.waitForTransfer(
-    SubRedditServer.address,
-    balance,
-    '100',
-    RCP._address
-  )
-
-  balance = await ChildChain.getBalance(SubRedditServer.address, RCP._address)
-  Logger.logBalance(SubRedditServer.name, RCP.symbol, 'OMG Network', balance)
-
-  receipt = await ChildChain.claimCommunityPoints(
+  balance = await ChildChain.getBalance(Alice, RCP)
+  await ChildChain.claimCommunityPoints(
     Alice,
-    SubRedditServer,
+    KARMA.address,
     '100',
+    SubRedditServer,
+    RCP.address,
     Distributor,
-    OmgUtil.transaction.ETH_CURRENCY
+    transaction.ETH_CURRENCY
   )
-  Logger.logTransactionHash(receipt.txhash)
+  await ChildChain.waitForTransfer(Alice, balance, '100', RCP)
+  await ChildChain.getBalance(Alice, RCP)
+  logger.info(`${Alice.name} has claimed her Reddit Community Points`)
 }
 
-executeClaimFlow()
+runClaimScript()

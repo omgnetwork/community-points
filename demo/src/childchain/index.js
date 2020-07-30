@@ -16,14 +16,17 @@
 
 const BN = require('bn.js')
 const OmgUtil = require('@omisego/omg-js-util')
+const logger = require('pino')({ prettyPrint: true })
 
 const AtomicSwap = require('./atomic-swap')
-const { Accounts, Clients, Config } = require(`../config`)
+const { Clients, Config } = require(`../config`)
 const { subunitToUnit, unitToSubunit, unitToBN } = require('../util')
 
-const { Distributor, Alice, SubRedditServer } = Accounts
-
 const transfer = async (sender, recipient, amount, currency) => {
+  logger.info(
+    `${sender.name} is now transfering ${amount} ${currency.symbol} to ${recipient.name} on the OMG Network.`
+  )
+
   const subunitAmount = unitToSubunit(amount)
 
   /* construct a transaction body */
@@ -32,7 +35,7 @@ const transfer = async (sender, recipient, amount, currency) => {
     payments: [
       {
         owner: recipient.address,
-        currency: currency,
+        currency: currency.address,
         amount: new BN(subunitAmount)
       }
     ],
@@ -65,33 +68,41 @@ const transfer = async (sender, recipient, amount, currency) => {
   )
 
   /* submit to the child chain */
-  return Clients.Plasma.ChildChain.submitTransaction(signedTxn)
+  const receipt = await Clients.Plasma.ChildChain.submitTransaction(signedTxn)
+  logger.info(`Transaction hash is ${receipt.txhash}`)
+  return receipt
 }
 
 const waitForTransfer = async (
-  address,
+  account,
   initialBalance,
   transferAmount,
   currency
 ) => {
+  logger.info('Waiting for transaction to be recorded by the Watcher ...')
+
   const subunitInitialBalance = new BN(unitToSubunit(initialBalance))
   const subunitTransferAmount = new BN(unitToSubunit(transferAmount))
   const expectedAmount = subunitInitialBalance.add(subunitTransferAmount)
 
   await OmgUtil.waitForChildchainBalance({
     childChain: Clients.Plasma.ChildChain,
-    address,
+    address: account.address,
     expectedAmount,
-    currency
+    currency: currency.address
   })
 }
 
-const getBalance = async (address, currency) => {
-  const balances = await Clients.Plasma.ChildChain.getBalance(address)
+const getBalance = async (account, currency) => {
+  const balances = await Clients.Plasma.ChildChain.getBalance(account.address)
   const balance = balances.find(balance => {
-    return balance.currency.toLowerCase() === currency.toLowerCase()
+    return balance.currency.toLowerCase() === currency.address.toLowerCase()
   })
+  const unitBalance = balance ? subunitToUnit(balance.amount) : '0'
 
+  logger.info(
+    `${currency.symbol} balance for ${account.name} on OMG Network is now ${unitBalance}`
+  )
   return balance ? subunitToUnit(balance.amount) : '0'
 }
 
@@ -194,25 +205,9 @@ const claimCommunityPoints = async (
   )
 
   /* Submit signed transaction */
-  return Clients.Plasma.ChildChain.submitTransaction(signedTx)
+  const receipt = await Clients.Plasma.ChildChain.submitTransaction(signedTx)
+  logger.info(`Transaction hash is ${receipt.txhash}`)
+  return receipt
 }
-
-// claimCommunityPoints(
-//   Distributor,
-//   Contracts.KARMA._address,
-//   '100',
-//   Distributor,
-//   Contracts.RCP._address,
-//   Distributor,
-//   OmgUtil.transaction.ETH_CURRENCY
-// )
-
-// claimCommunityPoints(
-//   Distributor,
-//   Distributor,
-//   '100',
-//   Distributor,
-//   OmgUtil.transaction.ETH_CURRENCY
-// )
 
 module.exports = { claimCommunityPoints, getBalance, transfer, waitForTransfer }
