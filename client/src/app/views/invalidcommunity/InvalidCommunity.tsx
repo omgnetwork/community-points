@@ -10,7 +10,7 @@ import * as styles from './InvalidCommunity.module.scss';
 
 function InvalidCommunity (): JSX.Element {
   function handleNewTab (): void {
-    locationService.openTab('https://www.reddit.com/r/omise_go');
+    locationService.openTab('https://www.reddit.com/r/OMGnetwork');
   }
 
   return (
@@ -30,7 +30,7 @@ function InvalidCommunity (): JSX.Element {
         onClick={handleNewTab}
         className={styles.button}
       >
-        <span>/R/OMISE_GO</span>
+        <span>/R/OMGNETWORK</span>
         <img src={arrow} alt='arrow' />
       </Button>
     </div>

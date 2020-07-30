@@ -1,6 +1,6 @@
 {
   "name": "Reddit Wallet",
-  "description": "Extension to transfer Reddit community points",
+  "description": "Extension to transfer community points",
   "version": "0.0.9",
   "permissions": [
     "tabs",
