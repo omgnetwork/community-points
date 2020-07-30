@@ -11,7 +11,7 @@
     height: 150px;
     overflow-y: scroll;
     .flair {
-      height: 50px;
+      height: 54px;
       width: calc(25% - 25px);
       cursor: pointer;
       padding: 5px;
@@ -41,7 +41,8 @@
       }
       .price {
         color: $gray4;
-        font-size: 10px;
+        margin-top: 2px;
+        font-size: 8px;
       }
     }
   }
