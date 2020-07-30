@@ -119,7 +119,7 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
 
   app.post('/create-relayed-tx', async (req, res) => {
     try {
-      logger.debug(`/create-relayed-tx: from ${req.body.utxos[0].owner}, to ${req.body.to}, amount ${req.body.amount}`)
+      logger.info(`/create-relayed-tx: from ${req.body.utxos[0].owner}, to ${req.body.to}, amount ${req.body.amount}`)
       const feeInfo = await getFeeInfo(childChain, feeToken)
       const tx = await relayTx.create(
         childChain,
