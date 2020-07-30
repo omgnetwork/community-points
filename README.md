@@ -21,6 +21,13 @@ Each component is created as an individual project, thus follow the instructions
 - A Web3 wallet, such as [MetaMask](https://metamask.io/).
 - A Chrome or Brave browser.
 
+## Project Documentation
+
+- [Project Wiki](https://github.com/omgnetwork/community-points/wiki)
+- [Technical Specs](https://docs.omg.network/use-cases/community-points)
+- [User Guide](https://github.com/omgnetwork/community-points/wiki/User-Guide)
+- [Moderator Guide](https://github.com/omgnetwork/community-points/wiki/Moderator-Guide)
+
 ## API Documentation
 
 The application uses the following APIs:
