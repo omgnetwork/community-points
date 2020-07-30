@@ -34,7 +34,7 @@ function compareUtxo (a, b) {
 
 module.exports = {
   getFeeUtxo: async function (childChain, feePayerAddress, feeToken, feeAmount) {
-    let validUtxos = await this.getValidUtxos(childChain, feePayerAddress, feeToken.toLowerCase())
+    let validUtxos = await this.getValidUtxos(childChain, feePayerAddress, feeToken.toLowerCase(), feeAmount)
 
     // Sort by value
     validUtxos = validUtxos.sort((a, b) => new BN(b.amount).sub(new BN(a.amount)))
@@ -66,11 +66,15 @@ module.exports = {
     return currentNumUtxos < FEE_RELAYER_DESIRED_NUM_UTXOS
   },
 
-  getValidUtxos: async function (childChain, address, feeToken) {
+  getValidUtxos: async function (childChain, address, feeToken, feeAmount) {
     const utxos = await this.getUtxos(childChain, address, feeToken)
 
+    const minAmount = new BN(feeAmount)
+
     // Remove pending utxos
-    const validUtxos = utxos.filter(utxo => !pendingUtxos.some(pending => compareUtxo(utxo, pending)))
+    const validUtxos = utxos
+      .filter(utxo => !pendingUtxos.some(pending => compareUtxo(utxo, pending)))
+      .filter(utxo => new BN(utxo.amount).gte(minAmount))
 
     // Refresh the cache asynchronously if necessary
     this.refresh(childChain, address, feeToken.toLowerCase(), validUtxos.length)
