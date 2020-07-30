@@ -18,9 +18,8 @@
  *
  */
 
-const WalletProvider = require("@truffle/hdwallet-provider");
-require("dotenv").config()
-
+const WalletProvider = require('@truffle/hdwallet-provider')
+require('dotenv').config()
 
 const { DISTRIBUTION_ADDRESS_MNEMONIC, WEB3_PROVIDER } = process.env
 // const infuraKey = "fj4jll3k.....";
@@ -63,10 +62,17 @@ module.exports = {
     // Useful for deploying to a public network.
     // NB: It's important to wrap the provider as a function.
     rinkeby: {
-      provider: () => new WalletProvider(DISTRIBUTION_ADDRESS_MNEMONIC, WEB3_PROVIDER),
+      provider: () =>
+        new WalletProvider(DISTRIBUTION_ADDRESS_MNEMONIC, WEB3_PROVIDER),
       network_id: 4,
-      gas: 5500000,
+      gas: 5500000
     },
+    ropsten: {
+      provider: () =>
+        new WalletProvider(DISTRIBUTION_ADDRESS_MNEMONIC, WEB3_PROVIDER),
+      network_id: 3,
+      gas: 5500000
+    }
     // Useful for private networks
     // private: {
     // provider: () => new HDWalletProvider(mnemonic, `https://network.io`),
@@ -83,7 +89,7 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.6.10",    // Fetch exact version from solc-bin (default: truffle's version)
+      version: '0.6.10' // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
       // settings: {          // See the solidity docs for advice about optimization and evmVersion
       //  optimizer: {
@@ -92,6 +98,6 @@ module.exports = {
       //  },
       //  evmVersion: "byzantium"
       // }
-    },
-  },
-};
+    }
+  }
+}
