@@ -10,7 +10,7 @@ Create an `.env` file in the root folder and add your configuration variables.
 
 Note that your distribution address must have a minimum amount of ETH to cover fees on the Ethereum and OMG Networks.
 
-### Ropsten
+### Rinkeby
 
 ```env
 DISTRIBUTION_ADDRESS=<ADDRESS>
@@ -22,7 +22,7 @@ WATCHER_URL=https://development-watcher-info-rinkeby-lr.omg.network/
 WEB3_PROVIDER=https://rinkeby.infura.io/v3/<ACCESS_KEY>
 ```
 
-### Rinkeby
+### Ropsten
 
 ```env
 DISTRIBUTION_ADDRESS=<ADDRESS>
