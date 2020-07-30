@@ -42,7 +42,7 @@ module.exports = {
     if (!feePayer) {
       throw new Error(`Address ${address} is not a fee payer account`)
     }
-    logger.info(`Signing tx with fee payer account ${feePayer.address}`)
+    logger.debug(`Signing tx with fee payer account ${feePayer.address}`)
     const toSign = transaction.getToSignHash(typedData)
     const signed = ethUtil.ecsign(
       toSign,
