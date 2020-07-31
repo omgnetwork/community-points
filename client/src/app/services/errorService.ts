@@ -20,10 +20,21 @@ export function log (error: Error): void {
   }
 }
 
-export function isExpectedError (error: Error): boolean {
+export function shouldSilence (error: Error): boolean {
   if (
     (error.message && error.message.includes('User denied')) ||
-    (error.message && error.message.includes('Extension context'))
+    (error.message && error.message.includes('Extension context')) ||
+    (error.message && error.message.includes('Already processing eth_requestAccounts'))
+  ) {
+    return true;
+  }
+  return false;
+}
+
+export function expectedError (error: Error): boolean {
+  if (
+    (error.message && error.message.includes('Insufficient funds to cover fee amount')) || // busy fee relayer
+    (error.message && error.message.includes('Network Error')) // down service
   ) {
     return true;
   }

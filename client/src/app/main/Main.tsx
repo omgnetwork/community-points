@@ -34,7 +34,10 @@ function Main (): JSX.Element {
     try {
       await action();
     } catch (error) {
-      errorService.log(error);
+      const shouldSilence = errorService.shouldSilence(error);
+      if (!shouldSilence) {
+        errorService.log(error);
+      }
       setErrorMessage(error.message);
       return setView('ERROR');
     }

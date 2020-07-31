@@ -15,20 +15,20 @@ export function createAction (
       // cancel loading state
       dispatch({ type: `${key}/ERROR` });
 
-      // sanitize expected errors
-      const expectedError = errorService.isExpectedError(error);
-      if (expectedError) {
+      // sanitize false negatives
+      const shouldSilence = errorService.shouldSilence(error);
+      if (shouldSilence) {
         return false;
       }
 
-      // handle busy fee relayer
-      if (error.message && error.message.includes('Insufficient funds to cover fee amount')) {
-        // pass custom message to ui
+      // expected errors, no sentry reporting, only ui
+      const expectedError = errorService.expectedError(error);
+      if (expectedError) {
         dispatch({ type: 'UI/ERROR/UPDATE', payload: 'Server is busy, please try again later' });
         return false;
       }
 
-      // pass error message to ui
+      // unexpected error to log to sentry
       dispatch({ type: 'UI/ERROR/UPDATE', payload: customErrorMessage || error.message });
       errorService.log(error);
       return false;
