@@ -103,7 +103,7 @@ const getBalance = async (account, currency) => {
   logger.info(
     `${currency.symbol} balance for ${account.name} on OMG Network is now ${unitBalance}`
   )
-  return balance ? subunitToUnit(balance.amount) : '0'
+  return unitBalance
 }
 
 const getFeeAmount = async currency => {
