@@ -9,6 +9,7 @@
   ],
   "content_scripts": [
     {
+      "run_at": "document_idle",
       "matches": [
         "https://www.reddit.com/*"
       ],
@@ -27,7 +28,7 @@
     ],
     "persistent": true
   },
-  "browser_action": {
+  "page_action": {
     "default_icon": {
       "16": "images/favicon.png",
       "32": "images/favicon.png",
