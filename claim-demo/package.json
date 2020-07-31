@@ -1,0 +1,25 @@
+{
+  "name": "community-points-demo",
+  "version": "1.0.0",
+  "description": "A script demonstrating the 'Claim' flow.",
+  "main": "index.js",
+  "scripts": {
+    "claim": "node index.js"
+  },
+  "author": "omar@omg.network",
+  "license": "MIT",
+  "dependencies": {
+    "@omisego/omg-js": "^4.0.1-1.0.0",
+    "@openzeppelin/contracts": "^3.1.0",
+    "@truffle/hdwallet-provider": "^1.0.40",
+    "bignumber.js": "^9.0.0",
+    "bn.js": "^5.1.2",
+    "dotenv": "^8.2.0",
+    "eth-sig-util": "^2.5.3",
+    "ethereumjs-util": "^7.0.3",
+    "pino": "^6.4.1",
+    "pino-pretty": "^4.1.0",
+    "prettier": "^2.0.5",
+    "web3": "^1.2.11"
+  }
+}
