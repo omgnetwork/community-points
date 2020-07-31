@@ -204,7 +204,7 @@ export async function transfer ({
     url: `${subReddit.feeRelay}/create-relayed-tx`,
     body: {
       utxos: spendableUtxos,
-      amount,
+      amount: new BN(amount),
       metadata,
       to: recipient
     }

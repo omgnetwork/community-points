@@ -34,7 +34,7 @@ describe('getFeeUtxo', () => {
 
     this.stubGetUtxos.returns(utxos)
     return assert.isRejected(utxoManager.getFeeUtxo(null, '', feeToken, feeAmount),
-    `Address  has insufficient funds in 1 valid utxos to cover fee amount ${feeAmount}`)
+    `Address  has insufficient funds in 0 valid utxos to cover fee amount ${feeAmount}`)
   })
 
   it('throws error if no fee token utxo is large enough', async () => {
@@ -46,7 +46,7 @@ describe('getFeeUtxo', () => {
 
     this.stubGetUtxos.returns(utxos)
     return assert.isRejected(utxoManager.getFeeUtxo(null, '', feeToken, feeAmount),
-      `Address  has insufficient funds in 1 valid utxos to cover fee amount ${feeAmount}`)
+      `Address  has insufficient funds in 0 valid utxos to cover fee amount ${feeAmount}`)
   })
 
   it('returns the only fee utxo', async () => {
