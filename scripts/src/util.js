@@ -12,6 +12,7 @@
 */
 
 const { transaction } = require('@omisego/omg-js-util')
+const BigNumber = require('bignumber.js');
 
 module.exports = {
   isAddress: function (address) {
@@ -23,11 +24,16 @@ module.exports = {
 
   validPurchase: function (tx, price, curr, burnAddr, flairName) {
     return tx.outputs.find(function(output) {
+      const x = new BigNumber(price);
+      const exp = new BigNumber(10).pow(18); //assume token is 18 decimals
+
+      const powOutput = new BigNumber(output.amount)
+      const calculated = x.multipliedBy(exp);
       const valid = [
         output.owner === burnAddr,
         tx.metadata === transaction.encodeMetadata(flairName),
         output.currency.toLowerCase() === curr.toLowerCase(),
-        output.amount === price
+        powOutput.comparedTo(calculated) === 0
       ]
       if (!valid.includes(false)) {
         return true
