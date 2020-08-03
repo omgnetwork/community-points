@@ -9,6 +9,7 @@ import { useDispatch, useSelector, batch } from 'react-redux';
 import Transactions from 'app/views/transactions/Transactions';
 import Merch from 'app/views/merch/Merch';
 import Loading from 'app/views/loading/Loading';
+import Support from 'app/views/support/Support';
 
 import Alert from 'app/components/alert/Alert';
 import Address from 'app/components/address/Address';
@@ -171,7 +172,7 @@ function Home (): JSX.Element {
       />
 
       <Tabs
-        options={[ 'Transfer', 'History', 'Merch' ]}
+        options={[ 'Transfer', 'History', 'Merch', 'Support' ]}
         selected={view}
         onSelect={setView}
       />
@@ -233,6 +234,8 @@ function Home (): JSX.Element {
           session={session}
         />
       )}
+
+      {(view as any) === 'Support' && <Support />}
     </div>
   );
 }

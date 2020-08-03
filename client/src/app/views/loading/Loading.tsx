@@ -43,7 +43,7 @@ function Loading (): JSX.Element {
       {timer < 0 && (
         <>
           <p>{"Something's taking too long..."}</p>
-          <p>Check that you are signed into your Metamask extension. If not, please restart the extension.</p>
+          <p>Check that you are signed into your Metamask extension. If not, please refresh the page and reopen the extension.</p>
         </>
       )}
       {timer >= 0 && (
