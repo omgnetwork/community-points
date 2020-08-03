@@ -7,6 +7,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ISession, IFlair, IFlairMap } from 'interfaces';
 import { powAmount, powAmountAsBN } from 'app/util/amountConvert';
 import { selectIsPendingTransaction, selectPurchasedFlairs } from 'app/selectors/transactionSelector';
+import * as networkService from 'app/services/networkService';
+import * as errorService from 'app/services/errorService';
 
 import { transfer } from 'app/actions';
 
@@ -29,19 +31,38 @@ function Merch ({
   const [ flair, setFlair ]: [ IFlair, any ] = useState(null);
   const [ transferLoading, setTransferLoading ]: [ boolean, any ] = useState(false);
   const [ signatureAlert, setSignatureAlert ]: [ boolean, any ] = useState(false);
+  const [ mergeModal, setMergeModal ]: [ boolean, any ] = useState(false);
 
   const isPendingTransaction: boolean = useSelector(selectIsPendingTransaction);
   const purchasedFlairs: IFlairMap = useSelector(selectPurchasedFlairs);
 
+  console.log(mergeModal);
+
   async function handleTransfer (): Promise<any> {
     try {
       setTransferLoading(true);
+      let spendableUtxos = [];
+      try {
+        spendableUtxos = await networkService.getSpendableUtxos({
+          amount: powAmount(flair.price, session.subReddit.decimals),
+          subReddit: session.subReddit
+        });
+      } catch (error) {
+        if (error.message.includes('No more inputs available')) {
+          setTransferLoading(false);
+          return setMergeModal(true);
+        }
+        dispatch({ type: 'UI/ERROR/UPDATE', payload: error.message });
+        return errorService.log(error);
+      }
+
       setSignatureAlert(true);
       const result = await dispatch(transfer({
         amount: powAmount(flair.price, session.subReddit.decimals),
         recipient: session.subReddit.flairAddress,
         metadata: flair.metaId,
-        subReddit: session.subReddit
+        subReddit: session.subReddit,
+        spendableUtxos
       }));
 
       setTransferLoading(false);

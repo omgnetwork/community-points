@@ -15,7 +15,8 @@ export function transfer ({
   amount,
   recipient,
   subReddit,
-  metadata
+  metadata,
+  spendableUtxos
 }) {
   return createAction(
     'TRANSACTION/CREATE',
@@ -23,7 +24,8 @@ export function transfer ({
       amount,
       recipient,
       subReddit,
-      metadata
+      metadata,
+      spendableUtxos
     })
   );
 }

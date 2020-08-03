@@ -169,18 +169,13 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
   return transactions.filter(i => !!i);
 };
 
-export async function transfer ({
+export async function getSpendableUtxos ({
   amount,
-  recipient,
-  metadata,
   subReddit
 }: {
-  amount: number,
-  recipient: string,
-  metadata: string,
+  amount: string,
   subReddit: ISubReddit
-}): Promise<ITransaction> {
-  // fetch and pick utxos to cover amount
+}): Promise<Object[]> {
   const account = await getActiveAccount();
   const allUtxos = await omgService.getUtxos(account);
   const subRedditUtxos = allUtxos
@@ -195,8 +190,28 @@ export async function transfer ({
     if (spendableSum.gte(new BN(amount.toString()))) {
       break;
     }
+    if (spendableUtxos.length === 3) {
+      throw new Error('No more inputs available');
+    }
     spendableUtxos.push(utxo);
   }
+  return spendableUtxos;
+}
+
+export async function transfer ({
+  amount,
+  recipient,
+  metadata,
+  subReddit,
+  spendableUtxos
+}: {
+  amount: string,
+  recipient: string,
+  metadata: string,
+  subReddit: ISubReddit,
+  spendableUtxos: Object[]
+}): Promise<ITransaction> {
+  const account = await getActiveAccount();
 
   // post to /create-relayed-tx { utxos, amount, to }
   const relayedTx = await transportService.post({

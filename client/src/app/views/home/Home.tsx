@@ -18,6 +18,7 @@ import Select from 'app/components/select/Select';
 import Input from 'app/components/input/Input';
 import PointBalance from 'app/components/pointbalance/PointBalance';
 import Tabs from 'app/components/tabs/Tabs';
+import MergeModal from 'app/components/mergemodal/MergeModal';
 
 import { ISession, IUserAddress, ITransaction } from 'interfaces';
 import { transfer, getSession, getTransactions, getUserAddressMap, clearError } from 'app/actions';
@@ -28,6 +29,7 @@ import { selectIsPendingTransaction, selectTransactions } from 'app/selectors/tr
 
 import * as omgService from 'app/services/omgService';
 import * as networkService from 'app/services/networkService';
+import * as errorService from 'app/services/errorService';
 
 import { powAmount, powAmountAsBN, logAmount } from 'app/util/amountConvert';
 import useInterval from 'app/util/useInterval';
@@ -44,6 +46,7 @@ function Home (): JSX.Element {
   const [ amount, setAmount ]: any = useState('');
   const [ transferLoading, setTransferLoading ]: [ boolean, any ] = useState(false);
   const [ signatureAlert, setSignatureAlert ]: [ boolean, any ] = useState(false);
+  const [ mergeModal, setMergeModal ]: [ boolean, any ] = useState(false);
 
   const errorMessage: string = useSelector(selectError);
   const session: ISession = useSelector(selectSession);
@@ -80,17 +83,32 @@ function Home (): JSX.Element {
       dispatch(getSession());
       dispatch(getTransactions());
     });
-  }, 20 * 1000);
+  }, 15 * 1000);
 
   async function handleTransfer (): Promise<any> {
     try {
       setTransferLoading(true);
+      let spendableUtxos = [];
+      try {
+        spendableUtxos = await networkService.getSpendableUtxos({
+          amount: powAmount(amount, session.subReddit.decimals),
+          subReddit: session.subReddit
+        });
+      } catch (error) {
+        if (error.message.includes('No more inputs available')) {
+          return setMergeModal(true);
+        }
+        dispatch({ type: 'UI/ERROR/UPDATE', payload: error.message });
+        return errorService.log(error);
+      }
+
       setSignatureAlert(true);
       const result = await dispatch(transfer({
         amount: powAmount(amount, session.subReddit.decimals),
         recipient,
         metadata: `r/${_truncate(session.subReddit.name, { length: 10 })} points`,
-        subReddit: session.subReddit
+        subReddit: session.subReddit,
+        spendableUtxos
       }));
 
       if (result) {
@@ -157,6 +175,10 @@ function Home (): JSX.Element {
         message='A signature request has been created. Please check the Metamask extension if you were not prompted.'
         title='Signature Request'
         type='success'
+      />
+      <MergeModal
+        onClose={() => setMergeModal(false)}
+        open={mergeModal}
       />
 
       <h1>{`r/${session.subReddit.name}`}</h1>
