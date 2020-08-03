@@ -14,6 +14,7 @@ import { transfer } from 'app/actions';
 
 import Alert from 'app/components/alert/Alert';
 import Button from 'app/components/button/Button';
+import MergeModal from 'app/components/mergemodal/MergeModal';
 
 import * as styles from './Merch.module.scss';
 
@@ -35,8 +36,6 @@ function Merch ({
 
   const isPendingTransaction: boolean = useSelector(selectIsPendingTransaction);
   const purchasedFlairs: IFlairMap = useSelector(selectPurchasedFlairs);
-
-  console.log(mergeModal);
 
   async function handleTransfer (): Promise<any> {
     try {
@@ -99,6 +98,12 @@ function Merch ({
         message='A signature request has been created. Please check the Metamask extension if you were not prompted.'
         title='Signature Request'
         type='success'
+      />
+
+      <MergeModal
+        onClose={() => setMergeModal(false)}
+        onSuccess={onSuccess}
+        open={mergeModal}
       />
 
       <div className={styles.flairList}>

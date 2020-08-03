@@ -2,6 +2,7 @@ import BN from 'bn.js';
 import { get, differenceBy } from 'lodash';
 
 import store from 'app/store';
+import config from 'config';
 
 import { ISession, ITransaction, ISubReddit } from 'interfaces';
 
@@ -196,6 +197,56 @@ export async function getSpendableUtxos ({
     spendableUtxos.push(utxo);
   }
   return spendableUtxos;
+}
+
+export async function merge ({
+  subReddit
+}: {
+  subReddit: ISubReddit
+}): Promise<any> {
+  const account = await getActiveAccount();
+  const allUtxos = await omgService.getUtxos(account);
+  const subRedditUtxos = allUtxos
+    .filter(utxo => utxo.currency.toLowerCase() === subReddit.token.toLowerCase())
+    .sort((a, b) => new BN(b.amount.toString()).sub(new BN(a.amount.toString())));
+  const utxosToMerge = subRedditUtxos.slice(0, 4);
+
+  const amount = utxosToMerge.reduce((prev, curr) => {
+    return prev.add(new BN(curr.amount));
+  }, new BN(0));
+
+  const _metadata = 'Merge UTXOs';
+  const txBody = {
+    inputs: utxosToMerge,
+    outputs: [{
+      outputType: 1,
+      outputGuard: account,
+      currency: subReddit.token,
+      amount
+    }],
+    metadata: omgService.encodeMetadata(_metadata)
+  };
+
+  const typedData = omgService.getTypedData(txBody, config.plasmaContractAddress);
+  const signature = await signTypedData(account, typedData);
+  const signatures = new Array(txBody.inputs.length).fill(signature);
+  const signedTxn = omgService.buildSignedTransaction(typedData, signatures);
+  const submittedTransaction = await omgService.submitTransaction(signedTxn);
+
+  console.log(submittedTransaction);
+  return {
+    direction: 'outgoing',
+    txhash: submittedTransaction.txhash,
+    status: 'Pending',
+    sender: account,
+    recipient: account,
+    amount,
+    metadata: _metadata,
+    currency: subReddit.token,
+    symbol: subReddit.symbol,
+    decimals: subReddit.decimals,
+    timestamp: Math.round((new Date()).getTime() / 1000)
+  };
 }
 
 export async function transfer ({

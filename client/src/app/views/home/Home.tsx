@@ -85,7 +85,7 @@ function Home (): JSX.Element {
     });
   }, 15 * 1000);
 
-  async function handleTransfer (): Promise<any> {
+  async function handleTransfer (): Promise<void> {
     try {
       setTransferLoading(true);
       let spendableUtxos = [];
@@ -178,6 +178,7 @@ function Home (): JSX.Element {
       />
       <MergeModal
         onClose={() => setMergeModal(false)}
+        onSuccess={() => setView('History')}
         open={mergeModal}
       />
 

@@ -11,6 +11,17 @@ export function getSession () {
   );
 }
 
+export function merge ({
+  subReddit
+}) {
+  return createAction(
+    'TRANSACTION/CREATE',
+    () => networkService.merge({
+      subReddit
+    })
+  );
+}
+
 export function transfer ({
   amount,
   recipient,
