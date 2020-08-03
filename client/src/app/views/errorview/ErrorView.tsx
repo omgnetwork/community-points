@@ -22,7 +22,10 @@ function ErrorView ({
   }
 
   function renderMessage (_message: string): JSX.Element {
-    if (_message.includes('Already processing eth_requestAccounts')) {
+    if (
+      _message.includes('Already processing eth_requestAccounts') ||
+      _message.includes('Permissions request already pending')
+    ) {
       return (
         <>
           <img

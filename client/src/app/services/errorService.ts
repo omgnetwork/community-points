@@ -24,7 +24,8 @@ export function shouldSilence (error: Error): boolean {
   if (
     (error.message && error.message.includes('User denied')) ||
     (error.message && error.message.includes('Extension context')) ||
-    (error.message && error.message.includes('Already processing eth_requestAccounts'))
+    (error.message && error.message.includes('Already processing eth_requestAccounts')) ||
+    (error.message && error.message.includes('Permissions request already pending'))
   ) {
     return true;
   }

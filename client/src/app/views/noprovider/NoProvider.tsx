@@ -25,7 +25,7 @@ function NoProvider (): JSX.Element {
         Please install Metamask to work with this extension
       </h1>
       <p>
-        Install Metamask and login to connect your existing wallet with this extension.
+        Install Metamask and login to connect your existing wallet with this extension. If you are already logged into the Metamask extension, check that your browser settings are set to use Metamask as the Web3 provider.
       </p>
       <Button
         onClick={handleNewTab}
