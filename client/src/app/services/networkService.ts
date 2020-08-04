@@ -102,33 +102,29 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
     // - if one of the inputs owner and currency match it is outgoing, else incoming
     const isOutgoing = transaction.inputs.some(matchingCurrencyAndOwner);
 
-    // - ignore merge transactions
-    // - if outgoing and only user in outputs
-    const allUserOutputs = transaction.outputs.every(i => i.owner.toLowerCase() === user);
-    if (isOutgoing && allUserOutputs) {
-      return null;
-    }
+    // identify merge transactions
+    const allUserAndCurrencyOutputs = transaction.outputs.every(matchingCurrencyAndOwner);
+    const allUserAndCurrencyInputs = transaction.inputs.every(matchingCurrencyAndOwner);
+    const moreInputsThanOutputs = transaction.inputs.length > transaction.outputs.length;
+    const isMerge = allUserAndCurrencyOutputs && allUserAndCurrencyInputs && moreInputsThanOutputs;
 
-    // outgoing and output amount to yourself is the same
-    const userOutputs = transaction.outputs.filter(i => i.owner.toLowerCase() === user);
-    const userOutputsAmount = userOutputs.reduce((acc, curr) => {
-      return acc.add(new BN(curr.amount.toString()));
-    }, new BN(0));
-    const userInputs = transaction.inputs.filter(i => i.owner.toLowerCase() === user);
-    const userInputsAmount = userInputs.reduce((acc, curr) => {
-      return acc.add(new BN(curr.amount.toString()));
-    }, new BN(0));
-    const isMerge = userInputsAmount.eq(userOutputsAmount);
-    if (isOutgoing && isMerge) {
-      return null;
-    }
-
-    // - for outgoing, sum amount of currency going to recipient in outputs
+    // calculate details
     let amount = '0';
     let recipient;
     let sender;
+    let direction;
 
-    if (isOutgoing) {
+    if (isMerge) {
+      direction = 'merge';
+      recipient = user;
+      sender = user;
+      amount = transaction.outputs.reduce((acc, curr) => {
+        return acc.add(new BN(curr.amount.toString()));
+      }, new BN(0));
+    }
+
+    if (isOutgoing && !isMerge) {
+      direction = 'outgoing';
       sender = user;
       const recipientOutputs = transaction.outputs.filter(matchingCurrencyAndDifferentOwner);
       recipient = get(recipientOutputs, '[0].owner', 'N/A'); // naive assign recipient from first output
@@ -139,7 +135,8 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
       amount = bnAmount.toString();
     }
 
-    if (!isOutgoing) {
+    if (!isOutgoing && !isMerge) {
+      direction = 'incoming';
       recipient = user;
       const bnAmount = transaction.outputs
         .filter(matchingCurrencyAndOwner)
@@ -153,7 +150,7 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
     }
 
     return {
-      direction: isOutgoing ? 'outgoing' : 'incoming',
+      direction,
       txhash: transaction.txhash,
       status: 'Confirmed',
       sender,
@@ -233,14 +230,13 @@ export async function merge ({
   const signedTxn = omgService.buildSignedTransaction(typedData, signatures);
   const submittedTransaction = await omgService.submitTransaction(signedTxn);
 
-  console.log(submittedTransaction);
   return {
-    direction: 'outgoing',
+    direction: 'merge',
     txhash: submittedTransaction.txhash,
     status: 'Pending',
     sender: account,
     recipient: account,
-    amount,
+    amount: amount.toString(),
     metadata: _metadata,
     currency: subReddit.token,
     symbol: subReddit.symbol,

@@ -178,7 +178,10 @@ function Home (): JSX.Element {
       />
       <MergeModal
         onClose={() => setMergeModal(false)}
-        onSuccess={() => setView('History')}
+        onSuccess={() => {
+          setMergeModal(false);
+          setView('History');
+        }}
         open={mergeModal}
       />
 

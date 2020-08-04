@@ -51,8 +51,10 @@ function Transactions (): JSX.Element {
 
       {visibleTransactions && visibleTransactions.map((transaction: ITransaction, index: number): JSX.Element => {
         const isIncoming: boolean = transaction.direction === 'incoming';
+        const isOutgoing: boolean = transaction.direction === 'outgoing';
+        const isMerge: boolean = transaction.direction === 'merge';
 
-        const otherUsername: string = isIncoming
+        const otherUsername: string = (isIncoming || isMerge)
           ? getUsernameFromMap(transaction.sender, userAddressMap)
           : getUsernameFromMap(transaction.recipient, userAddressMap);
 
@@ -72,7 +74,7 @@ function Transactions (): JSX.Element {
               src={omgcp_thickarrow}
               className={[
                 styles.arrow,
-                isIncoming ? styles.incoming : ''
+                (isIncoming || isMerge) ? styles.incoming : ''
               ].join(' ')}
               alt='arrow'
             />
@@ -80,10 +82,9 @@ function Transactions (): JSX.Element {
             <div className={styles.data}>
               <div className={styles.row}>
                 <div className={styles.direction}>
-                  {isIncoming
-                    ? 'Received'
-                    : 'Sent'
-                  }
+                  {isIncoming && 'Received'}
+                  {isOutgoing && 'Sent'}
+                  {isMerge && 'Merge'}
                 </div>
                 <div className={styles.rawAmount}>
                   {`${logAmount(transaction.amount, transaction.decimals)} ${transaction.symbol}`}
@@ -101,7 +102,7 @@ function Transactions (): JSX.Element {
                     {transaction.status === 'Pending' ? 'Pending' : 'Confirmed'}
                   </div>
                   <div className={styles.address}>
-                    {isIncoming
+                    {(isIncoming || isMerge)
                       ? otherUsername || truncate(transaction.sender, 6, 4, '...')
                       : otherUsername || truncate(transaction.recipient, 6, 4, '...')
                     }

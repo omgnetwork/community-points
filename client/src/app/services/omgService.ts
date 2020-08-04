@@ -1,8 +1,9 @@
+import * as rlp from 'rlp';
+import BN from 'bn.js';
+import { Buffer as _Buffer } from 'buffer';
+
 import * as transportService from 'app/services/transportService';
 import { hash1 } from 'app/util/artifacts';
-import { Buffer as _Buffer } from 'buffer';
-import rlp from 'rlp';
-import BN from 'bn.js';
 
 import config from 'config';
 
