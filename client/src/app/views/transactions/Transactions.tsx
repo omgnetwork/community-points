@@ -12,6 +12,7 @@ import { logAmount } from 'app/util/amountConvert';
 import { ITransaction, IUserAddress } from 'interfaces';
 
 import omgcp_thickarrow from 'app/images/omgcp_thickarrow.svg';
+import omgcp_merge_arrow from 'app/images/omgcp_merge_arrow.svg';
 
 import config from 'config';
 
@@ -70,14 +71,24 @@ function Transactions (): JSX.Element {
               : null
             }
           >
-            <img
-              src={omgcp_thickarrow}
-              className={[
-                styles.arrow,
-                (isIncoming || isMerge) ? styles.incoming : ''
-              ].join(' ')}
-              alt='arrow'
-            />
+            {isMerge && (
+              <img
+                src={omgcp_merge_arrow}
+                className={styles.arrow}
+                alt='arrow'
+              />
+            )}
+
+            {!isMerge && (
+              <img
+                src={omgcp_thickarrow}
+                className={[
+                  styles.arrow,
+                  isIncoming ? styles.incoming : ''
+                ].join(' ')}
+                alt='arrow'
+              />
+            )}
 
             <div className={styles.data}>
               <div className={styles.row}>
@@ -102,10 +113,9 @@ function Transactions (): JSX.Element {
                     {transaction.status === 'Pending' ? 'Pending' : 'Confirmed'}
                   </div>
                   <div className={styles.address}>
-                    {(isIncoming || isMerge)
-                      ? otherUsername || truncate(transaction.sender, 6, 4, '...')
-                      : otherUsername || truncate(transaction.recipient, 6, 4, '...')
-                    }
+                    {isIncoming && (otherUsername || truncate(transaction.sender, 6, 4, '...'))}
+                    {isOutgoing && (otherUsername || truncate(transaction.recipient, 6, 4, '...'))}
+                    {isMerge && (otherUsername || truncate(transaction.recipient, 6, 4, '...'))}
                   </div>
                 </div>
 

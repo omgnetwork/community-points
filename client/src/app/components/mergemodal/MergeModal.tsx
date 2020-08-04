@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ISession } from 'interfaces';
-import omgcp_subreddit from 'app/images/omgcp_subreddit.svg';
+import omgcp_merge_icon from 'app/images/omgcp_merge_icon.svg';
 
 import { selectSession } from 'app/selectors/sessionSelector';
 import { merge } from 'app/actions';
@@ -64,7 +64,7 @@ function MergeModal ({
       />
       <img
         className={styles.icon}
-        src={omgcp_subreddit}
+        src={omgcp_merge_icon}
         alt='merge-icon'
       />
       <h1>
