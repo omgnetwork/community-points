@@ -155,7 +155,7 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
       status: 'Confirmed',
       sender,
       recipient,
-      amount,
+      amount: amount.toString(),
       metadata: omgService.decodeMetadata(transaction.metadata),
       currency: session.subReddit.token,
       symbol: session.subReddit.symbol,
