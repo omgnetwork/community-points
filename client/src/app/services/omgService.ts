@@ -37,15 +37,19 @@ export function checkHash (): void {
 }
 
 export async function getPointBalance (address, currency): Promise<string> {
-  const childchainBalances = await transportService.post({
-    url: `${config.watcherUrl}/account.get_balance`,
-    body: { address }
-  });
-  const pointBalance = childchainBalances.find(i => i.currency.toLowerCase() === currency.toLowerCase());
-  if (!pointBalance) {
+  try {
+    const childchainBalances = await transportService.post({
+      url: `${config.watcherUrl}/account.get_balance`,
+      body: { address }
+    });
+    const pointBalance = childchainBalances.find(i => i.currency.toLowerCase() === currency.toLowerCase());
+    if (!pointBalance) {
+      return '0';
+    }
+    return pointBalance.amount.toString();
+  } catch (error) {
     return '0';
   }
-  return pointBalance.amount.toString();
 }
 
 export function encodeMetadata (text: string): string {

@@ -46,7 +46,7 @@ function Transactions (): JSX.Element {
     <div className={styles.Transactions}>
       {visibleTransactions && !visibleTransactions.length && (
         <div className={styles.disclaimer}>
-          No transaction history
+          Loading transaction history
         </div>
       )}
 

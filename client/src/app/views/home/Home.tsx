@@ -83,7 +83,7 @@ function Home (): JSX.Element {
       dispatch(getSession());
       dispatch(getTransactions());
     });
-  }, 15 * 1000);
+  }, 10 * 1000);
 
   async function handleTransfer (): Promise<void> {
     try {

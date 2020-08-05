@@ -42,9 +42,10 @@ export async function getActiveAccount (): Promise<string> {
 };
 
 export async function getSession (): Promise<ISession> {
-  const account = await getActiveAccount();
   const state = store.getState();
   const subReddit = state.session.subReddit;
+
+  const account = await getActiveAccount();
   const balance = await omgService.getPointBalance(account, subReddit.token);
   return {
     account,
@@ -69,7 +70,12 @@ export function checkForIncomingTransactions (prevTransactions: ITransaction[], 
 };
 
 export async function getAllTransactions (): Promise<Array<ITransaction>> {
-  const session = await getSession();
+  const state = store.getState();
+  const session = state.session;
+  if (!session.account || !session.subReddit) {
+    return null;
+  }
+
   const allTransactions = await omgService.getTransactions(session.account);
   const subRedditToken = session.subReddit.token.toLowerCase();
   const user = session.account.toLowerCase();

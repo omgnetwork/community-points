@@ -6,17 +6,17 @@ function getTransformResponse () {
 }
 
 function parseResponse (res: AxiosResponse): any {
-  let data;
   try {
-    data = JSONBigNumber.parse(res.data);
-  } catch (err) {
-    throw new Error(`Unable to parse response from server: ${err}`);
+    const response = JSONBigNumber.parse(res.data);
+    if (response.success) {
+      return response.data;
+    }
+    if (!response.success) {
+      throw new Error(JSON.stringify(response.data));
+    }
+  } catch (error) {
+    throw new Error(`Unable to parse response from server: ${JSON.stringify(error)}`);
   }
-
-  if (data.success) {
-    return data.data;
-  }
-  throw new Error(data.data);
 }
 
 interface IPost {
