@@ -7,7 +7,7 @@ export function getCurrentSubReddit (): Promise<ISubReddit> {
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
       try {
         const url = tabs[0].url;
-        const subReddit = url.match(/www.reddit.com\/r\/(.*?)\//);
+        const subReddit = url.match(/reddit.com\/r\/(.*?)\//);
         if (!subReddit) {
           return resolve(null);
         }

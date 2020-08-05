@@ -11,7 +11,8 @@
     {
       "run_at": "document_idle",
       "matches": [
-        "https://www.reddit.com/*"
+        "https://www.reddit.com/*",
+        "https://old.reddit.com/*"
       ],
       "js": [
         "contentScript.js"
