@@ -18,6 +18,7 @@ require('dotenv').config()
 const relayTx = require('./relay-tx')
 const accountSelector = require('./account-selector')
 const { getFeeInfo } = require('./fee-info')
+const utxoManager = require('./utxo-manager')
 const { ChildChain } = require('@omisego/omg-js')
 const express = require('express')
 const bodyParser = require('omg-body-parser')
@@ -25,7 +26,6 @@ const JSONBigNumber = require('omg-json-bigint')
 const createMiddleware = require('@apidevtools/swagger-express-middleware')
 const pino = require('pino')
 const cors = require('cors')
-const expressPino = require('express-pino-logger')
 const process = require('process')
 const Sentry = require('@sentry/node')
 
@@ -57,8 +57,6 @@ app.use(cors())
 app.use(bodyParser.json())
 
 const logger = pino({ level: process.env.LOG_LEVEL || 'info' })
-const expressLogger = expressPino({ logger })
-app.use(expressLogger)
 
 process
   .on('SIGTERM', shutdown('SIGTERM'))
@@ -111,6 +109,9 @@ createMiddleware('./swagger/swagger.yaml', app, async function (err, middleware)
     middleware.parseRequest(),
     middleware.validateRequest()
   )
+
+  // Initialise the utxo cache
+  await utxoManager.initCache(childChain, feePayerAddress, feeToken)
 
   app.get('/', async (req, res) => {
     res.status(200).end()

@@ -54,7 +54,7 @@ module.exports = {
       throw new Error(`Address ${address} is not a fee payer account`)
     }
 
-    logger.info(`Signing tx with fee payer account ${address}`)
+    logger.debug(`Signing tx with fee payer account ${address}`)
 
     const body = {
       isTyped: true,
@@ -65,7 +65,7 @@ module.exports = {
     try {
       const res = await post({ url: SIGN_URL, body })
       const response = res.data
-      logger.info(`HSM response: ${JSON.stringify(response, null, 2)}`)
+      logger.debug(`HSM response: ${JSON.stringify(response, null, 2)}`)
       if (!response.message || response.message !== 'success') {
         logger.error(`HSM error: ${response.message}`)
         throw new Error('Unable to sign transaction')

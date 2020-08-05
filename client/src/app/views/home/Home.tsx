@@ -28,7 +28,7 @@ import { selectIsPendingTransaction, selectTransactions } from 'app/selectors/tr
 import * as omgService from 'app/services/omgService';
 import * as networkService from 'app/services/networkService';
 
-import { powAmount, powAmountAsBN } from 'app/util/amountConvert';
+import { powAmount, powAmountAsBN, logAmount } from 'app/util/amountConvert';
 import useInterval from 'app/util/useInterval';
 import usePrevious from 'app/util/usePrevious';
 import isAddress from 'app/util/isAddress';
@@ -59,7 +59,7 @@ function Home (): JSX.Element {
           chrome.notifications.create(tx.txhash, {
             type: 'basic',
             title: 'New Transaction',
-            message: `${getUsernameFromMap(tx.sender, userAddressMap) || truncate(tx.sender, 6, 4, '...')} has sent you ${tx.amount} ${tx.symbol}`,
+            message: `${getUsernameFromMap(tx.sender, userAddressMap) || truncate(tx.sender, 6, 4, '...')} has sent you ${logAmount(tx.amount, tx.decimals)} ${tx.symbol}`,
             iconUrl: chrome.runtime.getURL('images/favicon.png')
           });
         } catch (error) {

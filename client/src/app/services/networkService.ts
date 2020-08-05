@@ -1,12 +1,13 @@
 import BN from 'bn.js';
 import { get, differenceBy } from 'lodash';
 
+import store from 'app/store';
+
 import { ISession, ITransaction, ISubReddit } from 'interfaces';
 
 import * as omgService from 'app/services/omgService';
 import * as transportService from 'app/services/transportService';
 import * as messageService from 'app/services/messageService';
-import * as locationService from 'app/services/locationService';
 
 export async function checkWeb3ProviderExists (): Promise<boolean> {
   const exists = await messageService.send({ type: 'WEB3/EXISTS' });
@@ -41,11 +42,9 @@ export async function getActiveAccount (): Promise<string> {
 
 export async function getSession (): Promise<ISession> {
   const account = await getActiveAccount();
-  const subReddit = await locationService.getCurrentSubReddit();
-  let balance = '0';
-  if (subReddit) {
-    balance = await omgService.getPointBalance(account, subReddit.token);
-  }
+  const state = store.getState();
+  const subReddit = state.session.subReddit;
+  const balance = await omgService.getPointBalance(account, subReddit.token);
   return {
     account,
     balance,
@@ -205,7 +204,7 @@ export async function transfer ({
     url: `${subReddit.feeRelay}/create-relayed-tx`,
     body: {
       utxos: spendableUtxos,
-      amount,
+      amount: new BN(amount),
       metadata,
       to: recipient
     }

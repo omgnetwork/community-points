@@ -1,7 +1,7 @@
 /* global chrome */
 
 export default {
-  'omise_go': {
+  'OMGnetwork': {
     token: '<community point erc20>',
     symbol: 'ROCK',
     decimals: 0,
