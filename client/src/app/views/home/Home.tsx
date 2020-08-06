@@ -6,6 +6,8 @@ import { truncate as _truncate } from 'lodash';
 import truncate from 'truncate-middle';
 import { useDispatch, useSelector } from 'react-redux';
 
+import subRedditMap from 'subRedditMap';
+
 import Transactions from 'app/views/transactions/Transactions';
 import Merch from 'app/views/merch/Merch';
 import Loading from 'app/views/loading/Loading';
@@ -79,11 +81,27 @@ function Home (): JSX.Element {
   }, [dispatch]);
 
   useInterval(() => {
-    dispatch(getSession());
-    setTimeout(() => {
-      // add a delay to give a chance for session data to be available on the first transaction fetch
-      dispatch(getTransactions());
-    }, 2 * 1000);
+    try {
+      // only make the poll if on the subreddit
+      chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+        const currentTabUrl = tabs[0].url;
+        const subReddit = currentTabUrl.match(/reddit.com\/r\/(.*?)\//);
+        if (!subReddit) {
+          return null;
+        }
+        const name = subReddit[1];
+        const subRedditObject = subRedditMap[name];
+        if (subRedditObject) {
+          dispatch(getSession());
+          setTimeout(() => {
+            // add a 2 sec delay to give a chance for session data to be available on the first history fetch
+            dispatch(getTransactions());
+          }, 2 * 1000);
+        }
+      });
+    } catch (error) {
+      //
+    }
   }, 15 * 1000);
 
   async function handleTransfer (): Promise<void> {
