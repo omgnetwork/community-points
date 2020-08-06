@@ -25,5 +25,6 @@ CLIENT_SECRET=<client secret of the Reddit application, obtained from Reddit dev
 USERNAME=<Reddit username, must be listed as a moderator on the Reddit Sub with flair access>
 PASSWORD=<Reddit password>
 SUB=<Name of the sub>
+SENTRY_DSN=<DSN to log the error to>
 
 ```

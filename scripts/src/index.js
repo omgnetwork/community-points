@@ -17,11 +17,13 @@ const util = require('./util.js')
 const cron = require('node-cron');
 const tx = require('./tx.js')
 const flair = require('./flair.js')
+const Sentry = require('@sentry/node');
 const burnAddr = process.env.BURN_ADDR
 const curr = process.env.CURRENCY
 const watcher = process.env.WATCHER
 const userAddressUrl = process.env.USER_THREAD
 const subreddit = process.env.SUB
+const sentryDsn = process.env.SENTRY_DSN;
 const r = new snoowrap({
   userAgent: process.env.USER_AGENT,
   clientId: process.env.CLIENT_ID,
@@ -30,9 +32,21 @@ const r = new snoowrap({
   password: process.env.PASSWORD
 });
 
+function logError(error) {
+  console.log(error.message);
+  if (config.sentryDsn) {
+    Sentry.captureException(error);
+  }
+}
 
 (async () => {
 	try {
+    if (sentryDsn) {
+      Sentry.init({ dsn: sentryDsn });
+      Sentry.configureScope(scope => {
+        scope.setTag('layer', 'flair-cron');
+      });
+    }
     cron.schedule('*/30 * * * *', async () => {
       const txconfig = {
         watcher: watcher,
@@ -49,13 +63,17 @@ const r = new snoowrap({
         getFlair('flair_salamander', ':salamander:', 7000),
         getFlair('flair_soon', ':soon:', 10000)
       )
-      console.log(flairArrays)
-      const update = await flair.setFlairs(
-        flairArrays,
-        r.getSubreddit(subreddit)
-      )
-      console.log(update)
-    })} catch(err) {
-    console.log(err)
+      if(flairArrays.length > 0) {
+        console.log(flairArrays)
+        const update = await flair.setFlairs(
+          flairArrays,
+          r.getSubreddit(subreddit)
+        )
+        console.log(update)
+
+      }
+    })
+  } catch(err) {
+    logError(err)
   }
 })();

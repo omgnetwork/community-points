@@ -37,7 +37,7 @@ module.exports = {
     // sanitize and filter comments for addresses
     for (const comment of rawComments) {
       const rawText = comment.data.body;
-      const words = rawText.trim().split(' ');
+      const words = rawText.trim().replace(/\n/g, ' ').split(' ');
 
       for (const word of words) {
         if (util.isAddress(word)) {

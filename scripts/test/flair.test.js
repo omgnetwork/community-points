@@ -11,7 +11,8 @@
   limitations under the License.
 */
 const flair = require('../src/flair.js')
-const assert = require('assert');
+const assert = require('chai').assert;
+const sinon = require('sinon');
 
 describe('Flair',  () => {
   describe('.shouldUpdateFlair()', () => {
@@ -34,6 +35,47 @@ describe('Flair',  () => {
       const purchased = ["rock", "omg"]
       const current = ["snoo", "rock"]
       assert.equal(flair.shouldUpdateFlair(purchased, current), true)
+    })
+  })
+
+  describe('.setFlairs()', () => {
+    it('should call subreddit API once with the correct updates obj', async () => {
+      const redditMock = { setMultipleUserFlairs: async (arg) => arg ? Promise.resolve(true) : Promise.resolve(false) }
+      const result = await flair.setFlairs(true, redditMock)
+      assert.equal(result, true)
+    })
+  })
+
+  describe('.flairGetter()', () => {
+    beforeEach(() => {
+      this.currency = '0x123'
+      this.owner = '0xabc'
+    })
+    it('should get the correct owner address on valid purchase', () => {
+      const txs = [{
+        inputs: [{
+          currency: this.currency, owner: this.owner
+        }]
+      }]
+      const flairFunc = flair.flairGetter({
+        curr: this.currency,
+        burnAddr: '0xdead'
+      }, txs, () => true)
+      const expectedFlair = { flairName: 'some_flair', flairText: 'flair', addresses: new Set([ this.owner ])}
+      assert.deepEqual(flairFunc('some_flair', 'flair', 100), expectedFlair)
+    })
+    it('should return empty addresses for no valid purchase', () => {
+      const txs = [{
+        inputs: [{
+          currency: this.currency, owner: this.owner
+        }]
+      }]
+      const flairFunc = flair.flairGetter({
+        curr: this.currency,
+        burnAddr: '0xdead'
+      }, txs, () => false)
+      const expectedFlair = { flairName: 'some_flair', flairText: 'flair', addresses: new Set([ ])}
+      assert.deepEqual(flairFunc('some_flair', 'flair', 100), expectedFlair)
     })
   })
 })
