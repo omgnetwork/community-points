@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import BigNumber from 'bignumber.js';
 import { truncate as _truncate } from 'lodash';
 import truncate from 'truncate-middle';
-import { useDispatch, useSelector, batch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Transactions from 'app/views/transactions/Transactions';
 import Merch from 'app/views/merch/Merch';
@@ -79,11 +79,12 @@ function Home (): JSX.Element {
   }, [dispatch]);
 
   useInterval(() => {
-    batch(() => {
-      dispatch(getSession());
+    dispatch(getSession());
+    setTimeout(() => {
+      // add a delay to give a chance for session data to be available on the first transaction fetch
       dispatch(getTransactions());
-    });
-  }, 10 * 1000);
+    }, 2 * 1000);
+  }, 15 * 1000);
 
   async function handleTransfer (): Promise<void> {
     try {

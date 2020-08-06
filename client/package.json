@@ -24,6 +24,7 @@
     "buffer": "^5.6.0",
     "lodash": "^4.17.15",
     "moment": "^2.27.0",
+    "numbro": "^2.3.1",
     "omg-json-bigint": "^1.0.0",
     "react": "^16.13.1",
     "react-copy-to-clipboard": "^5.0.2",

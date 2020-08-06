@@ -2,6 +2,7 @@ import * as React from 'react';
 import { useState } from 'react';
 import { get } from 'lodash';
 import BigNumber from 'bignumber.js';
+import numbro from 'numbro';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ISession, IFlair, IFlairMap } from 'interfaces';
@@ -123,7 +124,7 @@ function Merch ({
               <div className={styles.price}>
                 {purchased
                   ? 'OWNED'
-                  : `${_flair.price} ${session.subReddit.symbol}`
+                  : `${numbro(_flair.price).format({ thousandSeparated: true })} ${session.subReddit.symbol}`
                 }
               </div>
             </div>
