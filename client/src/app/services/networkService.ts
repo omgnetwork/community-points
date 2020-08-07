@@ -215,7 +215,7 @@ export async function merge ({
   const utxosToMerge = subRedditUtxos.slice(0, 4);
 
   const amount = utxosToMerge.reduce((prev, curr) => {
-    return prev.add(new BN(curr.amount));
+    return prev.add(new BN(curr.amount.toString()));
   }, new BN(0));
 
   const _metadata = 'Merge UTXOs';
@@ -272,7 +272,7 @@ export async function transfer ({
     url: `${subReddit.feeRelay}/create-relayed-tx`,
     body: {
       utxos: spendableUtxos,
-      amount: new BN(amount),
+      amount: new BN(amount.toString()),
       metadata,
       to: recipient
     }

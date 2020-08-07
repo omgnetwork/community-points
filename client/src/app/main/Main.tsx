@@ -45,6 +45,7 @@ function Main (): JSX.Element {
 
   // 1. check if valid subreddit
   useEffect(() => {
+    dispatch({ type: 'ROOT/FLUSH' });
     async function checkCurrentPage () {
       const validSubReddit = await locationService.getCurrentSubReddit();
       if (!validSubReddit) {
