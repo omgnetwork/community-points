@@ -206,7 +206,7 @@ export async function merge ({
   subReddit
 }: {
   subReddit: ISubReddit
-}): Promise<any> {
+}): Promise<ITransaction> {
   const account = await getActiveAccount();
   const allUtxos = await omgService.getUtxos(account);
   const subRedditUtxos = allUtxos

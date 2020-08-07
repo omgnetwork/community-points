@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ISession } from 'interfaces';
@@ -25,8 +25,8 @@ function MergeModal ({
   const dispatch = useDispatch();
 
   const session: ISession = useSelector(selectSession);
-  const [ transferLoading, setTransferLoading ]: [ boolean, any ] = useState(false);
-  const [ signatureAlert, setSignatureAlert ]: [ boolean, any ] = useState(false);
+  const [ transferLoading, setTransferLoading ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
+  const [ signatureAlert, setSignatureAlert ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
 
   async function handleMerge (): Promise<void> {
     try {

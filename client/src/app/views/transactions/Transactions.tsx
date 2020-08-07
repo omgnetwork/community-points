@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { unix } from 'moment';
 import truncate from 'truncate-middle';
 import { useSelector } from 'react-redux';
@@ -21,8 +21,8 @@ import * as styles from './Transactions.module.scss';
 const TRANSACTIONS_PER_PAGE = 4;
 
 function Transactions (): JSX.Element {
-  const [ visibleTransactions, setVisibleTransactions ]: [ ITransaction[], any ] = useState([]);
-  const [ visibleCount, setVisibleCount ]: [ number, any ] = useState(TRANSACTIONS_PER_PAGE);
+  const [ visibleTransactions, setVisibleTransactions ]: [ ITransaction[], Dispatch<SetStateAction<ITransaction[]>> ] = useState([]);
+  const [ visibleCount, setVisibleCount ]: [ number, Dispatch<SetStateAction<number>> ] = useState(TRANSACTIONS_PER_PAGE);
 
   const allTransactions: ITransaction[] = useSelector(selectTransactions);
   const userAddressMap: IUserAddress[] = useSelector(selectUserAddressMap);

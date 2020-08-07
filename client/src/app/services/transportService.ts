@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from 'axios';
+import axios, { AxiosResponse, AxiosRequestConfig } from 'axios';
 import JSONBigNumber from 'omg-json-bigint';
 
 function getTransformResponse () {
@@ -31,7 +31,7 @@ export async function post ({ url, body, rpc = true }: IPost): Promise<any> {
     body.id = body.id || 0;
   }
 
-  const options = {
+  const options: AxiosRequestConfig = {
     method: 'POST',
     url,
     headers: { 'Content-Type': 'application/json' },
@@ -41,15 +41,15 @@ export async function post ({ url, body, rpc = true }: IPost): Promise<any> {
       return true;
     }
   };
-  const res = await axios.request(options as any);
+  const res = await axios.request(options);
   return parseResponse(res);
 };
 
 export async function get ({ url }): Promise<any> {
-  const options = {
+  const options: AxiosRequestConfig = {
     method: 'GET',
     url
   };
-  const result = await axios(options as any);
+  const result = await axios(options);
   return result.data;
 };

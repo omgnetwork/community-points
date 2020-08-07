@@ -5,7 +5,7 @@ import * as styles from './Input.module.scss';
 interface InputProps {
   placeholder: string,
   type: string,
-  value: any,
+  value: string | number,
   onChange: (e) => void,
   className?: string,
   suffix?: string

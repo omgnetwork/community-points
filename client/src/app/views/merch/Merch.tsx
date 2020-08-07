@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, Dispatch, SetStateAction } from 'react';
 import { get } from 'lodash';
 import BigNumber from 'bignumber.js';
 import numbro from 'numbro';
@@ -30,15 +30,15 @@ function Merch ({
 }: MerchProps): JSX.Element {
   const dispatch = useDispatch();
 
-  const [ flair, setFlair ]: [ IFlair, any ] = useState(null);
-  const [ transferLoading, setTransferLoading ]: [ boolean, any ] = useState(false);
-  const [ signatureAlert, setSignatureAlert ]: [ boolean, any ] = useState(false);
-  const [ mergeModal, setMergeModal ]: [ boolean, any ] = useState(false);
+  const [ flair, setFlair ]: [ IFlair, Dispatch<SetStateAction<IFlair>> ] = useState(null);
+  const [ transferLoading, setTransferLoading ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
+  const [ signatureAlert, setSignatureAlert ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
+  const [ mergeModal, setMergeModal ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
 
   const isPendingTransaction: boolean = useSelector(selectIsPendingTransaction);
   const purchasedFlairs: IFlairMap = useSelector(selectPurchasedFlairs);
 
-  async function handleTransfer (): Promise<any> {
+  async function handleTransfer (): Promise<void> {
     try {
       setTransferLoading(true);
       let spendableUtxos = [];

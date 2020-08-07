@@ -1,6 +1,6 @@
 /* global chrome */
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import BigNumber from 'bignumber.js';
 import { truncate as _truncate } from 'lodash';
 import truncate from 'truncate-middle';
@@ -40,15 +40,17 @@ import isAddress from 'app/util/isAddress';
 
 import * as styles from './Home.module.scss';
 
+type IView = 'Transfer' | 'History' | 'Merch' | 'Support';
+
 function Home (): JSX.Element {
   const dispatch = useDispatch();
 
-  const [ view, setView ]: [ 'Transfer' | 'History' | 'Merch', any ] = useState('Transfer');
-  const [ recipient, setRecipient ]: [ string, any ] = useState('');
-  const [ amount, setAmount ]: any = useState('');
-  const [ transferLoading, setTransferLoading ]: [ boolean, any ] = useState(false);
-  const [ signatureAlert, setSignatureAlert ]: [ boolean, any ] = useState(false);
-  const [ mergeModal, setMergeModal ]: [ boolean, any ] = useState(false);
+  const [ view, setView ]: [ IView, Dispatch<SetStateAction<IView>> ] = useState('Transfer');
+  const [ recipient, setRecipient ]: [ string, Dispatch<SetStateAction<string>> ] = useState('');
+  const [ amount, setAmount ]: [ string | number, Dispatch<SetStateAction<string | number>> ] = useState('');
+  const [ transferLoading, setTransferLoading ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
+  const [ signatureAlert, setSignatureAlert ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
+  const [ mergeModal, setMergeModal ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
 
   const errorMessage: string = useSelector(selectError);
   const session: ISession = useSelector(selectSession);
@@ -219,10 +221,10 @@ function Home (): JSX.Element {
       <Tabs
         options={[ 'Transfer', 'History', 'Merch', 'Support' ]}
         selected={view}
-        onSelect={setView}
+        onSelect={(selected: IView) => setView(selected)}
       />
 
-      {(view as any) === 'Transfer' && (
+      {(view as IView) === 'Transfer' && (
         <>
           <Input
             type='number'
@@ -271,16 +273,16 @@ function Home (): JSX.Element {
         </>
       )}
 
-      {(view as any) === 'History' && <Transactions />}
+      {(view as IView) === 'History' && <Transactions />}
 
-      {(view as any) === 'Merch' && (
+      {(view as IView) === 'Merch' && (
         <Merch
           onSuccess={() => setView('History')}
           session={session}
         />
       )}
 
-      {(view as any) === 'Support' && <Support />}
+      {(view as IView) === 'Support' && <Support />}
     </div>
   );
 }
