@@ -47,7 +47,8 @@ function logError(error) {
         scope.setTag('layer', 'flair-cron');
       });
     }
-    cron.schedule('*/30 * * * *', async () => {
+
+    cron.schedule('*/15 * * * *', async () => {
       const txconfig = {
         watcher: watcher,
         burnAddr: burnAddr,
