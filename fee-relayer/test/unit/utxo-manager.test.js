@@ -1,22 +1,28 @@
 const utxoManager = require('../../src/utxo-manager')
 const chai = require('chai')
 const chaiAsPromised = require('chai-as-promised')
+const sinon = require('sinon')
 
 chai.use(chaiAsPromised)
 const assert = chai.assert
 
 const feeToken = '0x0000000000000000000000000000000000000000'
-const notFeeToken = '0xdeadfee000000000000000000000000000000000'
 
 describe('getFeeUtxo', () => {
   beforeEach(async () => {
+    this.stubGetUtxos = sinon.stub(utxoManager, 'getUtxos')
     return utxoManager.cleanPending([])
+  })
+
+  afterEach(() => {
+    this.stubGetUtxos.restore()
   })
 
   it('throws error if no utxo', async () => {
     const feeAmount = 1
-    assert.isRejected(utxoManager.getFeeUtxo([], feeToken, feeAmount),
-      `Insufficient funds to cover fee amount ${feeAmount}`)
+    this.stubGetUtxos.returns([])
+    return assert.isRejected(utxoManager.getFeeUtxo(null, '', feeToken, feeAmount),
+      `Address  has insufficient funds in 0 valid utxos to cover fee amount ${feeAmount}`)
   })
 
   it('throws error if no utxo is large enough', async () => {
@@ -26,21 +32,21 @@ describe('getFeeUtxo', () => {
     }]
     const feeAmount = 100
 
-    assert.isRejected(utxoManager.getFeeUtxo(utxos, feeToken, feeAmount), `Insufficient funds to cover fee amount ${feeAmount}`)
+    this.stubGetUtxos.returns(utxos)
+    return assert.isRejected(utxoManager.getFeeUtxo(null, '', feeToken, feeAmount),
+    `Address  has insufficient funds in 0 valid utxos to cover fee amount ${feeAmount}`)
   })
 
   it('throws error if no fee token utxo is large enough', async () => {
     const utxos = [{
       amount: '99',
       currency: feeToken
-    }, {
-      amount: '100',
-      currency: notFeeToken
     }]
     const feeAmount = 100
 
-    assert.isRejected(utxoManager.getFeeUtxo(utxos, feeToken, feeAmount)
-      , `Insufficient funds to cover fee amount ${feeAmount}`)
+    this.stubGetUtxos.returns(utxos)
+    return assert.isRejected(utxoManager.getFeeUtxo(null, '', feeToken, feeAmount),
+      `Address  has insufficient funds in 0 valid utxos to cover fee amount ${feeAmount}`)
   })
 
   it('returns the only fee utxo', async () => {
@@ -51,7 +57,8 @@ describe('getFeeUtxo', () => {
 
     const feeAmount = 100
 
-    const utxo = await utxoManager.getFeeUtxo(utxos, feeToken, feeAmount)
+    this.stubGetUtxos.returns(utxos)
+    const utxo = await utxoManager.getFeeUtxo(null, '', feeToken, feeAmount)
     assert(utxo === utxos[0])
   })
 
@@ -69,23 +76,9 @@ describe('getFeeUtxo', () => {
 
     const feeAmount = 100
 
-    const utxo = await utxoManager.getFeeUtxo(utxos, feeToken, feeAmount)
+    this.stubGetUtxos.returns(utxos)
+    const utxo = await utxoManager.getFeeUtxo(null, '', feeToken, feeAmount)
     assert(utxo === utxos[2])
-  })
-
-  it('returns a matching fee utxo if there are other token utxos', async () => {
-    const utxos = [{
-      amount: '100',
-      currency: notFeeToken
-    }, {
-      amount: '100',
-      currency: feeToken
-    }]
-
-    const feeAmount = 100
-
-    const utxo = await utxoManager.getFeeUtxo(utxos, feeToken, feeAmount)
-    assert(utxo === utxos[1])
   })
 
   it('does not return a pending utxo', async () => {
@@ -96,10 +89,11 @@ describe('getFeeUtxo', () => {
 
     const feeAmount = 100
 
-    const utxo = await utxoManager.getFeeUtxo(utxos, feeToken, feeAmount)
+    this.stubGetUtxos.returns(utxos)
+    const utxo = await utxoManager.getFeeUtxo(null, '', feeToken, feeAmount)
     assert(utxo === utxos[0])
 
-    assert.isRejected(utxoManager.getFeeUtxo(utxos, feeToken, feeAmount), `Insufficient funds to cover fee amount ${feeAmount}`)
+    return assert.isRejected(utxoManager.getFeeUtxo(null, '', feeToken, feeAmount), `Address  has insufficient funds in 0 valid utxos to cover fee amount ${feeAmount}`)
   })
 
   it('uses a previously pending utxo again', async () => {
@@ -113,13 +107,14 @@ describe('getFeeUtxo', () => {
 
     const feeAmount = 100
 
-    const utxo = await utxoManager.getFeeUtxo(utxos, feeToken, feeAmount)
+    this.stubGetUtxos.returns(utxos)
+    const utxo = await utxoManager.getFeeUtxo(null, '', feeToken, feeAmount)
     assert(utxo === utxos[0])
 
-    assert.isRejected(utxoManager.getFeeUtxo(utxos, feeToken, feeAmount), `Insufficient funds to cover fee amount ${feeAmount}`)
+    await assert.isRejected(utxoManager.getFeeUtxo(null, '', feeToken, feeAmount), `Address  has insufficient funds in 0 valid utxos to cover fee amount ${feeAmount}`)
 
     await utxoManager.cancelPending(utxo)
-    const newUtxo = await utxoManager.getFeeUtxo(utxos, feeToken, feeAmount)
+    const newUtxo = await utxoManager.getFeeUtxo(null, '', feeToken, feeAmount)
     assert(newUtxo === utxos[0])
   })
 })

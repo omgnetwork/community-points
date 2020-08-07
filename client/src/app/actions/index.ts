@@ -2,6 +2,8 @@ import { createAction } from 'app/actions/createAction';
 import * as networkService from 'app/services/networkService';
 import * as redditService from 'app/services/redditService';
 
+import { ISubReddit } from 'interfaces';
+
 export function getSession () {
   return createAction(
     'SESSION/GET',
@@ -49,5 +51,11 @@ export function clearError () {
 export function showError (message: string) {
   return function dispatchShowError (dispatch) {
     return dispatch({ type: 'UI/ERROR/UPDATE', payload: message });
+  };
+}
+
+export function saveSubReddit (subReddit: ISubReddit) {
+  return function dispatchSaveSubReddit (dispatch) {
+    return dispatch({ type: 'SUBREDDIT/GET/SUCCESS', payload: subReddit });
   };
 }

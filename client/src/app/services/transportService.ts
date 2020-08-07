@@ -36,7 +36,10 @@ export async function post ({ url, body, rpc = true }: IPost): Promise<any> {
     url,
     headers: { 'Content-Type': 'application/json' },
     data: JSONBigNumber.stringify(body),
-    transformResponse: getTransformResponse()
+    transformResponse: getTransformResponse(),
+    validateStatus: _ => {
+      return true;
+    }
   };
   const res = await axios.request(options as any);
   return parseResponse(res);

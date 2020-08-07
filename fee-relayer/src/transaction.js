@@ -18,9 +18,32 @@ const BN = require('bn.js')
 const { transaction } = require('@omisego/omg-js-util')
 
 const NULL_METADATA = '0x0000000000000000000000000000000000000000000000000000000000000000'
+const MAX_OUTPUTS = 4
+
+function splitAmount (amount, numParts) {
+  if (numParts === 1) {
+    return [amount]
+  }
+
+  const a = amount.divn(numParts)
+  const ret = new Array(numParts - 1).fill(a)
+  ret.push(amount.sub(a.muln(numParts - 1)))
+  return ret
+}
 
 module.exports = {
-  create: function (from, to, spendUtxos, spendAmount, metadata, spendToken, feeUtxos, feeAmount, feeOwner) {
+  create: function (
+    from,
+    to,
+    spendUtxos,
+    spendAmount,
+    metadata,
+    spendToken,
+    feeUtxos,
+    feeAmount,
+    feeOwner,
+    splitFeeOutput = false
+  ) {
     if (!spendUtxos || spendUtxos.length === 0) {
       throw new Error('spendUtxos is empty')
     }
@@ -72,12 +95,27 @@ module.exports = {
     // Check if we need to add a change output for the fee token
     if (feeTotal.gt(feeAmount)) {
       const changeAmount = feeTotal.sub(feeAmount)
-      txBody.outputs.push({
-        outputType: 1,
-        outputGuard: feeOwner,
-        currency: feeUtxos[0].currency,
-        amount: changeAmount
-      })
+
+      const numNonFeeOutputs = spendTotal.gt(spendAmount) ? 2 : 1
+      const maxNumFeeOutputs = MAX_OUTPUTS - numNonFeeOutputs
+
+      if (splitFeeOutput && changeAmount.gte(feeAmount.muln(maxNumFeeOutputs))) {
+        const amounts = splitAmount(changeAmount, maxNumFeeOutputs)
+        amounts.forEach(amount =>
+          txBody.outputs.push({
+            outputType: 1,
+            outputGuard: feeOwner,
+            currency: feeUtxos[0].currency,
+            amount
+          }))
+      } else {
+        txBody.outputs.push({
+          outputType: 1,
+          outputGuard: feeOwner,
+          currency: feeUtxos[0].currency,
+          amount: changeAmount
+        })
+      }
     }
 
     return txBody
