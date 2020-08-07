@@ -36,6 +36,7 @@ function Address ({
         title={username || 'User'}
         detail={truncate(address, 6, 4, '...')}
         image={avatar}
+        clickable={false}
       />
       <div className={styles.purchasedFlairs}>
         {Object.values(session.subReddit.flairMap).map((_flair: IFlair, index: number) => {

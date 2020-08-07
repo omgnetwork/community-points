@@ -1,13 +1,10 @@
+@import 'app/styles/colors';
+
 .Support {
-  .description {
-    height: 100px;
-  }
-  .button {
+  .link {
     margin-top: 20px;
     align-items: center;
-    img {
-      margin-left: 7px;
-      height: 12px;
-    }
+    color: $orange;
+    cursor: pointer;
   }
 }

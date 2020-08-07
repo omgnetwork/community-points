@@ -3,8 +3,6 @@ import * as React from 'react';
 import Button from 'app/components/button/Button';
 
 import * as locationService from 'app/services/locationService';
-import config from 'config';
-
 import arrow from 'app/images/omgcp_arrow.svg';
 import omgcp_metamask from 'app/images/omgcp_metamask.svg';
 import omgcp_lightning from 'app/images/omgcp_lightning.svg';
@@ -18,7 +16,7 @@ function ErrorView ({
   message
 }: ErrorViewProps): JSX.Element {
   function handleSupportTab (): void {
-    locationService.openTab(config.supportUrl);
+    locationService.openTab('https://omg.eco/CPEsupport');
   }
 
   function renderMessage (_message: string): JSX.Element {
