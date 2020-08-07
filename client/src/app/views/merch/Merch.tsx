@@ -1,17 +1,21 @@
 import * as React from 'react';
-import { useState } from 'react';
+import { useState, Dispatch, SetStateAction } from 'react';
 import { get } from 'lodash';
 import BigNumber from 'bignumber.js';
+import numbro from 'numbro';
 import { useDispatch, useSelector } from 'react-redux';
 
 import { ISession, IFlair, IFlairMap } from 'interfaces';
 import { powAmount, powAmountAsBN } from 'app/util/amountConvert';
 import { selectIsPendingTransaction, selectPurchasedFlairs } from 'app/selectors/transactionSelector';
+import * as networkService from 'app/services/networkService';
+import * as errorService from 'app/services/errorService';
 
 import { transfer } from 'app/actions';
 
 import Alert from 'app/components/alert/Alert';
 import Button from 'app/components/button/Button';
+import MergeModal from 'app/components/mergemodal/MergeModal';
 
 import * as styles from './Merch.module.scss';
 
@@ -26,22 +30,39 @@ function Merch ({
 }: MerchProps): JSX.Element {
   const dispatch = useDispatch();
 
-  const [ flair, setFlair ]: [ IFlair, any ] = useState(null);
-  const [ transferLoading, setTransferLoading ]: [ boolean, any ] = useState(false);
-  const [ signatureAlert, setSignatureAlert ]: [ boolean, any ] = useState(false);
+  const [ flair, setFlair ]: [ IFlair, Dispatch<SetStateAction<IFlair>> ] = useState(null);
+  const [ transferLoading, setTransferLoading ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
+  const [ signatureAlert, setSignatureAlert ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
+  const [ mergeModal, setMergeModal ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
 
   const isPendingTransaction: boolean = useSelector(selectIsPendingTransaction);
   const purchasedFlairs: IFlairMap = useSelector(selectPurchasedFlairs);
 
-  async function handleTransfer (): Promise<any> {
+  async function handleTransfer (): Promise<void> {
     try {
       setTransferLoading(true);
+      let spendableUtxos = [];
+      try {
+        spendableUtxos = await networkService.getSpendableUtxos({
+          amount: powAmount(flair.price, session.subReddit.decimals),
+          subReddit: session.subReddit
+        });
+      } catch (error) {
+        if (error.message.includes('No more inputs available')) {
+          setTransferLoading(false);
+          return setMergeModal(true);
+        }
+        dispatch({ type: 'UI/ERROR/UPDATE', payload: error.message });
+        return errorService.log(error);
+      }
+
       setSignatureAlert(true);
       const result = await dispatch(transfer({
         amount: powAmount(flair.price, session.subReddit.decimals),
         recipient: session.subReddit.flairAddress,
         metadata: flair.metaId,
-        subReddit: session.subReddit
+        subReddit: session.subReddit,
+        spendableUtxos
       }));
 
       setTransferLoading(false);
@@ -80,6 +101,12 @@ function Merch ({
         type='success'
       />
 
+      <MergeModal
+        onClose={() => setMergeModal(false)}
+        onSuccess={onSuccess}
+        open={mergeModal}
+      />
+
       <div className={styles.flairList}>
         {Object.values(session.subReddit.flairMap).map((_flair: IFlair, index: number) => {
           const purchased = purchasedFlairs[_flair.metaId];
@@ -97,7 +124,7 @@ function Merch ({
               <div className={styles.price}>
                 {purchased
                   ? 'OWNED'
-                  : `${_flair.price} ${session.subReddit.symbol}`
+                  : `${numbro(_flair.price).format({ thousandSeparated: true })} ${session.subReddit.symbol}`
                 }
               </div>
             </div>

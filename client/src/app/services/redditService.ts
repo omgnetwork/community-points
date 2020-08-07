@@ -14,7 +14,7 @@ export function parseThreadJSON (json): Partial<IUserAddress[]> {
   // sanitize and filter comments for addresses
   for (const comment of rawComments) {
     const rawText = comment.data.body;
-    const words = rawText.trim().split(' ');
+    const words = rawText.trim().replace(/\n/g, ' ').split(' ');
 
     for (const word of words) {
       if (isAddress(word)) {

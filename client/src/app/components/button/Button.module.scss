@@ -11,6 +11,12 @@
   align-items: center;
   color: $white;
 
+  &.secondary {
+    background-color: $white;
+    border: 1px solid $orange;
+    color: $orange;
+  }
+
   &.disabled {
     pointer-events: none;
     background-color: $gray4;

@@ -2,6 +2,7 @@ import BN from 'bn.js';
 import { get, differenceBy } from 'lodash';
 
 import store from 'app/store';
+import config from 'config';
 
 import { ISession, ITransaction, ISubReddit } from 'interfaces';
 
@@ -41,9 +42,10 @@ export async function getActiveAccount (): Promise<string> {
 };
 
 export async function getSession (): Promise<ISession> {
-  const account = await getActiveAccount();
   const state = store.getState();
   const subReddit = state.session.subReddit;
+
+  const account = await getActiveAccount();
   const balance = await omgService.getPointBalance(account, subReddit.token);
   return {
     account,
@@ -68,7 +70,12 @@ export function checkForIncomingTransactions (prevTransactions: ITransaction[], 
 };
 
 export async function getAllTransactions (): Promise<Array<ITransaction>> {
-  const session = await getSession();
+  const state = store.getState();
+  const session = state.session;
+  if (!session.account || !session.subReddit) {
+    return null;
+  }
+
   const allTransactions = await omgService.getTransactions(session.account);
   const subRedditToken = session.subReddit.token.toLowerCase();
   const user = session.account.toLowerCase();
@@ -101,33 +108,29 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
     // - if one of the inputs owner and currency match it is outgoing, else incoming
     const isOutgoing = transaction.inputs.some(matchingCurrencyAndOwner);
 
-    // - ignore merge transactions
-    // - if outgoing and only user in outputs
-    const allUserOutputs = transaction.outputs.every(i => i.owner.toLowerCase() === user);
-    if (isOutgoing && allUserOutputs) {
-      return null;
-    }
+    // identify merge transactions
+    const allUserAndCurrencyOutputs = transaction.outputs.every(matchingCurrencyAndOwner);
+    const allUserAndCurrencyInputs = transaction.inputs.every(matchingCurrencyAndOwner);
+    const moreInputsThanOutputs = transaction.inputs.length > transaction.outputs.length;
+    const isMerge = allUserAndCurrencyOutputs && allUserAndCurrencyInputs && moreInputsThanOutputs;
 
-    // outgoing and output amount to yourself is the same
-    const userOutputs = transaction.outputs.filter(i => i.owner.toLowerCase() === user);
-    const userOutputsAmount = userOutputs.reduce((acc, curr) => {
-      return acc.add(new BN(curr.amount.toString()));
-    }, new BN(0));
-    const userInputs = transaction.inputs.filter(i => i.owner.toLowerCase() === user);
-    const userInputsAmount = userInputs.reduce((acc, curr) => {
-      return acc.add(new BN(curr.amount.toString()));
-    }, new BN(0));
-    const isMerge = userInputsAmount.eq(userOutputsAmount);
-    if (isOutgoing && isMerge) {
-      return null;
-    }
-
-    // - for outgoing, sum amount of currency going to recipient in outputs
+    // calculate details
     let amount = '0';
     let recipient;
     let sender;
+    let direction;
 
-    if (isOutgoing) {
+    if (isMerge) {
+      direction = 'merge';
+      recipient = user;
+      sender = user;
+      amount = transaction.outputs.reduce((acc, curr) => {
+        return acc.add(new BN(curr.amount.toString()));
+      }, new BN(0));
+    }
+
+    if (isOutgoing && !isMerge) {
+      direction = 'outgoing';
       sender = user;
       const recipientOutputs = transaction.outputs.filter(matchingCurrencyAndDifferentOwner);
       recipient = get(recipientOutputs, '[0].owner', 'N/A'); // naive assign recipient from first output
@@ -138,7 +141,8 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
       amount = bnAmount.toString();
     }
 
-    if (!isOutgoing) {
+    if (!isOutgoing && !isMerge) {
+      direction = 'incoming';
       recipient = user;
       const bnAmount = transaction.outputs
         .filter(matchingCurrencyAndOwner)
@@ -152,12 +156,12 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
     }
 
     return {
-      direction: isOutgoing ? 'outgoing' : 'incoming',
+      direction,
       txhash: transaction.txhash,
       status: 'Confirmed',
       sender,
       recipient,
-      amount,
+      amount: amount.toString(),
       metadata: omgService.decodeMetadata(transaction.metadata),
       currency: session.subReddit.token,
       symbol: session.subReddit.symbol,
@@ -169,18 +173,13 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
   return transactions.filter(i => !!i);
 };
 
-export async function transfer ({
+export async function getSpendableUtxos ({
   amount,
-  recipient,
-  metadata,
   subReddit
 }: {
-  amount: number,
-  recipient: string,
-  metadata: string,
+  amount: string,
   subReddit: ISubReddit
-}): Promise<ITransaction> {
-  // fetch and pick utxos to cover amount
+}): Promise<Object[]> {
   const account = await getActiveAccount();
   const allUtxos = await omgService.getUtxos(account);
   const subRedditUtxos = allUtxos
@@ -195,8 +194,77 @@ export async function transfer ({
     if (spendableSum.gte(new BN(amount.toString()))) {
       break;
     }
+    if (spendableUtxos.length === 3) {
+      throw new Error('No more inputs available');
+    }
     spendableUtxos.push(utxo);
   }
+  return spendableUtxos;
+}
+
+export async function merge ({
+  subReddit
+}: {
+  subReddit: ISubReddit
+}): Promise<ITransaction> {
+  const account = await getActiveAccount();
+  const allUtxos = await omgService.getUtxos(account);
+  const subRedditUtxos = allUtxos
+    .filter(utxo => utxo.currency.toLowerCase() === subReddit.token.toLowerCase())
+    .sort((a, b) => new BN(b.amount.toString()).sub(new BN(a.amount.toString())));
+  const utxosToMerge = subRedditUtxos.slice(0, 4);
+
+  const amount = utxosToMerge.reduce((prev, curr) => {
+    return prev.add(new BN(curr.amount.toString()));
+  }, new BN(0));
+
+  const _metadata = 'Merge UTXOs';
+  const txBody = {
+    inputs: utxosToMerge,
+    outputs: [{
+      outputType: 1,
+      outputGuard: account,
+      currency: subReddit.token,
+      amount
+    }],
+    metadata: omgService.encodeMetadata(_metadata)
+  };
+
+  const typedData = omgService.getTypedData(txBody, config.plasmaContractAddress);
+  const signature = await signTypedData(account, typedData);
+  const signatures = new Array(txBody.inputs.length).fill(signature);
+  const signedTxn = omgService.buildSignedTransaction(typedData, signatures);
+  const submittedTransaction = await omgService.submitTransaction(signedTxn);
+
+  return {
+    direction: 'merge',
+    txhash: submittedTransaction.txhash,
+    status: 'Pending',
+    sender: account,
+    recipient: account,
+    amount: amount.toString(),
+    metadata: _metadata,
+    currency: subReddit.token,
+    symbol: subReddit.symbol,
+    decimals: subReddit.decimals,
+    timestamp: Math.round((new Date()).getTime() / 1000)
+  };
+}
+
+export async function transfer ({
+  amount,
+  recipient,
+  metadata,
+  subReddit,
+  spendableUtxos
+}: {
+  amount: string,
+  recipient: string,
+  metadata: string,
+  subReddit: ISubReddit,
+  spendableUtxos: Object[]
+}): Promise<ITransaction> {
+  const account = await getActiveAccount();
 
   // post to /create-relayed-tx { utxos, amount, to }
   const relayedTx = await transportService.post({
@@ -204,7 +272,7 @@ export async function transfer ({
     url: `${subReddit.feeRelay}/create-relayed-tx`,
     body: {
       utxos: spendableUtxos,
-      amount: new BN(amount),
+      amount: new BN(amount.toString()),
       metadata,
       to: recipient
     }

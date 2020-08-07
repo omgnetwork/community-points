@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect, useRef } from 'react';
+import { Dispatch, SetStateAction, useState, useEffect, useRef } from 'react';
 import { find, get } from 'lodash';
 
 import Option from 'app/components/option/Option';
@@ -31,9 +31,9 @@ function Select ({
 }: SelectProps): JSX.Element {
   const selectNode = useRef(null);
 
-  const [ isOpen, setIsOpen ]: [ boolean, any ] = useState(false);
-  const [ inputValue, setInputValue ]: [ string, any ] = useState('');
-  const [ filteredOptions, setFilteredOptions ]: [ IOption[], any ] = useState([]);
+  const [ isOpen, setIsOpen ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
+  const [ inputValue, setInputValue ]: [ string, Dispatch<SetStateAction<string>> ] = useState('');
+  const [ filteredOptions, setFilteredOptions ]: [ IOption[], Dispatch<SetStateAction<IOption[]>> ] = useState([]);
 
   useEffect(() => {
     if (options.length && !inputValue) {

@@ -11,8 +11,7 @@
     height: 150px;
     overflow-y: scroll;
     .flair {
-      height: 70px;
-      width: calc(33% - 25px);
+      height: 50px;
       cursor: pointer;
       padding: 5px;
       margin: 5px;
@@ -35,8 +34,7 @@
       }
       img {
         margin-bottom: 5px;
-        height: 50px;
-        width: 50px;
+        width: 25px;
         object-fit: cover;
       }
       .price {

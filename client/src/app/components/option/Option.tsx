@@ -9,7 +9,8 @@ interface OptionProps {
   image?: string,
   onClick?: () => void,
   selected?: boolean,
-  className?: string
+  className?: string,
+  clickable?: boolean
 }
 
 function Option ({
@@ -18,14 +19,16 @@ function Option ({
   detail,
   image,
   selected,
-  className
+  className,
+  clickable = true
 }: OptionProps): JSX.Element {
   return (
     <div
-      onClick={onClick}
+      onClick={clickable ? onClick : null}
       className={[
         styles.Option,
         selected ? styles.selected : '',
+        clickable ? styles.clickable : '',
         className
       ].join(' ')}
     >

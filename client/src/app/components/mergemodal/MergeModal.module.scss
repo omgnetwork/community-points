@@ -1,0 +1,37 @@
+@import 'app/styles/colors';
+
+.MergeModal {
+  position: absolute;
+  top: 0px;
+  right: 0px;
+  left: 0px;
+  bottom: 0px;
+  background-color: $white;
+  z-index: 1;
+  flex-direction: column;
+
+  &.open {
+    display: flex;
+  }
+  &.closed {
+    display: none;
+  }
+
+  .icon {
+    align-self: flex-start;
+    margin-bottom: 20px;
+  }
+
+  .actions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: 20px;
+    .button {
+      flex: 1;
+      &:first-child {
+        margin-right: 5px;
+      }
+    }
+  }
+}

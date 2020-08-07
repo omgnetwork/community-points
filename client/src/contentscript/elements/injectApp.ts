@@ -57,9 +57,9 @@ function injectApp (): void {
   `;
 
   document.body.appendChild(appContainer);
-  const iframeNode = document.getElementById('omgcp-iframe');
+  const iframeNode: Partial<HTMLIFrameElement> = document.getElementById('omgcp-iframe');
   // inject react into iframe
-  (iframeNode as any).src = chrome.extension.getURL('app.html');
+  iframeNode.src = chrome.extension.getURL('app.html');
   const containerNode = document.getElementById('omgcp-container');
   makeDraggable(containerNode, 'omgcp-header');
 

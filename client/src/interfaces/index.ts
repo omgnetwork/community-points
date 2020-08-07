@@ -5,7 +5,7 @@ export interface IMessage {
 }
 
 export interface ITransaction {
-  direction: 'incoming' | 'outgoing',
+  direction: 'incoming' | 'outgoing' | 'merge',
   txhash: string,
   status: 'Pending' | 'Confirmed',
   sender: string,

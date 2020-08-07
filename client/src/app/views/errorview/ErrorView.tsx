@@ -1,5 +1,9 @@
 import * as React from 'react';
 
+import Button from 'app/components/button/Button';
+
+import * as locationService from 'app/services/locationService';
+import arrow from 'app/images/omgcp_arrow.svg';
 import omgcp_metamask from 'app/images/omgcp_metamask.svg';
 import omgcp_lightning from 'app/images/omgcp_lightning.svg';
 import * as styles from './ErrorView.module.scss';
@@ -11,8 +15,15 @@ interface ErrorViewProps {
 function ErrorView ({
   message
 }: ErrorViewProps): JSX.Element {
+  function handleSupportTab (): void {
+    locationService.openTab('https://omg.eco/CPEsupport');
+  }
+
   function renderMessage (_message: string): JSX.Element {
-    if (_message.includes('Already processing eth_requestAccounts')) {
+    if (
+      _message.includes('Already processing eth_requestAccounts') ||
+      _message.includes('Permissions request already pending')
+    ) {
       return (
         <>
           <img
@@ -21,7 +32,7 @@ function ErrorView ({
             alt='metamask_logo'
           />
           <h1>Waiting for Metamask</h1>
-          <p>Please open and sign into your Metamask extension. Then, restart this extension.</p>
+          <p>Please open and sign into your Metamask extension. Then, reopen this extension.</p>
         </>
       );
     }
@@ -37,11 +48,18 @@ function ErrorView ({
           Oops! Something went wrong.
         </h1>
         <p>
-          Please restart this extension. If the error persists, please contact support.
+          Please try refreshing the page and reopening this extension. If the error persists, check out the support page to file an issue.
         </p>
         <p className={styles.rawError}>
           {_message}
         </p>
+        <Button
+          onClick={handleSupportTab}
+          className={styles.button}
+        >
+          <span>GO TO SUPPORT</span>
+          <img src={arrow} alt='arrow' />
+        </Button>
       </>
     );
   }

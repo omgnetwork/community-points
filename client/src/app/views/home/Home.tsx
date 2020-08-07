@@ -1,14 +1,17 @@
 /* global chrome */
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import BigNumber from 'bignumber.js';
 import { truncate as _truncate } from 'lodash';
 import truncate from 'truncate-middle';
-import { useDispatch, useSelector, batch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+
+import subRedditMap from 'subRedditMap';
 
 import Transactions from 'app/views/transactions/Transactions';
 import Merch from 'app/views/merch/Merch';
 import Loading from 'app/views/loading/Loading';
+import Support from 'app/views/support/Support';
 
 import Alert from 'app/components/alert/Alert';
 import Address from 'app/components/address/Address';
@@ -17,6 +20,7 @@ import Select from 'app/components/select/Select';
 import Input from 'app/components/input/Input';
 import PointBalance from 'app/components/pointbalance/PointBalance';
 import Tabs from 'app/components/tabs/Tabs';
+import MergeModal from 'app/components/mergemodal/MergeModal';
 
 import { ISession, IUserAddress, ITransaction } from 'interfaces';
 import { transfer, getSession, getTransactions, getUserAddressMap, clearError } from 'app/actions';
@@ -27,6 +31,7 @@ import { selectIsPendingTransaction, selectTransactions } from 'app/selectors/tr
 
 import * as omgService from 'app/services/omgService';
 import * as networkService from 'app/services/networkService';
+import * as errorService from 'app/services/errorService';
 
 import { powAmount, powAmountAsBN, logAmount } from 'app/util/amountConvert';
 import useInterval from 'app/util/useInterval';
@@ -35,14 +40,17 @@ import isAddress from 'app/util/isAddress';
 
 import * as styles from './Home.module.scss';
 
+type IView = 'Transfer' | 'History' | 'Merch' | 'Support';
+
 function Home (): JSX.Element {
   const dispatch = useDispatch();
 
-  const [ view, setView ]: [ 'Transfer' | 'History' | 'Merch', any ] = useState('Transfer');
-  const [ recipient, setRecipient ]: [ string, any ] = useState('');
-  const [ amount, setAmount ]: any = useState('');
-  const [ transferLoading, setTransferLoading ]: [ boolean, any ] = useState(false);
-  const [ signatureAlert, setSignatureAlert ]: [ boolean, any ] = useState(false);
+  const [ view, setView ]: [ IView, Dispatch<SetStateAction<IView>> ] = useState('Transfer');
+  const [ recipient, setRecipient ]: [ string, Dispatch<SetStateAction<string>> ] = useState('');
+  const [ amount, setAmount ]: [ string | number, Dispatch<SetStateAction<string | number>> ] = useState('');
+  const [ transferLoading, setTransferLoading ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
+  const [ signatureAlert, setSignatureAlert ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
+  const [ mergeModal, setMergeModal ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
 
   const errorMessage: string = useSelector(selectError);
   const session: ISession = useSelector(selectSession);
@@ -75,21 +83,53 @@ function Home (): JSX.Element {
   }, [dispatch]);
 
   useInterval(() => {
-    batch(() => {
-      dispatch(getSession());
-      dispatch(getTransactions());
-    });
-  }, 20 * 1000);
+    try {
+      // only make the poll if on the subreddit
+      chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
+        const currentTabUrl = tabs[0].url;
+        const subReddit = currentTabUrl.match(/reddit.com\/r\/(.*?)\//);
+        if (!subReddit) {
+          return null;
+        }
+        const name = subReddit[1];
+        const subRedditObject = subRedditMap[name];
+        if (subRedditObject) {
+          dispatch(getSession());
+          setTimeout(() => {
+            // add a 2 sec delay to give a chance for session data to be available on the first history fetch
+            dispatch(getTransactions());
+          }, 2 * 1000);
+        }
+      });
+    } catch (error) {
+      //
+    }
+  }, 15 * 1000);
 
-  async function handleTransfer (): Promise<any> {
+  async function handleTransfer (): Promise<void> {
     try {
       setTransferLoading(true);
+      let spendableUtxos = [];
+      try {
+        spendableUtxos = await networkService.getSpendableUtxos({
+          amount: powAmount(amount, session.subReddit.decimals),
+          subReddit: session.subReddit
+        });
+      } catch (error) {
+        if (error.message.includes('No more inputs available')) {
+          return setMergeModal(true);
+        }
+        dispatch({ type: 'UI/ERROR/UPDATE', payload: error.message });
+        return errorService.log(error);
+      }
+
       setSignatureAlert(true);
       const result = await dispatch(transfer({
         amount: powAmount(amount, session.subReddit.decimals),
         recipient,
         metadata: `r/${_truncate(session.subReddit.name, { length: 10 })} points`,
-        subReddit: session.subReddit
+        subReddit: session.subReddit,
+        spendableUtxos
       }));
 
       if (result) {
@@ -157,6 +197,14 @@ function Home (): JSX.Element {
         title='Signature Request'
         type='success'
       />
+      <MergeModal
+        onClose={() => setMergeModal(false)}
+        onSuccess={() => {
+          setMergeModal(false);
+          setView('History');
+        }}
+        open={mergeModal}
+      />
 
       <h1>{`r/${session.subReddit.name}`}</h1>
       <Address
@@ -171,12 +219,12 @@ function Home (): JSX.Element {
       />
 
       <Tabs
-        options={[ 'Transfer', 'History', 'Merch' ]}
+        options={[ 'Transfer', 'History', 'Merch', 'Support' ]}
         selected={view}
-        onSelect={setView}
+        onSelect={(selected: IView) => setView(selected)}
       />
 
-      {(view as any) === 'Transfer' && (
+      {(view as IView) === 'Transfer' && (
         <>
           <Input
             type='number'
@@ -225,14 +273,16 @@ function Home (): JSX.Element {
         </>
       )}
 
-      {(view as any) === 'History' && <Transactions />}
+      {(view as IView) === 'History' && <Transactions />}
 
-      {(view as any) === 'Merch' && (
+      {(view as IView) === 'Merch' && (
         <Merch
           onSuccess={() => setView('History')}
           session={session}
         />
       )}
+
+      {(view as IView) === 'Support' && <Support />}
     </div>
   );
 }

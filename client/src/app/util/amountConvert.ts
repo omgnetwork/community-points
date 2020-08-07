@@ -1,6 +1,6 @@
 import BigNumber from 'bignumber.js';
 
-export function logAmount (amount: any, power: number): string {
+export function logAmount (amount: string | number, power: number): string {
   const x = new BigNumber(amount);
   const exp = new BigNumber(10).pow(power);
 
@@ -8,7 +8,7 @@ export function logAmount (amount: any, power: number): string {
   return calculated.toFixed();
 }
 
-export function powAmount (amount: any, power: number): string {
+export function powAmount (amount: string | number, power: number): string {
   const x = new BigNumber(amount);
   const exp = new BigNumber(10).pow(power);
 
@@ -16,7 +16,7 @@ export function powAmount (amount: any, power: number): string {
   return calculated.toFixed(0);
 }
 
-export function powAmountAsBN (amount: any, power: number): BigNumber {
+export function powAmountAsBN (amount: string | number, power: number): BigNumber {
   const x = new BigNumber(amount);
   const exp = new BigNumber(10).pow(power);
   return x.multipliedBy(exp);
