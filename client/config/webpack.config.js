@@ -25,6 +25,7 @@ module.exports = {
     modules: [ 'src', 'node_modules' ]
   },
   plugins: [
+    new Dotenv(),
     new CopyPlugin({
       patterns: [
         { from: path.resolve(__dirname, './manifest.json'), to: BUILD_PATH },
@@ -36,7 +37,6 @@ module.exports = {
       filename: 'app.html',
       inject: false
     }),
-    new Dotenv(),
     new CleanWebpackPlugin()
   ],
   module: {
