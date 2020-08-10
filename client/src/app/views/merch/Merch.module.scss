@@ -12,9 +12,10 @@
     overflow-y: scroll;
     .flair {
       height: 50px;
+      width: 60px;
       cursor: pointer;
-      padding: 5px;
       margin: 5px;
+      padding: 5px;
       transition: all 200ms ease-in-out;
       display: flex;
       flex-direction: column;
@@ -34,7 +35,7 @@
       }
       img {
         margin-bottom: 5px;
-        width: 25px;
+        height: 30px;
         object-fit: cover;
       }
       .price {
