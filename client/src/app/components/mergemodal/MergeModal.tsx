@@ -74,7 +74,7 @@ function MergeModal ({
         {"You currently don't have enough large value UTXOs to cover this amount with less than 4 UTXOs. Since the OMG Network is limited to spend 4 UTXOs per transaction, you need to merge some UTXOs."}
       </p>
       <p>
-        Click the button below to create a merge transaction. A merge transaction is simply a free transaction to yourself that merges 4 of your UTXOs into 1. You are not spending or losing any points with this transaction.
+        Click the button below to create a merge transaction. A merge transaction is simply a free transaction to yourself that merges 4 of your UTXOs into 1. You will not lose any points with this transaction.
       </p>
       <div className={styles.actions}>
         <Button
