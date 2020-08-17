@@ -49,6 +49,9 @@ function Main (): JSX.Element {
   useEffect(() => {
     async function fetchConfig () {
       const subRedditConfig = await configService.fetchConfig();
+      if (!subRedditConfig) {
+        return setView('ERROR');
+      }
       dispatch(saveConfig(subRedditConfig));
       return setConfigFetched(true);
     }

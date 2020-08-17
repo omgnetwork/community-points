@@ -7,9 +7,10 @@ import { useSelector } from 'react-redux';
 import * as locationService from 'app/services/locationService';
 import { selectTransactions } from 'app/selectors/transactionSelector';
 import { selectUserAddressMap, getUsernameFromMap } from 'app/selectors/addressSelector';
+import { selectConfig } from 'app/selectors/configSelector';
 import { logAmount } from 'app/util/amountConvert';
 
-import { ITransaction, IUserAddress } from 'interfaces';
+import { ITransaction, IUserAddress, IConfig } from 'interfaces';
 
 import omgcp_thickarrow from 'app/images/omgcp_thickarrow.svg';
 import omgcp_merge_arrow from 'app/images/omgcp_merge_arrow.svg';
@@ -24,6 +25,7 @@ function Transactions (): JSX.Element {
   const [ visibleTransactions, setVisibleTransactions ]: [ ITransaction[], Dispatch<SetStateAction<ITransaction[]>> ] = useState([]);
   const [ visibleCount, setVisibleCount ]: [ number, Dispatch<SetStateAction<number>> ] = useState(TRANSACTIONS_PER_PAGE);
 
+  const subRedditConfig: IConfig = useSelector(selectConfig);
   const allTransactions: ITransaction[] = useSelector(selectTransactions);
   const userAddressMap: IUserAddress[] = useSelector(selectUserAddressMap);
 
@@ -56,8 +58,8 @@ function Transactions (): JSX.Element {
         const isMerge: boolean = transaction.direction === 'merge';
 
         const otherUsername: string = (isIncoming || isMerge)
-          ? getUsernameFromMap(transaction.sender, userAddressMap)
-          : getUsernameFromMap(transaction.recipient, userAddressMap);
+          ? getUsernameFromMap(subRedditConfig, transaction.sender, userAddressMap)
+          : getUsernameFromMap(subRedditConfig, transaction.recipient, userAddressMap);
 
         return (
           <div

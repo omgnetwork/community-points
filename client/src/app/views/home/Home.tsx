@@ -20,10 +20,11 @@ import PointBalance from 'app/components/pointbalance/PointBalance';
 import Tabs from 'app/components/tabs/Tabs';
 import MergeModal from 'app/components/mergemodal/MergeModal';
 
-import { ISession, IUserAddress, ITransaction } from 'interfaces';
+import { ISession, IUserAddress, ITransaction, IConfig } from 'interfaces';
 import { transfer, getSession, getTransactions, getUserAddressMap, clearError } from 'app/actions';
 import { selectError } from 'app/selectors/uiSelector';
 import { selectSession } from 'app/selectors/sessionSelector';
+import { selectConfig } from 'app/selectors/configSelector';
 import { selectUserAddressMap, getUsernameFromMap } from 'app/selectors/addressSelector';
 import { selectIsPendingTransaction, selectTransactions } from 'app/selectors/transactionSelector';
 
@@ -51,6 +52,7 @@ function Home (): JSX.Element {
   const [ signatureAlert, setSignatureAlert ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
   const [ mergeModal, setMergeModal ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
 
+  const subRedditConfig: IConfig = useSelector(selectConfig);
   const errorMessage: string = useSelector(selectError);
   const session: ISession = useSelector(selectSession);
   const isPendingTransaction: boolean = useSelector(selectIsPendingTransaction);
@@ -67,7 +69,7 @@ function Home (): JSX.Element {
           chrome.notifications.create(tx.txhash, {
             type: 'basic',
             title: 'New Transaction',
-            message: `${getUsernameFromMap(tx.sender, userAddressMap) || truncate(tx.sender, 6, 4, '...')} has sent you ${logAmount(tx.amount, tx.decimals)} ${tx.symbol}`,
+            message: `${getUsernameFromMap(subRedditConfig, tx.sender, userAddressMap) || truncate(tx.sender, 6, 4, '...')} has sent you ${logAmount(tx.amount, tx.decimals)} ${tx.symbol}`,
             iconUrl: chrome.runtime.getURL('images/favicon.png')
           });
         } catch (error) {
