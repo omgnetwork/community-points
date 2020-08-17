@@ -6,8 +6,6 @@ import { truncate as _truncate } from 'lodash';
 import truncate from 'truncate-middle';
 import { useDispatch, useSelector } from 'react-redux';
 
-import subRedditMap from 'subRedditMap';
-
 import Transactions from 'app/views/transactions/Transactions';
 import Merch from 'app/views/merch/Merch';
 import Loading from 'app/views/loading/Loading';
@@ -31,6 +29,7 @@ import { selectIsPendingTransaction, selectTransactions } from 'app/selectors/tr
 
 import * as omgService from 'app/services/omgService';
 import * as networkService from 'app/services/networkService';
+import * as locationService from 'app/services/locationService';
 import * as errorService from 'app/services/errorService';
 
 import { powAmount, powAmountAsBN, logAmount } from 'app/util/amountConvert';
@@ -59,6 +58,7 @@ function Home (): JSX.Element {
 
   const newTransactions: ITransaction[] = useSelector(selectTransactions);
   const prevTransactions: ITransaction[] = usePrevious(newTransactions);
+
   useEffect(() => {
     const incomingTxs = networkService.checkForIncomingTransactions(prevTransactions, newTransactions);
     if (incomingTxs) {
@@ -83,27 +83,14 @@ function Home (): JSX.Element {
   }, [dispatch]);
 
   useInterval(() => {
-    try {
-      // only make the poll if on the subreddit
-      chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-        const currentTabUrl = tabs[0].url;
-        const subReddit = currentTabUrl.match(/reddit.com\/r\/(.*?)\//);
-        if (!subReddit) {
-          return null;
-        }
-        const name = subReddit[1];
-        const subRedditObject = subRedditMap[name];
-        if (subRedditObject) {
-          dispatch(getSession());
-          setTimeout(() => {
-            // add a 2 sec delay to give a chance for session data to be available on the first history fetch
-            dispatch(getTransactions());
-          }, 2 * 1000);
-        }
-      });
-    } catch (error) {
-      //
+    function pollSessionAndTransactions (): void {
+      dispatch(getSession());
+      setTimeout(() => {
+        // add a 2 sec delay to give a chance for session data to be available on the first history fetch
+        dispatch(getTransactions());
+      }, 2 * 1000);
     }
+    locationService.onValidSubreddit(pollSessionAndTransactions);
   }, 15 * 1000);
 
   async function handleTransfer (): Promise<void> {

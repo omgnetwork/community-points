@@ -2,7 +2,7 @@ import { createAction } from 'app/actions/createAction';
 import * as networkService from 'app/services/networkService';
 import * as redditService from 'app/services/redditService';
 
-import { ISubReddit } from 'interfaces';
+import { ISubReddit, IConfig } from 'interfaces';
 
 export function getSession () {
   return createAction(
@@ -70,5 +70,11 @@ export function showError (message: string) {
 export function saveSubReddit (subReddit: ISubReddit) {
   return function dispatchSaveSubReddit (dispatch) {
     return dispatch({ type: 'SUBREDDIT/GET/SUCCESS', payload: subReddit });
+  };
+}
+
+export function saveConfig (config: IConfig) {
+  return function dispatchSaveConfig (dispatch) {
+    return dispatch({ type: 'CONFIG/GET/SUCCESS', payload: config });
   };
 }

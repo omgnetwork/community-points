@@ -1,7 +1,9 @@
 import { get } from 'lodash';
 
-import subRedditMap from 'subRedditMap';
-import { IUserAddress } from 'interfaces';
+import { IUserAddress, IConfig } from 'interfaces';
+
+// TODO: replace with state config selection
+const subRedditMap: IConfig = {};
 
 export function selectUserAddressMap (state): IUserAddress[] {
   return Object.values(state.address);

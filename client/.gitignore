@@ -5,4 +5,3 @@ yarn-error.log
 .DS_Store
 release/*.zip
 package-lock.json
-src/subRedditMap.ts

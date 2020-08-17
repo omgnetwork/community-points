@@ -1,3 +1,7 @@
+export interface ITab {
+  url: string
+}
+
 export interface IMessage {
   type: string,
   payload?: any,
@@ -16,6 +20,10 @@ export interface ITransaction {
   symbol: string,
   decimals: number,
   timestamp: number
+}
+
+export interface IConfig {
+  [subreddit: string]: ISubReddit
 }
 
 export interface ISubReddit {
