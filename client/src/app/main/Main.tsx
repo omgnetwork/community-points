@@ -47,6 +47,8 @@ function Main (): JSX.Element {
 
   // 0. fetch subreddit config
   useEffect(() => {
+    dispatch({ type: 'ROOT/FLUSH' });
+
     async function fetchConfig () {
       const subRedditConfig = await configService.fetchConfig();
       if (!subRedditConfig) {
