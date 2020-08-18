@@ -52,7 +52,7 @@ function Main (): JSX.Element {
       if (!subRedditConfig) {
         return setView('ERROR');
       }
-      dispatch(saveConfig(subRedditConfig));
+      await dispatch(saveConfig(subRedditConfig));
       return setConfigFetched(true);
     }
     withErrorHandler(fetchConfig);
