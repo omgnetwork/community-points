@@ -14,9 +14,13 @@ if (config.sentryDsn) {
 }
 
 export function log (error: Error): void {
-  console.log(error.toString());
-  if (config.sentryDsn) {
-    Sentry.captureException(error);
+  try {
+    console.log(error.toString());
+    if (config.sentryDsn) {
+      Sentry.captureException(error);
+    }
+  } catch (error) {
+    // silence any sentry/error reporting errors
   }
 }
 
