@@ -15,7 +15,7 @@ function parseResponse (res: AxiosResponse): any {
       throw new Error(JSON.stringify(response.data));
     }
   } catch (error) {
-    throw new Error(`Unable to parse response from server: ${JSON.stringify(error)}`);
+    throw new Error(`Unable to parse response from server: ${error.message}`);
   }
 }
 

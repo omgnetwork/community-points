@@ -1,18 +1,17 @@
 import { get } from 'lodash';
 
-import subRedditMap from 'subRedditMap';
-import { IUserAddress } from 'interfaces';
+import { IUserAddress, IConfig } from 'interfaces';
 
 export function selectUserAddressMap (state): IUserAddress[] {
   return Object.values(state.address);
 }
 
-export function getUsernameFromMap (address: string, userAddressMap: IUserAddress[]): string {
+export function getUsernameFromMap (subRedditConfig: IConfig, address: string, userAddressMap: IUserAddress[]): string {
   if (!address) {
     return null;
   }
 
-  const flairAddresses = Object.values(subRedditMap).map(i => i.flairAddress.toLowerCase());
+  const flairAddresses = Object.values(subRedditConfig).map(i => i.flairAddress.toLowerCase());
   if (flairAddresses.includes(address.toLowerCase())) {
     return 'Flair Purchase';
   }
@@ -27,7 +26,7 @@ export function getUsernameFromMap (address: string, userAddressMap: IUserAddres
 export function selectUsername (address: string) {
   return function selectUsernameFromState (state): string {
     const userAddressMap: IUserAddress[] = Object.values(state.address);
-    return getUsernameFromMap(address, userAddressMap);
+    return getUsernameFromMap(state.config, address, userAddressMap);
   };
 }
 

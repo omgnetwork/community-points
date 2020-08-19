@@ -14,7 +14,6 @@ This project is a Chrome extension used to transfer community points directly in
 ### Development
 
 - create a `.env` file with values shown in `.env.template`
-- create `src/subRedditMap.ts` with values shown in `src/subRedditMap.ts.template`
 - `yarn install` to install dependencies
 - `yarn build:dev` to compile application
 - in a Chrome based browser (Brave or Chrome), open `Extensions` (brave:://extensions or chrome:://extensions) in `Developer mode`, and click `Load unpacked` and select the `build` folder

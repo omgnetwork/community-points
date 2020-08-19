@@ -2,10 +2,11 @@ import * as React from 'react';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 
-import { saveSubReddit } from 'app/actions';
+import { saveSubReddit, saveConfig } from 'app/actions';
 
 import * as locationService from 'app/services/locationService';
 import * as networkService from 'app/services/networkService';
+import * as configService from 'app/services/configService';
 import * as errorService from 'app/services/errorService';
 
 import Loading from 'app/views/loading/Loading';
@@ -25,6 +26,7 @@ function Main (): JSX.Element {
   const dispatch = useDispatch();
   const [ view, setView ]: [ IViewState, Dispatch<SetStateAction<IViewState>> ] = useState('LOADING');
 
+  const [ configFetched, setConfigFetched ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
   const [ validSubReddit, setValidSubReddit ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
   const [ providerEnabled, setProviderEnabled ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
   const [ correctNetwork, setCorrectNetwork ]: [ boolean, Dispatch<SetStateAction<boolean>> ] = useState(false);
@@ -43,9 +45,23 @@ function Main (): JSX.Element {
     }
   }
 
-  // 1. check if valid subreddit
+  // 0. fetch subreddit config
   useEffect(() => {
     dispatch({ type: 'ROOT/FLUSH' });
+
+    async function fetchConfig () {
+      const subRedditConfig = await configService.fetchConfig();
+      if (!subRedditConfig) {
+        return setView('ERROR');
+      }
+      await dispatch(saveConfig(subRedditConfig));
+      return setConfigFetched(true);
+    }
+    withErrorHandler(fetchConfig);
+  }, []);
+
+  // 1. check if valid subreddit
+  useEffect(() => {
     async function checkCurrentPage () {
       const validSubReddit = await locationService.getCurrentSubReddit();
       if (!validSubReddit) {
@@ -54,8 +70,10 @@ function Main (): JSX.Element {
       dispatch(saveSubReddit(validSubReddit));
       return setValidSubReddit(true);
     }
-    withErrorHandler(checkCurrentPage);
-  }, []);
+    if (configFetched) {
+      withErrorHandler(checkCurrentPage);
+    }
+  }, [configFetched]);
 
   // 2. check if provider installed, and enable if so
   useEffect(() => {
