@@ -20,6 +20,11 @@
         "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/master/client/images/flair_soon.png",
         "price": 10000,
         "metaId": "flair_soon"
+      },
+      "flair_soon_test": {
+        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/master/client/images/flair_soon.png",
+        "price": 20000,
+        "metaId": "flair_soon"
       }
     }
   }
