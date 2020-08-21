@@ -70,7 +70,7 @@ function Home (): JSX.Element {
             type: 'basic',
             title: 'New Transaction',
             message: `${getUsernameFromMap(subRedditConfig, tx.sender, userAddressMap) || truncate(tx.sender, 6, 4, '...')} has sent you ${logAmount(tx.amount, tx.decimals)} ${tx.symbol}`,
-            iconUrl: chrome.runtime.getURL('images/favicon.png')
+            iconUrl: chrome.runtime.getURL('images/app_icon-48.png')
           });
         } catch (error) {
           // safe catch in case of some issue with notification api
