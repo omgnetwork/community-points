@@ -47,7 +47,8 @@ function Main (): JSX.Element {
 
   // 0. fetch subreddit config
   useEffect(() => {
-    dispatch({ type: 'ROOT/FLUSH' });
+    // clear transaction history since same web3 account not guaranteed
+    dispatch({ type: 'TRANSACTION/CLEAR/SUCCESS' });
 
     async function fetchConfig () {
       const subRedditConfig = await configService.fetchConfig();
