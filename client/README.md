@@ -1,4 +1,4 @@
-## Reddit Wallet - Chrome Extension
+## Community Points Engine - Chrome Extension
 
 This project is a Chrome extension used to transfer community points directly in the browser. It is powered by the OMG Network.
 
