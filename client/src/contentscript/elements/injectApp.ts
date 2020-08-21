@@ -48,7 +48,7 @@ function injectApp (): void {
       id='omgcp-header'
     >
       <span>
-        Reddit Wallet
+        Community Points Engine
       </span>
       <button id='omgcp-close-button'>
         𝖷

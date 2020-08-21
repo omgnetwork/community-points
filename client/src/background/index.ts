@@ -37,6 +37,6 @@ chrome.contextMenus.onClicked.addListener(
 
 chrome.contextMenus.create({
   id: 'omgcp-contextmenu',
-  title: 'Reddit Wallet',
+  title: 'Community Points Engine',
   contexts: ['all']
 });
