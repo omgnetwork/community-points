@@ -61,10 +61,10 @@ function logError(error) {
       const flairArrays = flair.buildMultipleUserFlairs(
         rUsers,
         getFlair('flair_rock', ':rock:', 1500),
-        getFlair('flair_salamander', ':salamander:', 7000),
-        getFlair('flair_soonalisa', ':snl:', 10000),
+        getFlair('flair_wave', ':wave:', 3000),
         getFlair('flair_skate', ':skb:', 5000),
-        getFlair('flair_wave', ':wave:', 3000)
+        getFlair('flair_salamander', ':salamander:', 7000),
+        getFlair('flair_soonalisa', ':snl:', 10000)
       )
       if (flairArrays.length > 0) {
         console.log(flairArrays)
