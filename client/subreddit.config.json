@@ -23,12 +23,12 @@
       },
       "flair_skate": {
         "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/nm-new-flairs/client/images/flair_skate.png",
-        "price": 20000,
+        "price": 5000,
         "metaId": "flair_skate"
       },
       "flair_wave": {
         "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/nm-new-flairs/client/images/flair_wave.png",
-        "price": 30000,
+        "price": 3000,
         "metaId": "flair_wave"
       }
     }
