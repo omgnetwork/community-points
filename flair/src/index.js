@@ -62,7 +62,9 @@ function logError(error) {
         rUsers,
         getFlair('flair_rock', ':rock:', 1500),
         getFlair('flair_salamander', ':salamander:', 7000),
-        getFlair('flair_soon', ':soon:', 10000)
+        getFlair('flair_soonalisa', ':soon:', 10000),
+        getFlair('flair_skate', ':soon:', 20000),
+        getFlair('flair_wave', ':soon:', 30000)
       )
       if(flairArrays.length > 0) {
         console.log(flairArrays)

@@ -7,19 +7,29 @@
     "flairAddress": "0x000000000000000000000000000000000000dead",
     "flairMap": {
       "flair_rock": {
-        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/master/client/images/flair_rock.png",
+        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/nm-new-flairs/client/images/flair_rock.png",
         "price": 1500,
         "metaId": "flair_rock"
       },
       "flair_salamander": {
-        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/master/client/images/flair_salamander.png",
+        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/nm-new-flairs/client/images/flair_salamander.png",
         "price": 7000,
         "metaId": "flair_salamander"
       },
-      "flair_soon": {
-        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/master/client/images/flair_soon.png",
+      "flair_soonalisa": {
+        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/nm-new-flairs/client/images/flair_soonalisa.png",
         "price": 10000,
-        "metaId": "flair_soon"
+        "metaId": "flair_soonalisa"
+      },
+      "flair_skate": {
+        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/nm-new-flairs/client/images/flair_skate.png",
+        "price": 20000,
+        "metaId": "flair_skate"
+      },
+      "flair_wave": {
+        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/nm-new-flairs/client/images/flair_wave.png",
+        "price": 30000,
+        "metaId": "flair_wave"
       }
     }
   }
