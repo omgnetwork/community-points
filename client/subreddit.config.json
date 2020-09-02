@@ -11,15 +11,25 @@
         "price": 1500,
         "metaId": "flair_rock"
       },
+      "flair_wave": {
+        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/master/client/images/flair_wave.png",
+        "price": 3000,
+        "metaId": "flair_wave"
+      },
+      "flair_skate": {
+        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/master/client/images/flair_skate.png",
+        "price": 5000,
+        "metaId": "flair_skate"
+      },
       "flair_salamander": {
         "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/master/client/images/flair_salamander.png",
         "price": 7000,
         "metaId": "flair_salamander"
       },
-      "flair_soon": {
-        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/master/client/images/flair_soon.png",
+      "flair_soonalisa": {
+        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/master/client/images/flair_soonalisa.png",
         "price": 10000,
-        "metaId": "flair_soon"
+        "metaId": "flair_soonalisa"
       }
     }
   }
