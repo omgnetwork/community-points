@@ -1,11 +1,13 @@
 import { IAction } from 'interfaces';
 
 interface UiState {
-  error: string
+  error: string,
+  transactionsFetched: boolean
 }
 
 const initialState: UiState = {
-  error: null
+  error: null,
+  transactionsFetched: false
 };
 
 function uiReducer (
@@ -15,6 +17,10 @@ function uiReducer (
   switch (action.type) {
     case 'UI/ERROR/UPDATE':
       return { ...state, error: action.payload };
+    case 'TRANSACTION/GETALL/SUCCESS':
+      return { ...state, transactionsFetched: true };
+    case 'TRANSACTION/CLEAR/SUCCESS':
+      return { ...state, transactionsFetched: false };
     default:
       return state;
   }

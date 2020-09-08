@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ISession, IFlair, IFlairMap } from 'interfaces';
 import { powAmount, powAmountAsBN } from 'app/util/amountConvert';
 import { selectIsPendingTransaction, selectPurchasedFlairs } from 'app/selectors/transactionSelector';
+import { selectTransactionsFetched } from 'app/selectors/uiSelector';
 import * as networkService from 'app/services/networkService';
 import * as errorService from 'app/services/errorService';
 
@@ -37,6 +38,7 @@ function Merch ({
 
   const isPendingTransaction: boolean = useSelector(selectIsPendingTransaction);
   const purchasedFlairs: IFlairMap = useSelector(selectPurchasedFlairs);
+  const transactionsFetched: boolean = useSelector(selectTransactionsFetched);
 
   async function handleTransfer (): Promise<void> {
     try {
@@ -89,6 +91,14 @@ function Merch ({
       return true;
     }
     return false;
+  }
+
+  if (!transactionsFetched) {
+    return (
+      <div>
+        Loading...
+      </div>
+    );
   }
 
   return (
