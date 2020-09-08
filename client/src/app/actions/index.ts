@@ -55,6 +55,13 @@ export function getUserAddressMap () {
   );
 }
 
+export function getUserAvatar (username: string) {
+  return createAction(
+    'USERAVATAR/GET',
+    () => redditService.getUserAvatar(username)
+  );
+}
+
 export function clearError () {
   return function dispatchClearError (dispatch) {
     return dispatch({ type: 'UI/ERROR/UPDATE', payload: null });

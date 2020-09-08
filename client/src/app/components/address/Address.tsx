@@ -1,11 +1,13 @@
 import * as React from 'react';
+import { useEffect } from 'react';
 import truncate from 'truncate-middle';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import { ISession, IFlairMap, IFlair } from 'interfaces';
 import { selectSession } from 'app/selectors/sessionSelector';
 import { selectUsername, selectAvatarByAddress } from 'app/selectors/addressSelector';
 import { selectPurchasedFlairs } from 'app/selectors/transactionSelector';
+import { getUserAvatar } from 'app/actions';
 
 import Option from 'app/components/option/Option';
 
@@ -20,10 +22,18 @@ function Address ({
   address,
   className
 }: AddressProps): JSX.Element {
+  const dispatch = useDispatch();
+
   const username: string = useSelector(selectUsername(address));
   const avatar: string = useSelector(selectAvatarByAddress(address));
   const purchasedFlairs: IFlairMap = useSelector(selectPurchasedFlairs);
   const session: ISession = useSelector(selectSession);
+
+  useEffect(() => {
+    if (username && !avatar) {
+      dispatch(getUserAvatar(username));
+    }
+  }, [ username, avatar ]);
 
   return (
     <div
