@@ -191,9 +191,17 @@ export async function getSpendableUtxos ({
     const spendableSum = spendableUtxos.reduce((prev, curr) => {
       return prev.add(new BN(curr.amount.toString()));
     }, new BN(0));
+
     if (spendableSum.gte(new BN(amount.toString()))) {
+      // fill inputs with the next utxo
+      if (spendableUtxos.length < 3) {
+        spendableUtxos.push(utxo);
+        continue;
+      }
+      // reaching this break succeeds this function
       break;
     }
+
     if (spendableUtxos.length === 3) {
       throw new Error('No more inputs available');
     }
