@@ -21,11 +21,11 @@ import Tabs from 'app/components/tabs/Tabs';
 import MergeModal from 'app/components/mergemodal/MergeModal';
 
 import { ISession, IUserAddress, ITransaction, IConfig } from 'interfaces';
-import { transfer, getSession, getTransactions, getUserAddressMap, clearError } from 'app/actions';
+import { transfer, getSession, getTransactions, getUserAddressMap, clearError, getUserAvatar } from 'app/actions';
 import { selectError } from 'app/selectors/uiSelector';
 import { selectSession } from 'app/selectors/sessionSelector';
 import { selectConfig } from 'app/selectors/configSelector';
-import { selectUserAddressMap, getUsernameFromMap } from 'app/selectors/addressSelector';
+import { selectUserAddressMap, getUsernameFromMap, getAvatarFromMap } from 'app/selectors/addressSelector';
 import { selectIsPendingTransaction, selectTransactions } from 'app/selectors/transactionSelector';
 
 import * as omgService from 'app/services/omgService';
@@ -164,6 +164,17 @@ function Home (): JSX.Element {
     dispatch(clearError());
   }
 
+  function onRecipientSelect (recipient: string) {
+    setRecipient(recipient);
+    const username = getUsernameFromMap(subRedditConfig, recipient, userAddressMap);
+    if (username) {
+      const avatar = getAvatarFromMap(username, userAddressMap);
+      if (!avatar) {
+        dispatch(getUserAvatar(username));
+      }
+    }
+  }
+
   if (!session) {
     return (
       <Loading />
@@ -244,7 +255,7 @@ function Home (): JSX.Element {
                   detail: truncate(i.address, 6, 4, '...')
                 };
               })}
-            onSelect={setRecipient}
+            onSelect={onRecipientSelect}
           />
           <Button
             onClick={handleTransfer}

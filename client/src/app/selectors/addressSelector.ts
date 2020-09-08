@@ -23,6 +23,11 @@ export function getUsernameFromMap (subRedditConfig: IConfig, address: string, u
   return username;
 }
 
+export function getAvatarFromMap (username: string, userAddressMap: IUserAddress[]): string {
+  const userObject = userAddressMap.find(i => i.author === username);
+  return userObject.avatar;
+}
+
 export function selectUsername (address: string) {
   return function selectUsernameFromState (state): string {
     const userAddressMap: IUserAddress[] = Object.values(state.address);
