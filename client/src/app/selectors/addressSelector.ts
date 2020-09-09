@@ -25,7 +25,7 @@ export function getUsernameFromMap (subRedditConfig: IConfig, address: string, u
 
 export function getAvatarFromMap (username: string, userAddressMap: IUserAddress[]): string {
   const userObject = userAddressMap.find(i => i.author === username);
-  return userObject.avatar;
+  return get(userObject, 'avatar', null);
 }
 
 export function selectUsername (address: string) {
