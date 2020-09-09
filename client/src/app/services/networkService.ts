@@ -38,7 +38,7 @@ export async function signTypedData (account, typedData): Promise<string> {
 
 export async function getActiveAccount (): Promise<string> {
   const account = await messageService.send({ type: 'WEB3/ACCOUNT' });
-  return account;
+  return account ? account.toLowerCase() : null;
 };
 
 export async function getSession (): Promise<ISession> {
@@ -161,6 +161,7 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
       status: 'Confirmed',
       sender,
       recipient,
+      user,
       amount: amount.toString(),
       metadata: omgService.decodeMetadata(transaction.metadata),
       currency: session.subReddit.token,
@@ -249,6 +250,7 @@ export async function merge ({
     txhash: submittedTransaction.txhash,
     status: 'Pending',
     sender: account,
+    user: account,
     recipient: account,
     amount: amount.toString(),
     metadata: _metadata,
@@ -322,6 +324,7 @@ export async function transfer ({
     txhash: submittedTransaction.txhash,
     status: 'Pending',
     sender: account,
+    user: account,
     recipient,
     amount,
     metadata,

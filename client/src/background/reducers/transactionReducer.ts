@@ -13,11 +13,24 @@ function transactionReducer (
 ): TransactionState {
   switch (action.type) {
     case 'TRANSACTION/GETALL/SUCCESS':
-      return { ...state, ...keyBy(action.payload, 'txhash') };
+      if (action.payload.length) {
+        return {
+          ...state,
+          [action.payload[0].user]: {
+            ...state[action.payload[0].user],
+            ...keyBy(action.payload, 'txhash')
+          }
+        };
+      }
+      return state;
     case 'TRANSACTION/CREATE/SUCCESS':
-      return { ...state, [action.payload.txhash]: action.payload };
-    case 'TRANSACTION/CLEAR/SUCCESS':
-      return {};
+      return {
+        ...state,
+        [action.payload.user]: {
+          ...state[action.payload.user],
+          [action.payload.txhash]: action.payload
+        }
+      };
     default:
       return state;
   }

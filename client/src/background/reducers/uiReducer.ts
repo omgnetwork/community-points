@@ -19,8 +19,6 @@ function uiReducer (
       return { ...state, error: action.payload };
     case 'TRANSACTION/GETALL/SUCCESS':
       return { ...state, transactionsFetched: true };
-    case 'TRANSACTION/CLEAR/SUCCESS':
-      return { ...state, transactionsFetched: false };
     default:
       return state;
   }

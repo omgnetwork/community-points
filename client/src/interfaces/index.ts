@@ -13,6 +13,7 @@ export interface ITransaction {
   txhash: string,
   status: 'Pending' | 'Confirmed',
   sender: string,
+  user: string,
   recipient: string,
   amount: any,
   metadata: string,
