@@ -40,6 +40,8 @@ function Merch ({
   const purchasedFlairs: IFlairMap = useSelector(selectPurchasedFlairs);
   const transactionsFetched: boolean = useSelector(selectTransactionsFetched);
 
+  const unleveledFlairs = Object.values(session.subReddit.flairMap).filter(i => !i.metaId.includes(':'));
+
   async function handleTransfer (): Promise<void> {
     try {
       setTransferLoading(true);
@@ -93,6 +95,57 @@ function Merch ({
     return false;
   }
 
+  function renderFlair (flairData: IFlair, purchased: boolean): JSX.Element {
+    return (
+      <div
+        key={flairData.metaId}
+        className={[
+          styles.flair,
+          flairData.metaId === get(flair, 'metaId') ? styles.selected : '',
+          purchased ? styles.disabled : ''
+        ].join(' ')}
+        onClick={() => setFlair(flairData)}
+      >
+        <img src={flairData.icon} alt='flair-icon' />
+        <div className={styles.price}>
+          {purchased
+            ? 'OWNED'
+            : `${numbro(flairData.price).format({ thousandSeparated: true })} ${session.subReddit.symbol}`
+          }
+        </div>
+      </div>
+    );
+  }
+
+  function renderHighestLevelFlair (metaId: string): JSX.Element {
+    const flairData: IFlair = Object.values(session.subReddit.flairMap).find(i => i.metaId === metaId);
+    if (!flairData) {
+      // should never reach here, but in case we do
+      return null;
+    }
+
+    const purchased: IFlair = purchasedFlairs[flairData.metaId];
+    if (purchased) {
+      // check if a level up is available first
+      const splitMetaId = metaId.split(':');
+      if (splitMetaId.length === 2) {
+        // is a leveled flair
+        const nextLevelMetaId = `${splitMetaId[0]}:${splitMetaId[1] + 1}`;
+        const nextLevelValid = Object.values(session.subReddit.flairMap).find(i => i.metaId === nextLevelMetaId);
+        if (nextLevelValid) {
+          // recurse for next level
+          return renderHighestLevelFlair(nextLevelMetaId);
+        }
+        // no next level flair available, render as purchased
+        return renderFlair(flairData, true);
+      }
+      // is a base flair, render as is as purchased
+      return renderFlair(flairData, true);
+    }
+    // unpurchased, render as is
+    return renderFlair(flairData, false);
+  }
+
   if (!transactionsFetched) {
     return (
       <div>
@@ -118,27 +171,8 @@ function Merch ({
       />
 
       <div className={styles.flairList}>
-        {Object.values(session.subReddit.flairMap).map((_flair: IFlair, index: number) => {
-          const purchased = purchasedFlairs[_flair.metaId];
-          return (
-            <div
-              key={index}
-              className={[
-                styles.flair,
-                _flair.metaId === get(flair, 'metaId') ? styles.selected : '',
-                purchased ? styles.disabled : ''
-              ].join(' ')}
-              onClick={() => setFlair(_flair)}
-            >
-              <img src={_flair.icon} alt='flair-icon' />
-              <div className={styles.price}>
-                {purchased
-                  ? 'OWNED'
-                  : `${numbro(_flair.price).format({ thousandSeparated: true })} ${session.subReddit.symbol}`
-                }
-              </div>
-            </div>
-          );
+        {unleveledFlairs.map((unleveledFlair: IFlair) => {
+          return renderHighestLevelFlair(unleveledFlair.metaId);
         })}
       </div>
 
