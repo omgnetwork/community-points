@@ -126,21 +126,16 @@ function Merch ({
 
     const purchased: IFlair = purchasedFlairs[flairData.metaId];
     if (purchased) {
-      // check if a level up is available first
+      // check if the next level up is available first
       const splitMetaId = metaId.split(':');
-      if (splitMetaId.length === 2) {
-        // is a leveled flair
-        const nextLevelMetaId = `${splitMetaId[0]}:${splitMetaId[1] + 1}`;
-        const nextLevelValid = Object.values(session.subReddit.flairMap).find(i => i.metaId === nextLevelMetaId);
-        if (nextLevelValid) {
-          // recurse for next level
-          return renderHighestLevelFlair(nextLevelMetaId);
-        }
-        // no next level flair available, render as purchased
-        return renderFlair(flairData, true);
-      }
-      // is a base flair, render as is as purchased
-      return renderFlair(flairData, true);
+      const nextLevelMetaId = splitMetaId.length === 2
+        ? `${splitMetaId[0]}:${Number(splitMetaId[1]) + 1}`
+        : `${metaId}:2`;
+
+      const validNextLevel = Object.values(session.subReddit.flairMap).find(i => i.metaId === nextLevelMetaId);
+      return validNextLevel
+        ? renderHighestLevelFlair(nextLevelMetaId)
+        : renderFlair(flairData, true);
     }
     // unpurchased, render as is
     return renderFlair(flairData, false);
