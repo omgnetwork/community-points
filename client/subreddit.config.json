@@ -11,6 +11,11 @@
         "price": 1500,
         "metaId": "flair_rock"
       },
+      "flair_rock:2": {
+        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/master/client/images/flair_rock.png",
+        "price": 1500,
+        "metaId": "flair_rock:2"
+      },
       "flair_wave": {
         "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/master/client/images/flair_wave.png",
         "price": 3000,
