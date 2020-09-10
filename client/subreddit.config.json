@@ -14,7 +14,7 @@
       },
       "flair_rock:2": {
         "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/nm-flair-levelups/client/images/flair_rock_2.png",
-        "price": 1502,
+        "price": 1500,
         "metaId": "flair_rock:2",
         "title": "Super Rock"
       },
@@ -23,6 +23,12 @@
         "price": 3000,
         "metaId": "flair_wave",
         "title": "Wave"
+      },
+      "flair_wave:2": {
+        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/nm-flair-levelups/client/images/flair_rock_2.png",
+        "price": 3000,
+        "metaId": "flair_wave:2",
+        "title": "Super Wave"
       },
       "flair_skate": {
         "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/nm-flair-levelups/client/images/flair_skate.png",

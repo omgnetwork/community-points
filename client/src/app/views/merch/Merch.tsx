@@ -180,7 +180,7 @@ function Merch ({
         disabled={disableTransfer()}
         loading={transferLoading}
       >
-        <span>BUY FLAIR</span>
+        <span>{flair && flair.metaId.includes(':') ? 'UPGRADE' : 'BUY FLAIR'}</span>
       </Button>
       {isPendingTransaction && (
         <p className={styles.disclaimer}>
