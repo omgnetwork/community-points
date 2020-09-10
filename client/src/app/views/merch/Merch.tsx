@@ -107,6 +107,9 @@ function Merch ({
         onClick={() => setFlair(flairData)}
       >
         <img src={flairData.icon} alt='flair-icon' />
+        <div className={styles.title}>
+          {flairData.title}
+        </div>
         <div className={styles.price}>
           {purchased
             ? 'OWNED'

@@ -58,7 +58,8 @@ export interface IAction {
 export interface IFlair {
   icon: string,
   price: number,
-  metaId: string
+  metaId: string,
+  title: string
 }
 
 export interface IFlairMap {

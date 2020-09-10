@@ -7,29 +7,40 @@
     "flairAddress": "0x000000000000000000000000000000000000dead",
     "flairMap": {
       "flair_rock": {
-        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/master/client/images/flair_rock.png",
+        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/nm-flair-levelups/client/images/flair_rock.png",
         "price": 1500,
-        "metaId": "flair_rock"
+        "metaId": "flair_rock",
+        "title": "Rock"
+      },
+      "flair_rock:2": {
+        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/nm-flair-levelups/client/images/flair_rock_2.png",
+        "price": 1502,
+        "metaId": "flair_rock:2",
+        "title": "Super Rock"
       },
       "flair_wave": {
-        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/master/client/images/flair_wave.png",
+        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/nm-flair-levelups/client/images/flair_wave.png",
         "price": 3000,
-        "metaId": "flair_wave"
+        "metaId": "flair_wave",
+        "title": "Wave"
       },
       "flair_skate": {
-        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/master/client/images/flair_skate.png",
+        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/nm-flair-levelups/client/images/flair_skate.png",
         "price": 5000,
-        "metaId": "flair_skate"
+        "metaId": "flair_skate",
+        "title": "Skate"
       },
       "flair_salamander": {
-        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/master/client/images/flair_salamander.png",
+        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/nm-flair-levelups/client/images/flair_salamander.png",
         "price": 7000,
-        "metaId": "flair_salamander"
+        "metaId": "flair_salamander",
+        "title": "Salamander"
       },
       "flair_soonalisa": {
-        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/master/client/images/flair_soonalisa.png",
+        "icon": "https://raw.githubusercontent.com/omgnetwork/community-points/nm-flair-levelups/client/images/flair_soonalisa.png",
         "price": 10000,
-        "metaId": "flair_soonalisa"
+        "metaId": "flair_soonalisa",
+        "title": "Soonalisa"
       }
     }
   }
