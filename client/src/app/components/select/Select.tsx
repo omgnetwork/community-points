@@ -123,7 +123,7 @@ function Select ({
                   onClick={() => handleOptionClick(option)}
                   title={option.title}
                   detail={option.detail}
-                  image={option.image}
+                  showAvatar={false}
                   selected={option.value === get(selected, 'value')}
                   className={styles.option}
                 />

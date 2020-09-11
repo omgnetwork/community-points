@@ -56,36 +56,30 @@ export async function getUserAddressMap (): Promise<IUserAddress[]> {
   const rawData = await transportService.get({
     url: `${config.userAddressUrl}.json?limit=10000`
   });
-  const _userAddressMap: Partial<IUserAddress[]> = parseThreadJSON(rawData);
-
-  // fetch user avatars
-  const fetchAvatarPromises = _userAddressMap.map((user: Partial<IUserAddress>) => {
-    return getUserAvatar(user.author);
-  });
-
-  const avatars = await Promise.all(fetchAvatarPromises);
-  const userAddressMap = _userAddressMap.map((user: IUserAddress, index: number) => {
-    return {
-      ...user,
-      avatar: avatars[index]
-    };
-  });
-
-  return userAddressMap;
+  return parseThreadJSON(rawData);
 }
 
-export async function getUserAvatar (username: string): Promise<string> {
+export async function getUserAvatar (username: string): Promise<{username: string, avatar: string}> {
   try {
     const userData = await transportService.get({
       url: `https://www.reddit.com/user/${username}/about.json`
     });
     const rawAssetUrl = get(userData, 'data.icon_img', null);
     if (!rawAssetUrl) {
-      return null;
+      return {
+        username,
+        avatar: null
+      };
     }
     const rootHash = rawAssetUrl.split('?');
-    return rootHash[0];
+    return {
+      username,
+      avatar: rootHash[0]
+    };
   } catch (error) {
-    return null;
+    return {
+      username,
+      avatar: null
+    };
   }
 }

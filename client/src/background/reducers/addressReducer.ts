@@ -11,9 +11,29 @@ function addressReducer (
   state: AddressState = initialState,
   action: IAction
 ): AddressState {
+  if (action.type === 'USERADDRESSMAP/GET/SUCCESS') {
+    const stateCopy = { ...state };
+    const freshData = keyBy(action.payload, 'author');
+
+    const usernames = Object.keys(freshData);
+    for (const username of usernames) {
+      stateCopy[username] = {
+        ...stateCopy[username],
+        ...freshData[username]
+      };
+    }
+    return stateCopy;
+  }
+
   switch (action.type) {
-    case 'USERADDRESSMAP/GET/SUCCESS':
-      return { ...state, ...keyBy(action.payload, 'author') };
+    case 'USERAVATAR/GET/SUCCESS':
+      return {
+        ...state,
+        [action.payload.username]: {
+          ...state[action.payload.username],
+          avatar: action.payload.avatar
+        }
+      };
     default:
       return state;
   }

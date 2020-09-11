@@ -13,6 +13,7 @@ export interface ITransaction {
   txhash: string,
   status: 'Pending' | 'Confirmed',
   sender: string,
+  user: string,
   recipient: string,
   amount: any,
   metadata: string,
@@ -57,7 +58,8 @@ export interface IAction {
 export interface IFlair {
   icon: string,
   price: number,
-  metaId: string
+  metaId: string,
+  title: string
 }
 
 export interface IFlairMap {

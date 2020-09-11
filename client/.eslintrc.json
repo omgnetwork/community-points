@@ -30,7 +30,8 @@
 		"no-async-promise-executor": "off",
 		"prefer-promise-reject-errors": "off",
 		"camelcase": "off",
-		"no-undef": "warn"
+		"no-undef": "warn",
+		"react/prop-types": "off"
 	},
 	"settings": {
 		"react": {

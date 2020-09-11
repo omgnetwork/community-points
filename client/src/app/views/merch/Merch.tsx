@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { ISession, IFlair, IFlairMap } from 'interfaces';
 import { powAmount, powAmountAsBN } from 'app/util/amountConvert';
 import { selectIsPendingTransaction, selectPurchasedFlairs } from 'app/selectors/transactionSelector';
+import { selectTransactionsFetched } from 'app/selectors/uiSelector';
 import * as networkService from 'app/services/networkService';
 import * as errorService from 'app/services/errorService';
 
@@ -37,6 +38,9 @@ function Merch ({
 
   const isPendingTransaction: boolean = useSelector(selectIsPendingTransaction);
   const purchasedFlairs: IFlairMap = useSelector(selectPurchasedFlairs);
+  const transactionsFetched: boolean = useSelector(selectTransactionsFetched);
+
+  const unleveledFlairs = Object.values(session.subReddit.flairMap).filter(i => !i.metaId.includes(':'));
 
   async function handleTransfer (): Promise<void> {
     try {
@@ -91,6 +95,63 @@ function Merch ({
     return false;
   }
 
+  function renderFlair (flairData: IFlair, purchased: boolean): JSX.Element {
+    return (
+      <div
+        key={flairData.metaId}
+        className={[
+          styles.flair,
+          flairData.metaId === get(flair, 'metaId') ? styles.selected : '',
+          purchased ? styles.disabled : ''
+        ].join(' ')}
+        onClick={() => setFlair(flairData)}
+      >
+        <img src={flairData.icon} alt='flair-icon' />
+        <div className={styles.title}>
+          {flairData.title}
+        </div>
+        <div className={styles.price}>
+          {purchased
+            ? 'OWNED'
+            : `${numbro(flairData.price).format({ thousandSeparated: true })} ${session.subReddit.symbol}`
+          }
+        </div>
+      </div>
+    );
+  }
+
+  function renderHighestLevelFlair (metaId: string): JSX.Element {
+    const flairData: IFlair = Object.values(session.subReddit.flairMap).find(i => i.metaId === metaId);
+    if (!flairData) {
+      // should never reach here, but in case we do
+      return null;
+    }
+
+    const purchased: IFlair = purchasedFlairs[flairData.metaId];
+    if (purchased) {
+      // check if the next level up is available first
+      const splitMetaId = metaId.split(':');
+      const nextLevelMetaId = splitMetaId.length === 2
+        ? `${splitMetaId[0]}:${Number(splitMetaId[1]) + 1}`
+        : `${metaId}:2`;
+
+      const validNextLevel = Object.values(session.subReddit.flairMap).find(i => i.metaId === nextLevelMetaId);
+      return validNextLevel
+        ? renderHighestLevelFlair(nextLevelMetaId)
+        : renderFlair(flairData, true);
+    }
+    // unpurchased, render as is
+    return renderFlair(flairData, false);
+  }
+
+  if (!transactionsFetched) {
+    return (
+      <div>
+        Loading...
+      </div>
+    );
+  }
+
   return (
     <div className={styles.Merch}>
       <Alert
@@ -108,27 +169,8 @@ function Merch ({
       />
 
       <div className={styles.flairList}>
-        {Object.values(session.subReddit.flairMap).map((_flair: IFlair, index: number) => {
-          const purchased = purchasedFlairs[_flair.metaId];
-          return (
-            <div
-              key={index}
-              className={[
-                styles.flair,
-                _flair.metaId === get(flair, 'metaId') ? styles.selected : '',
-                purchased ? styles.disabled : ''
-              ].join(' ')}
-              onClick={() => setFlair(_flair)}
-            >
-              <img src={_flair.icon} alt='flair-icon' />
-              <div className={styles.price}>
-                {purchased
-                  ? 'OWNED'
-                  : `${numbro(_flair.price).format({ thousandSeparated: true })} ${session.subReddit.symbol}`
-                }
-              </div>
-            </div>
-          );
+        {unleveledFlairs.map((unleveledFlair: IFlair) => {
+          return renderHighestLevelFlair(unleveledFlair.metaId);
         })}
       </div>
 
@@ -138,7 +180,7 @@ function Merch ({
         disabled={disableTransfer()}
         loading={transferLoading}
       >
-        <span>BUY FLAIR</span>
+        <span>{flair && flair.metaId.includes(':') ? 'UPGRADE' : 'BUY FLAIR'}</span>
       </Button>
       {isPendingTransaction && (
         <p className={styles.disclaimer}>

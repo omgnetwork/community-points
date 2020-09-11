@@ -38,7 +38,7 @@ export async function signTypedData (account, typedData): Promise<string> {
 
 export async function getActiveAccount (): Promise<string> {
   const account = await messageService.send({ type: 'WEB3/ACCOUNT' });
-  return account;
+  return account ? account.toLowerCase() : null;
 };
 
 export async function getSession (): Promise<ISession> {
@@ -161,6 +161,7 @@ export async function getAllTransactions (): Promise<Array<ITransaction>> {
       status: 'Confirmed',
       sender,
       recipient,
+      user,
       amount: amount.toString(),
       metadata: omgService.decodeMetadata(transaction.metadata),
       currency: session.subReddit.token,
@@ -191,9 +192,17 @@ export async function getSpendableUtxos ({
     const spendableSum = spendableUtxos.reduce((prev, curr) => {
       return prev.add(new BN(curr.amount.toString()));
     }, new BN(0));
+
     if (spendableSum.gte(new BN(amount.toString()))) {
+      // fill inputs with the next utxo
+      if (spendableUtxos.length < 3) {
+        spendableUtxos.push(utxo);
+        continue;
+      }
+      // reaching this break succeeds this function
       break;
     }
+
     if (spendableUtxos.length === 3) {
       throw new Error('No more inputs available');
     }
@@ -241,6 +250,7 @@ export async function merge ({
     txhash: submittedTransaction.txhash,
     status: 'Pending',
     sender: account,
+    user: account,
     recipient: account,
     amount: amount.toString(),
     metadata: _metadata,
@@ -314,6 +324,7 @@ export async function transfer ({
     txhash: submittedTransaction.txhash,
     status: 'Pending',
     sender: account,
+    user: account,
     recipient,
     amount,
     metadata,
