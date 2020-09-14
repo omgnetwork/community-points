@@ -11,6 +11,7 @@
   limitations under the License.
 */
 const flair = require('../src/flair.js')
+const expect = require('chai').expect;
 const assert = require('chai').assert;
 const sinon = require('sinon');
 
@@ -18,23 +19,34 @@ describe('Flair',  () => {
   describe('.shouldUpdateFlair()', () => {
     it('should return false when the user does not have any purchased flairs', () => {
       const purchased = []
-      const current = ["snoo"]
+      const current = [":snoo:"]
       assert.equal(flair.shouldUpdateFlair(purchased, current), false)
     })
     it('should return true when the curent flairs dont have purchased flairs', () => {
-      const purchased = ["rock", "omg"]
-      const current = ["snoo"]
+      const purchased = [":rock:", ":omg:"]
+      const current = [":snoo:"]
       assert.equal(flair.shouldUpdateFlair(purchased, current), true)
-    })
-    it('should return false when current flairs already have all the purchased flairs', () => {
-      const purchased = ["rock", "omg"]
-      const current = ["snoo", "rock", "omg"]
-      assert.equal(flair.shouldUpdateFlair(purchased, current), false)
     })
     it('should return true when current flairs dont have all the purchased flairs', () => {
       const purchased = ["rock", "omg"]
-      const current = ["snoo", "rock"]
+      const current = [":snoo:", ":rock:"]
+      // console.log(flair.shouldUpdateFlair(purchased, current))
       assert.equal(flair.shouldUpdateFlair(purchased, current), true)
+    })
+    it('should return false when current flairs already have all the purchased flairs', () => {
+      const purchased = [":rock:", ":omg:"]
+      const current = [":snoo:", ":rock:", ":omg:"]
+      assert.equal(flair.shouldUpdateFlair(purchased, current), false)
+    })
+    it('should return true if upgrade flairs are not shown on current flairs', () => {
+      const purchased = [":rock:", ":rock-2:", ":omg:"]
+      const current = [":snoo:", ":rock:", ":omg:"]
+      assert.equal(flair.shouldUpdateFlair(purchased, current), true)
+    })
+    it('should return false if current flairs lvl are all upgraded', () => {
+      const purchased = [":rock:", ":omg:", ":omg-2:", ":omg-3:"]
+      const current = [":snoo:", ":rock:", ":omg-3:"]
+      assert.equal(flair.shouldUpdateFlair(purchased, current), false)
     })
   })
 
@@ -78,4 +90,50 @@ describe('Flair',  () => {
       assert.deepEqual(flairFunc('some_flair', 'flair', 100), expectedFlair)
     })
   })
+
+  // describe('.shouldUpdateFlair',() => {
+  //   it('should return true if purchased flairs are not shown on current flairs', () => {
+  //     assert.equal(flair.shouldUpdateFlair(
+  //       [":foo:", "bar", "baz"],
+  //       ["foo", "bar", "baz"]
+  //     ))
+  //   })
+  //   // it('should return true if upgrade flairs are not shown on current flairs')
+  //   // it('should return false if current flairs lvl are all upgraded')
+  // })
+
+  describe('.filterLevel', () => {
+    it('should return all unleveled flairs', () => {
+      let sampleflairs = [":foo:", ":bar:", ":baz:"]
+      const filteredFlairs = flair.filterLevel(sampleflairs)
+      assert.deepEqual(
+        [filteredFlairs.has(":foo:"),
+         filteredFlairs.has(":bar:"),
+         filteredFlairs.has(":baz:")],
+        [true,true,true]
+      )
+    })
+    it('should return a highest leveled flair', () => {
+      let sampleflairs = [":foo:", ":bar:", ":baz:", ":baz-2:", ":baz-3:", ":foo-2:"]
+      const filteredFlairs = flair.filterLevel(sampleflairs)
+      assert.deepEqual(filteredFlairs.size, new Set([":foo-2:", ":bar:", ":baz-3:"]).size)
+      assert(filteredFlairs.has(":baz-3:"))
+      assert(filteredFlairs.has(":foo-2:"))
+    })
+
+    it('should not allow user to skip a flair level', () => {
+      let sampleflairs = [":foo:", ":bar:", ":baz:", ":foo-3:"]
+      const filteredFlairs = flair.filterLevel(sampleflairs)
+      assert(!filteredFlairs.has(":foo-3:"))
+      assert(filteredFlairs.has(":foo:"))
+    })
+  })
+
+  describe('.lvlFlairGetter', () => {
+    // it('should return all level flairs if purchased')
+    // it('should not return next level flairs if not purchased')
+    // it('should not return next level flairs if purchase is not valid')
+    // it('should not skip levels')
+  })
+
 })

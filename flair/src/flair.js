@@ -10,11 +10,15 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-const { get, find, orderBy, difference } = require('lodash')
+const { remove, head, split, trim, get, find, orderBy, difference } = require('lodash')
 const fetch = require('node-fetch');
 const util = require('./util.js')
 
 module.exports = {
+  lvlFlairGetter: function ({ curr, burnAddr}, txs, purchaseVerifier) {
+   // do recursion until the script has gone through all the flairs
+  },
+
   flairGetter: function ({ curr, burnAddr}, txs, purchaseVerifier) {
     return function (flairName, flairText, price) {
       const res = txs.reduce(function(owners, tx) {
@@ -82,10 +86,72 @@ module.exports = {
   },
 
   shouldUpdateFlair: function (purchased, current) {
-    if (difference(purchased, current).length === 0 ) {
+    const lvlflair = new RegExp('-[0-9]+');
+    const name = (flr) => trim(head(split(flr, '-')), ':')
+
+    let parsed = purchased.map((flr) => {
+      if (flr.match(lvlflair)) {
+        return { name: name(flr), lvl: parseInt(flr.match(/\d+/g).join([])) }
+      } else {
+        return { name: name(flr), lvl: 1 }
+      }})
+
+    let highest = []
+    for (const flr of parsed) {
+      let prevFlair = find(highest, (h) => h.name === flr.name)
+      if (!prevFlair) {
+        highest.push(flr)
+      }
+      if (prevFlair && flr.lvl === prevFlair.lvl + 1) {
+        remove(highest, prevFlair)
+        highest.push(flr)
+      }
+    }
+    // let bought = highest.map(val => ':'.concat(val.name, ':'))
+    let bought = highest.map((flr) => {
+      if (flr.lvl === 1) {
+        return ':'.concat(flr.name, ':')
+      } else {
+        return ':'.concat(flr.name, '-', flr.lvl.toString(), ':')
+      }
+    })
+    if (difference(bought, current).length === 0 ) {
       return false
     }
     return true
+  },
+
+  // filter out older level flairs
+  // expect flairs to be sorted by levels
+  filterLevel: function (flairs) {
+    const lvlflair = new RegExp('-[0-9]+');
+    const name = (flr) => trim(head(split(flr, '-')), ':')
+
+    let parsed = flairs.map((flr) => {
+      if (flr.match(lvlflair)) {
+        return { name: name(flr), lvl: parseInt(flr.match(/\d+/g).join([])) }
+      } else {
+        return { name: name(flr), lvl: 1 }
+      }})
+
+    let highest = []
+    for (const flr of parsed) {
+      let prevFlair = find(highest, (h) => h.name === flr.name)
+      if (!prevFlair) {
+        highest.push(flr)
+      }
+      if (prevFlair && flr.lvl === prevFlair.lvl + 1) {
+        remove(highest, prevFlair)
+        highest.push(flr)
+      }
+    }
+    return new Set(highest.map((flr) => {
+      if (flr.lvl === 1) {
+        return ':'.concat(flr.name, ':')
+      } else {
+        return ':'.concat(flr.name, '-', flr.lvl.toString(), ':')
+      }
+    }))
   },
 
   // output the flairs update object for setMultipleUserFlairs
