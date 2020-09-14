@@ -44,4 +44,5 @@ module.exports = {
   getOwner: function (tx, curr) {
     return tx.inputs.find(input => input.currency.toLowerCase() === curr.toLowerCase()).owner
   }
+
 }

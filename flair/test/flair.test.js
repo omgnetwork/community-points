@@ -48,6 +48,11 @@ describe('Flair',  () => {
       const current = [":snoo:", ":rock:", ":omg-3:"]
       assert.equal(flair.shouldUpdateFlair(purchased, current), false)
     })
+    it('should return false if current flairs lvl are all upgraded, and purchased order is descending', () => {
+      const purchased = [":rock:", ":omg-3:", ":omg-2:", ":omg:"]
+      const current = [":snoo:", ":rock:", ":omg-3:"]
+      assert.equal(flair.shouldUpdateFlair(purchased, current), false)
+    })
   })
 
   describe('.setFlairs()', () => {
@@ -91,17 +96,6 @@ describe('Flair',  () => {
     })
   })
 
-  // describe('.shouldUpdateFlair',() => {
-  //   it('should return true if purchased flairs are not shown on current flairs', () => {
-  //     assert.equal(flair.shouldUpdateFlair(
-  //       [":foo:", "bar", "baz"],
-  //       ["foo", "bar", "baz"]
-  //     ))
-  //   })
-  //   // it('should return true if upgrade flairs are not shown on current flairs')
-  //   // it('should return false if current flairs lvl are all upgraded')
-  // })
-
   describe('.filterLevel', () => {
     it('should return all unleveled flairs', () => {
       let sampleflairs = [":foo:", ":bar:", ":baz:"]
@@ -121,19 +115,39 @@ describe('Flair',  () => {
       assert(filteredFlairs.has(":foo-2:"))
     })
 
-    it('should not allow user to skip a flair level', () => {
+    it('should return correct level even if order of upgrades are descending', () => {
+      let sampleflairs = [":foo-3", ":foo-2:", ":bar:", ":baz:", ":foo:"]
+      const filteredFlairs = flair.filterLevel(sampleflairs)
+      assert(filteredFlairs.has(":foo-3:"))
+      assert(!filteredFlairs.has(":foo:"))
+      assert(filteredFlairs.has(":bar:"))
+    })
+
+    it('should not allow user to skip a flair level on ascending order', () => {
       let sampleflairs = [":foo:", ":bar:", ":baz:", ":foo-3:"]
       const filteredFlairs = flair.filterLevel(sampleflairs)
       assert(!filteredFlairs.has(":foo-3:"))
       assert(filteredFlairs.has(":foo:"))
     })
+
+    it('should ignore dups', () => {
+      let sampleflairs = [":foo", ":bar:", ":baz:",":foo:", ":bar:", ":baz:", ":foo-2:"]
+      const filteredFlairs = flair.filterLevel(sampleflairs)
+      assert(!filteredFlairs.has(":foo:"))
+      assert(filteredFlairs.has(":foo-2:"))
+      assert(filteredFlairs.has(":bar:"))
+      assert(filteredFlairs.has(":baz:"))
+      assert.equal(filteredFlairs.size, 3)
+    })
+
+    
   })
 
-  describe('.lvlFlairGetter', () => {
-    // it('should return all level flairs if purchased')
-    // it('should not return next level flairs if not purchased')
-    // it('should not return next level flairs if purchase is not valid')
-    // it('should not skip levels')
-  })
+  // describe('.lvlFlairGetter', () => {
+  //   // it('should return all level flairs if purchased')
+  //   // it('should not return next level flairs if not purchased')
+  //   // it('should not return next level flairs if purchase is not valid')
+  //   // it('should not skip levels')
+  // })
 
 })

@@ -15,10 +15,7 @@ const fetch = require('node-fetch');
 const util = require('./util.js')
 
 module.exports = {
-  lvlFlairGetter: function ({ curr, burnAddr}, txs, purchaseVerifier) {
-   // do recursion until the script has gone through all the flairs
-  },
-
+  
   flairGetter: function ({ curr, burnAddr}, txs, purchaseVerifier) {
     return function (flairName, flairText, price) {
       const res = txs.reduce(function(owners, tx) {
@@ -95,11 +92,18 @@ module.exports = {
       } else {
         return { name: name(flr), lvl: 1 }
       }})
+        .sort((a, b) => {
+          if (a.name === b.name && a.lvl !== b.lvl) {
+            // only compare lvl under same name
+            return a.lvl - b.lvl;
+          }
+          return a.name > b.name ? 1 : -1;
+        })
 
     let highest = []
     for (const flr of parsed) {
       let prevFlair = find(highest, (h) => h.name === flr.name)
-      if (!prevFlair) {
+      if (!prevFlair && flr.lvl === 1) {
         highest.push(flr)
       }
       if (prevFlair && flr.lvl === prevFlair.lvl + 1) {
@@ -121,8 +125,7 @@ module.exports = {
     return true
   },
 
-  // filter out older level flairs
-  // expect flairs to be sorted by levels
+  // filter out older level flairs, expect low level first
   filterLevel: function (flairs) {
     const lvlflair = new RegExp('-[0-9]+');
     const name = (flr) => trim(head(split(flr, '-')), ':')
@@ -133,11 +136,19 @@ module.exports = {
       } else {
         return { name: name(flr), lvl: 1 }
       }})
+        .sort((a, b) => {
+          if (a.name === b.name && a.lvl !== b.lvl) {
+            // only compare lvl under same name
+            return a.lvl - b.lvl;
+          }
+          return a.name > b.name ? 1 : -1;
+        })
+    // console.log(parsed)
 
     let highest = []
     for (const flr of parsed) {
       let prevFlair = find(highest, (h) => h.name === flr.name)
-      if (!prevFlair) {
+      if (!prevFlair && flr.lvl === 1) {
         highest.push(flr)
       }
       if (prevFlair && flr.lvl === prevFlair.lvl + 1) {
@@ -155,6 +166,7 @@ module.exports = {
   },
 
   // output the flairs update object for setMultipleUserFlairs
+  // if all flairs are upgradeable, flairs to be sorted by order of levels
   buildMultipleUserFlairs: function (allusers, ...flairs) {
     let flairArrays = []
     for (const user of allusers) {
@@ -170,7 +182,7 @@ module.exports = {
       // user did make a purchase and purchased flair dont exist
       if ( allPurchasedFlairs.length > 0 && this.shouldUpdateFlair(allPurchasedFlairs, currentFlairs)) {
         //update the flair, remove flair dups
-        const toUpdateFlairs = Array.from( new Set([ ...allPurchasedFlairs, ...currentFlairs ]) ).join('')
+        const toUpdateFlairs = Array.from( this.filterLevel([ ...allPurchasedFlairs, ...currentFlairs ]) ).join('')
         flairArrays.push({
           name: user.author,
           text: toUpdateFlairs,

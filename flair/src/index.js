@@ -57,16 +57,12 @@ function logError(error) {
       }
       const burned = await tx.getAllBurned(txconfig)
       const getFlair = flair.flairGetter(txconfig, burned, util.validPurchase)
-      // const getLvlFlairs = flair.lvlFlairGetter(txconfig, burned, util.validPurchase)
       const rUsers = await flair.getUserMap(userAddressUrl)
       const flairArrays = flair.buildMultipleUserFlairs(
         rUsers,
         getFlair('flair_rock', ':rock:', 1500),
-        // getLvlFlairs('flair_rock', ':rock:', [
-        //   {lvl: 1, price: 1500},
-        //   {lvl: 2, price: 3000},
-        //   {lvl: 3, price: 5000}
-        // ]),
+        // getFlair('flair_rock:2', ':rock-2:', 1500),
+        // getFlair('flair_rock:3', ':rock-3:', 1500),
         getFlair('flair_wave', ':wve:', 3000),
         getFlair('flair_skate', ':skb:', 5000),
         getFlair('flair_salamander', ':salamander:', 7000),
