@@ -2,8 +2,7 @@ import * as transportService from 'app/services/transportService';
 
 import { IConfig } from 'interfaces';
 
-// const configBranch = 'master';
-const configBranch = 'nm-21-leaderboard-link';
+const configBranch = 'master';
 
 export async function fetchConfig (): Promise<IConfig> {
   const config = await transportService.get({
