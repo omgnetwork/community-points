@@ -164,6 +164,10 @@ function Home (): JSX.Element {
     dispatch(clearError());
   }
 
+  function handleLeaderboard (): void {
+    locationService.openTab('https://omg.eco/CPELeaderboard');
+  }
+
   function onRecipientSelect (recipient: string) {
     setRecipient(recipient);
     const username = getUsernameFromMap(subRedditConfig, recipient, userAddressMap);
@@ -270,6 +274,12 @@ function Home (): JSX.Element {
               You currently cannot make a second transaction, as your previous transaction is still pending confirmation.
             </p>
           )}
+          <p
+            className={styles.leaderboardLink}
+            onClick={handleLeaderboard}
+          >
+            ROCK leaderboard
+          </p>
         </>
       )}
 
