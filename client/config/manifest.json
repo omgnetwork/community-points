@@ -1,7 +1,7 @@
 {
   "name": "Community Points Engine",
   "description": "Extension to transfer community points",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "permissions": [
     "tabs",
     "contextMenus",
