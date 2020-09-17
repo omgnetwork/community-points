@@ -87,86 +87,61 @@ module.exports = {
     const name = (flr) => trim(head(split(flr, '-')), ':')
 
     let parsed = purchased.map((flr) => {
-      if (flr.match(lvlflair)) {
-        return { name: name(flr), lvl: parseInt(flr.match(/\d+/g).join([])) }
-      } else {
-        return { name: name(flr), lvl: 1 }
-      }})
-        .sort((a, b) => {
-          if (a.name === b.name && a.lvl !== b.lvl) {
-            // only compare lvl under same name
-            return a.lvl - b.lvl;
-          }
-          return a.name > b.name ? 1 : -1;
-        })
-
-    let highest = []
-    for (const flr of parsed) {
-      let prevFlair = find(highest, (h) => h.name === flr.name)
+      return flr.match(lvlflair)
+        ? { name: name(flr), lvl: parseInt(flr.match(/\d+/g).join([])) }
+        : { name: name(flr), lvl: 1 }
+      })
+    let sortedFlairs = orderBy(parsed, ['name', 'lvl'], ['dsc', 'asc'])
+    let topLevel = []
+    for (const flr of sortedFlairs) {
+      let prevFlair = find(topLevel, (h) => h.name === flr.name)
       if (!prevFlair && flr.lvl === 1) {
-        highest.push(flr)
+        topLevel.push(flr)
       }
       if (prevFlair && flr.lvl === prevFlair.lvl + 1) {
-        remove(highest, prevFlair)
-        highest.push(flr)
+        remove(topLevel, prevFlair)
+        topLevel.push(flr)
       }
     }
-    // let bought = highest.map(val => ':'.concat(val.name, ':'))
-    let bought = highest.map((flr) => {
-      if (flr.lvl === 1) {
-        return ':'.concat(flr.name, ':')
-      } else {
-        return ':'.concat(flr.name, '-', flr.lvl.toString(), ':')
-      }
+    let bought = topLevel.map((flr) => {
+      return flr.lvl === 1
+        ? ':'.concat(flr.name, ':')
+        : ':'.concat(flr.name, '-', flr.lvl.toString(), ':')
     })
-    if (difference(bought, current).length === 0 ) {
-      return false
-    }
-    return true
+    return difference(bought, current).length === 0 ? false : true
   },
 
-  // filter out older level flairs, expect low level first
+  // filter out older level flairs
   filterLevel: function (flairs) {
     const lvlflair = new RegExp('-[0-9]+');
     const name = (flr) => trim(head(split(flr, '-')), ':')
 
     let parsed = flairs.map((flr) => {
-      if (flr.match(lvlflair)) {
-        return { name: name(flr), lvl: parseInt(flr.match(/\d+/g).join([])) }
-      } else {
-        return { name: name(flr), lvl: 1 }
-      }})
-        .sort((a, b) => {
-          if (a.name === b.name && a.lvl !== b.lvl) {
-            // only compare lvl under same name
-            return a.lvl - b.lvl;
-          }
-          return a.name > b.name ? 1 : -1;
-        })
-    // console.log(parsed)
+      return flr.match(lvlflair)
+        ? { name: name(flr), lvl: parseInt(flr.match(/\d+/g).join([])) }
+        : { name: name(flr), lvl: 1 }
+    })
+    let sortedFlairs = orderBy(parsed, ['name', 'lvl'], ['dsc', 'asc'])
 
-    let highest = []
-    for (const flr of parsed) {
-      let prevFlair = find(highest, (h) => h.name === flr.name)
+    let topLevel = []
+    for (const flr of sortedFlairs) {
+      let prevFlair = find(topLevel, (h) => h.name === flr.name)
       if (!prevFlair && flr.lvl === 1) {
-        highest.push(flr)
+        topLevel.push(flr)
       }
       if (prevFlair && flr.lvl === prevFlair.lvl + 1) {
-        remove(highest, prevFlair)
-        highest.push(flr)
+        remove(topLevel, prevFlair)
+        topLevel.push(flr)
       }
     }
-    return new Set(highest.map((flr) => {
-      if (flr.lvl === 1) {
-        return ':'.concat(flr.name, ':')
-      } else {
-        return ':'.concat(flr.name, '-', flr.lvl.toString(), ':')
-      }
+    return new Set(topLevel.map((flr) => {
+      return flr.lvl === 1
+        ? ':'.concat(flr.name, ':')
+        : ':'.concat(flr.name, '-', flr.lvl.toString(), ':')
     }))
   },
 
   // output the flairs update object for setMultipleUserFlairs
-  // if all flairs are upgradeable, flairs to be sorted by order of levels
   buildMultipleUserFlairs: function (allusers, ...flairs) {
     let flairArrays = []
     for (const user of allusers) {
