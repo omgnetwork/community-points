@@ -143,11 +143,4 @@ describe('Flair',  () => {
     
   })
 
-  // describe('.lvlFlairGetter', () => {
-  //   // it('should return all level flairs if purchased')
-  //   // it('should not return next level flairs if not purchased')
-  //   // it('should not return next level flairs if purchase is not valid')
-  //   // it('should not skip levels')
-  // })
-
 })
