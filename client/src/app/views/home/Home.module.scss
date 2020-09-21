@@ -19,4 +19,14 @@
   .disclaimer {
     color: $gray4;
   }
+  .leaderboardLink {
+    color: $gray4;
+    text-align: center;
+    transition: all 200ms ease-in-out;
+    margin-top: 30px;
+    &:hover {
+      cursor: pointer;
+      color: $orange;
+    }
+  }
 }
