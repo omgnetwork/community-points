@@ -10,11 +10,12 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 */
-const { get, find, orderBy, difference } = require('lodash')
+const { remove, head, split, trim, get, find, orderBy, difference } = require('lodash')
 const fetch = require('node-fetch');
 const util = require('./util.js')
 
 module.exports = {
+  
   flairGetter: function ({ curr, burnAddr}, txs, purchaseVerifier) {
     return function (flairName, flairText, price) {
       const res = txs.reduce(function(owners, tx) {
@@ -82,10 +83,62 @@ module.exports = {
   },
 
   shouldUpdateFlair: function (purchased, current) {
-    if (difference(purchased, current).length === 0 ) {
-      return false
+    const lvlflair = new RegExp('-[0-9]+');
+    const name = (flr) => trim(head(split(flr, '-')), ':')
+
+    let parsed = purchased.map((flr) => {
+      return flr.match(lvlflair)
+        ? { name: name(flr), lvl: parseInt(flr.match(/\d+/g).join([])) }
+        : { name: name(flr), lvl: 1 }
+      })
+    let sortedFlairs = orderBy(parsed, ['name', 'lvl'], ['dsc', 'asc'])
+    let topLevel = []
+    for (const flr of sortedFlairs) {
+      let prevFlair = find(topLevel, (h) => h.name === flr.name)
+      if (!prevFlair && flr.lvl === 1) {
+        topLevel.push(flr)
+      }
+      if (prevFlair && flr.lvl === prevFlair.lvl + 1) {
+        remove(topLevel, prevFlair)
+        topLevel.push(flr)
+      }
     }
-    return true
+    let bought = topLevel.map((flr) => {
+      return flr.lvl === 1
+        ? ':'.concat(flr.name, ':')
+        : ':'.concat(flr.name, '-', flr.lvl.toString(), ':')
+    })
+    return difference(bought, current).length === 0 ? false : true
+  },
+
+  // filter out older level flairs
+  filterLevel: function (flairs) {
+    const lvlflair = new RegExp('-[0-9]+');
+    const name = (flr) => trim(head(split(flr, '-')), ':')
+
+    let parsed = flairs.map((flr) => {
+      return flr.match(lvlflair)
+        ? { name: name(flr), lvl: parseInt(flr.match(/\d+/g).join([])) }
+        : { name: name(flr), lvl: 1 }
+    })
+    let sortedFlairs = orderBy(parsed, ['name', 'lvl'], ['dsc', 'asc'])
+
+    let topLevel = []
+    for (const flr of sortedFlairs) {
+      let prevFlair = find(topLevel, (h) => h.name === flr.name)
+      if (!prevFlair && flr.lvl === 1) {
+        topLevel.push(flr)
+      }
+      if (prevFlair && flr.lvl === prevFlair.lvl + 1) {
+        remove(topLevel, prevFlair)
+        topLevel.push(flr)
+      }
+    }
+    return new Set(topLevel.map((flr) => {
+      return flr.lvl === 1
+        ? ':'.concat(flr.name, ':')
+        : ':'.concat(flr.name, '-', flr.lvl.toString(), ':')
+    }))
   },
 
   // output the flairs update object for setMultipleUserFlairs
@@ -104,7 +157,7 @@ module.exports = {
       // user did make a purchase and purchased flair dont exist
       if ( allPurchasedFlairs.length > 0 && this.shouldUpdateFlair(allPurchasedFlairs, currentFlairs)) {
         //update the flair, remove flair dups
-        const toUpdateFlairs = Array.from( new Set([ ...allPurchasedFlairs, ...currentFlairs ]) ).join('')
+        const toUpdateFlairs = Array.from( this.filterLevel([ ...allPurchasedFlairs, ...currentFlairs ]) ).join('')
         flairArrays.push({
           name: user.author,
           text: toUpdateFlairs,
