@@ -11,26 +11,32 @@ const store = createStore(
 );
 wrapStore(store, { portName: 'omgcp-port' });
 
-chrome.browserAction.onClicked.addListener(
-  function onBrowserAction () {
+chrome.runtime.onMessage.addListener(
+  function onMessageListener (message, sender, _): void {
+    if (message.type === 'PAGEACTION/SHOW') {
+      chrome.pageAction.show(sender.tab.id);
+    }
+  }
+);
+
+chrome.pageAction.onClicked.addListener(
+  function onPageAction (): void {
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-      chrome.tabs.sendMessage(tabs[0].id, { type: 'BROWSERACTION/SHOW' });
+      chrome.tabs.sendMessage(tabs[0].id, { type: 'PAGEACTION/CLICKED' });
     });
   }
 );
 
 chrome.contextMenus.onClicked.addListener(
-  function onContextMenu () {
+  function onContextMenu (): void {
     chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
-      chrome.tabs.sendMessage(tabs[0].id, { type: 'BROWSERACTION/SHOW' });
+      chrome.tabs.sendMessage(tabs[0].id, { type: 'PAGEACTION/CLICKED' });
     });
   }
 );
 
 chrome.contextMenus.create({
   id: 'omgcp-contextmenu',
-  title: 'Reddit Wallet',
+  title: 'Community Points Engine',
   contexts: ['all']
 });
-
-console.log('omgcp background.js initialized...');

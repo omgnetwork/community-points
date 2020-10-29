@@ -1,3 +1,7 @@
+export interface ITab {
+  url: string
+}
+
 export interface IMessage {
   type: string,
   payload?: any,
@@ -5,10 +9,11 @@ export interface IMessage {
 }
 
 export interface ITransaction {
-  direction: 'incoming' | 'outgoing',
+  direction: 'incoming' | 'outgoing' | 'merge',
   txhash: string,
   status: 'Pending' | 'Confirmed',
   sender: string,
+  user: string,
   recipient: string,
   amount: any,
   metadata: string,
@@ -16,6 +21,10 @@ export interface ITransaction {
   symbol: string,
   decimals: number,
   timestamp: number
+}
+
+export interface IConfig {
+  [subreddit: string]: ISubReddit
 }
 
 export interface ISubReddit {
@@ -49,7 +58,8 @@ export interface IAction {
 export interface IFlair {
   icon: string,
   price: number,
-  metaId: string
+  metaId: string,
+  title: string
 }
 
 export interface IFlairMap {

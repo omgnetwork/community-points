@@ -67,6 +67,24 @@ describe('redditService', () => {
     }]);
   });
 
+  test('should handle comments with newlines', () => {
+    const mock = makeMock([
+      {
+        data: {
+          body: 'hihi\n\n\n0xa013debd703e28af78c2ffd0264ef70f978c5465\n\n\n',
+          author: 'toto',
+          created: 1
+        }
+      }
+    ]);
+    const result = parseThreadJSON(mock);
+    expect(result).toEqual([{
+      address: '0xa013debd703e28af78c2ffd0264ef70f978c5465',
+      author: 'toto',
+      created: 1
+    }]);
+  });
+
   test('should take latest comment from author', () => {
     const mock = makeMock([
       {

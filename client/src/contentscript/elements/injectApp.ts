@@ -14,7 +14,7 @@ function injectApp (): void {
   appContainer.style.zIndex = '1000000';
   appContainer.style.backgroundColor = '#FFFFFF';
   appContainer.style.width = '400px';
-  appContainer.style.height = '500px';
+  appContainer.style.height = '550px';
   appContainer.style.borderRadius = '8px';
   appContainer.style.boxShadow = '0px 0px 29px -8px rgba(0,0,0,0.5)';
 
@@ -48,7 +48,7 @@ function injectApp (): void {
       id='omgcp-header'
     >
       <span>
-        Reddit Wallet
+        Community Points Engine
       </span>
       <button id='omgcp-close-button'>
         𝖷
@@ -57,9 +57,9 @@ function injectApp (): void {
   `;
 
   document.body.appendChild(appContainer);
-  const iframeNode = document.getElementById('omgcp-iframe');
+  const iframeNode: Partial<HTMLIFrameElement> = document.getElementById('omgcp-iframe');
   // inject react into iframe
-  (iframeNode as any).src = chrome.extension.getURL('app.html');
+  iframeNode.src = chrome.extension.getURL('app.html');
   const containerNode = document.getElementById('omgcp-container');
   makeDraggable(containerNode, 'omgcp-header');
 

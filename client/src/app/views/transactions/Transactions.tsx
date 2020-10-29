@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useState, useEffect } from 'react';
+import { Dispatch, SetStateAction, useState, useEffect } from 'react';
 import { unix } from 'moment';
 import truncate from 'truncate-middle';
 import { useSelector } from 'react-redux';
@@ -7,11 +7,13 @@ import { useSelector } from 'react-redux';
 import * as locationService from 'app/services/locationService';
 import { selectTransactions } from 'app/selectors/transactionSelector';
 import { selectUserAddressMap, getUsernameFromMap } from 'app/selectors/addressSelector';
+import { selectConfig } from 'app/selectors/configSelector';
 import { logAmount } from 'app/util/amountConvert';
 
-import { ITransaction, IUserAddress } from 'interfaces';
+import { ITransaction, IUserAddress, IConfig } from 'interfaces';
 
 import omgcp_thickarrow from 'app/images/omgcp_thickarrow.svg';
+import omgcp_merge_arrow from 'app/images/omgcp_merge_arrow.svg';
 
 import config from 'config';
 
@@ -20,9 +22,10 @@ import * as styles from './Transactions.module.scss';
 const TRANSACTIONS_PER_PAGE = 4;
 
 function Transactions (): JSX.Element {
-  const [ visibleTransactions, setVisibleTransactions ]: [ ITransaction[], any ] = useState([]);
-  const [ visibleCount, setVisibleCount ]: [ number, any ] = useState(TRANSACTIONS_PER_PAGE);
+  const [ visibleTransactions, setVisibleTransactions ]: [ ITransaction[], Dispatch<SetStateAction<ITransaction[]>> ] = useState([]);
+  const [ visibleCount, setVisibleCount ]: [ number, Dispatch<SetStateAction<number>> ] = useState(TRANSACTIONS_PER_PAGE);
 
+  const subRedditConfig: IConfig = useSelector(selectConfig);
   const allTransactions: ITransaction[] = useSelector(selectTransactions);
   const userAddressMap: IUserAddress[] = useSelector(selectUserAddressMap);
 
@@ -45,16 +48,18 @@ function Transactions (): JSX.Element {
     <div className={styles.Transactions}>
       {visibleTransactions && !visibleTransactions.length && (
         <div className={styles.disclaimer}>
-          No transaction history
+          Loading transaction history
         </div>
       )}
 
       {visibleTransactions && visibleTransactions.map((transaction: ITransaction, index: number): JSX.Element => {
         const isIncoming: boolean = transaction.direction === 'incoming';
+        const isOutgoing: boolean = transaction.direction === 'outgoing';
+        const isMerge: boolean = transaction.direction === 'merge';
 
-        const otherUsername: string = isIncoming
-          ? getUsernameFromMap(transaction.sender, userAddressMap)
-          : getUsernameFromMap(transaction.recipient, userAddressMap);
+        const otherUsername: string = (isIncoming || isMerge)
+          ? getUsernameFromMap(subRedditConfig, transaction.sender, userAddressMap)
+          : getUsernameFromMap(subRedditConfig, transaction.recipient, userAddressMap);
 
         return (
           <div
@@ -68,22 +73,31 @@ function Transactions (): JSX.Element {
               : null
             }
           >
-            <img
-              src={omgcp_thickarrow}
-              className={[
-                styles.arrow,
-                isIncoming ? styles.incoming : ''
-              ].join(' ')}
-              alt='arrow'
-            />
+            {isMerge && (
+              <img
+                src={omgcp_merge_arrow}
+                className={styles.arrow}
+                alt='arrow'
+              />
+            )}
+
+            {!isMerge && (
+              <img
+                src={omgcp_thickarrow}
+                className={[
+                  styles.arrow,
+                  isIncoming ? styles.incoming : ''
+                ].join(' ')}
+                alt='arrow'
+              />
+            )}
 
             <div className={styles.data}>
               <div className={styles.row}>
                 <div className={styles.direction}>
-                  {isIncoming
-                    ? 'Received'
-                    : 'Sent'
-                  }
+                  {isIncoming && 'Received'}
+                  {isOutgoing && 'Sent'}
+                  {isMerge && 'Merge'}
                 </div>
                 <div className={styles.rawAmount}>
                   {`${logAmount(transaction.amount, transaction.decimals)} ${transaction.symbol}`}
@@ -101,10 +115,9 @@ function Transactions (): JSX.Element {
                     {transaction.status === 'Pending' ? 'Pending' : 'Confirmed'}
                   </div>
                   <div className={styles.address}>
-                    {isIncoming
-                      ? otherUsername || truncate(transaction.sender, 6, 4, '...')
-                      : otherUsername || truncate(transaction.recipient, 6, 4, '...')
-                    }
+                    {isIncoming && (otherUsername || truncate(transaction.sender, 6, 4, '...'))}
+                    {isOutgoing && (otherUsername || truncate(transaction.recipient, 6, 4, '...'))}
+                    {isMerge && (otherUsername || truncate(transaction.recipient, 6, 4, '...'))}
                   </div>
                 </div>
 

@@ -1,7 +1,7 @@
 @import 'app/styles/colors';
 
 .Option {
-  cursor: pointer;
+  flex: 1;
   height: 48px;
   background-color: $white;
   color: $black;
@@ -32,5 +32,8 @@
     .title {
       color: $orange;
     }
+  }
+  &.clickable {
+    cursor: pointer;
   }
 }

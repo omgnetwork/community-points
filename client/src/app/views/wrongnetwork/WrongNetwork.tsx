@@ -22,7 +22,7 @@ function WrongNetwork (): JSX.Element {
       />
       <h1>You are on the wrong network</h1>
       <p>
-        Please point your Metamask wallet to the {networkMap[config.network]}.
+        Please point your Web3 provider to the {networkMap[config.network]} and reopen this extension.
       </p>
     </div>
   );

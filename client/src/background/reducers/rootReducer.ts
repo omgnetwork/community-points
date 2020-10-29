@@ -7,13 +7,15 @@ import transactionReducer from 'background/reducers/transactionReducer';
 import sessionReducer from 'background/reducers/sessionReducer';
 import addressReducer from 'background/reducers/addressReducer';
 import uiReducer from 'background/reducers/uiReducer';
+import configReducer from 'background/reducers/configReducer';
 
 const allReducers = combineReducers({
   loading: loadingReducer,
   transaction: transactionReducer,
   session: sessionReducer,
   address: addressReducer,
-  ui: uiReducer
+  ui: uiReducer,
+  config: configReducer
 });
 
 function rootReducer (state, action: IAction) {

@@ -2,7 +2,7 @@ import { createAction } from 'app/actions/createAction';
 import * as networkService from 'app/services/networkService';
 import * as redditService from 'app/services/redditService';
 
-import { ISubReddit } from 'interfaces';
+import { ISubReddit, IConfig } from 'interfaces';
 
 export function getSession () {
   return createAction(
@@ -11,11 +11,23 @@ export function getSession () {
   );
 }
 
+export function merge ({
+  subReddit
+}) {
+  return createAction(
+    'TRANSACTION/CREATE',
+    () => networkService.merge({
+      subReddit
+    })
+  );
+}
+
 export function transfer ({
   amount,
   recipient,
   subReddit,
-  metadata
+  metadata,
+  spendableUtxos
 }) {
   return createAction(
     'TRANSACTION/CREATE',
@@ -23,7 +35,8 @@ export function transfer ({
       amount,
       recipient,
       subReddit,
-      metadata
+      metadata,
+      spendableUtxos
     })
   );
 }
@@ -42,6 +55,13 @@ export function getUserAddressMap () {
   );
 }
 
+export function getUserAvatar (username: string) {
+  return createAction(
+    'USERAVATAR/GET',
+    () => redditService.getUserAvatar(username)
+  );
+}
+
 export function clearError () {
   return function dispatchClearError (dispatch) {
     return dispatch({ type: 'UI/ERROR/UPDATE', payload: null });
@@ -57,5 +77,11 @@ export function showError (message: string) {
 export function saveSubReddit (subReddit: ISubReddit) {
   return function dispatchSaveSubReddit (dispatch) {
     return dispatch({ type: 'SUBREDDIT/GET/SUCCESS', payload: subReddit });
+  };
+}
+
+export function saveConfig (config: IConfig) {
+  return function dispatchSaveConfig (dispatch) {
+    return dispatch({ type: 'CONFIG/GET/SUCCESS', payload: config });
   };
 }

@@ -6,29 +6,37 @@ export function createAction (
   customErrorMessage?: string
 ) {
   return async function dispatchCreateAction (dispatch) {
-    dispatch({ type: `${key}/REQUEST` });
     try {
+      dispatch({ type: `${key}/REQUEST` });
       const response = await asyncAction();
       dispatch({ type: `${key}/SUCCESS`, payload: response });
       return true;
     } catch (error) {
+      // check if because extension context is invalid
+      const isInvalidContext = errorService.invalidExtensionContext(error);
+      if (isInvalidContext) {
+        // will force loading view and prompt for required refresh
+        window.location.reload(false);
+        return false;
+      }
+
       // cancel loading state
       dispatch({ type: `${key}/ERROR` });
 
-      // sanitize expected errors
-      const expectedError = errorService.isExpectedError(error);
-      if (expectedError) {
+      // sanitize false negatives
+      const shouldSilence = errorService.shouldSilence(error);
+      if (shouldSilence) {
         return false;
       }
 
-      // handle busy fee relayer
-      if (error.message && error.message.includes('Insufficient funds to cover fee amount')) {
-        // pass custom message to ui
-        dispatch({ type: 'UI/ERROR/UPDATE', payload: 'Server is busy, please try again later' });
+      // busy server, no sentry reporting, only ui
+      const busyServer = errorService.busyServer(error);
+      if (busyServer) {
+        dispatch({ type: 'UI/ERROR/UPDATE', payload: 'Sorry, the server is busy, please try again in a few minutes.' });
         return false;
       }
 
-      // pass error message to ui
+      // unexpected error to log to sentry
       dispatch({ type: 'UI/ERROR/UPDATE', payload: customErrorMessage || error.message });
       errorService.log(error);
       return false;

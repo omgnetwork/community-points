@@ -9,7 +9,9 @@ interface OptionProps {
   image?: string,
   onClick?: () => void,
   selected?: boolean,
-  className?: string
+  className?: string,
+  clickable?: boolean,
+  showAvatar?: boolean
 }
 
 function Option ({
@@ -18,18 +20,23 @@ function Option ({
   detail,
   image,
   selected,
-  className
+  className,
+  clickable = true,
+  showAvatar = true
 }: OptionProps): JSX.Element {
   return (
     <div
-      onClick={onClick}
+      onClick={clickable ? onClick : null}
       className={[
         styles.Option,
         selected ? styles.selected : '',
+        clickable ? styles.clickable : '',
         className
       ].join(' ')}
     >
-      <img src={image || omgcp_avatar} alt='avatar' />
+      {!!showAvatar && (
+        <img src={image || omgcp_avatar} alt='avatar' />
+      )}
       <div className={styles.data}>
         <div className={styles.title}>
           {title}

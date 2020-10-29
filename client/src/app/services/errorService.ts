@@ -14,18 +14,59 @@ if (config.sentryDsn) {
 }
 
 export function log (error: Error): void {
-  console.log(error.message);
-  if (config.sentryDsn) {
-    Sentry.captureException(error);
+  try {
+    console.log(error.toString());
+    if (config.sentryDsn) {
+      Sentry.captureException(error);
+    }
+  } catch (error) {
+    // silence any sentry/error reporting errors
   }
 }
 
-export function isExpectedError (error: Error): boolean {
-  if (
-    (error.message && error.message.includes('User denied')) ||
-    (error.message && error.message.includes('Extension context'))
-  ) {
-    return true;
+// metamask 'errors' that are handled in ui
+export function shouldSilence (_error: Error): boolean {
+  try {
+    const message = _error.message || _error.toString();
+    if (
+      (message.includes('User denied')) ||
+      (message.includes('User rejected')) ||
+      (message.includes('Already processing eth_requestAccounts')) ||
+      (message.includes('Permissions request already pending'))
+    ) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    return false;
   }
-  return false;
+}
+
+// busy server or down service
+export function busyServer (_error: Error): boolean {
+  try {
+    const message = _error.message || _error.toString();
+    if (
+      message.includes('Insufficient funds to cover fee amount') ||
+      message.includes('Network Error')
+    ) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    return false;
+  }
+}
+
+// bad extension update causing conflicting scripts
+export function invalidExtensionContext (_error: Error): boolean {
+  try {
+    const message = _error.message || _error.toString();
+    if (message.includes('Extension context')) {
+      return true;
+    }
+    return false;
+  } catch (error) {
+    return false;
+  }
 }

@@ -4,17 +4,25 @@ import { logAmount } from 'app/util/amountConvert';
 import { ITransaction, IFlairMap } from 'interfaces';
 
 export function selectTransactions (state): ITransaction[] {
-  const transactions: ITransaction[] = Object.values(state.transaction);
-  return orderBy(transactions, ['timestamp'], ['desc']);
+  if (state.session.account) {
+    const transactions: ITransaction[] = Object.values(state.transaction[state.session.account] || {});
+    return orderBy(transactions, ['timestamp'], ['desc']);
+  }
+  return [];
 }
 
 export function selectIsPendingTransaction (state): boolean {
-  const transactions: ITransaction[] = Object.values(state.transaction);
-  return transactions.some((tx: ITransaction) => tx.status === 'Pending');
+  if (state.session.account) {
+    const transactions: ITransaction[] = Object.values(state.transaction[state.session.account] || {});
+    return transactions.some((tx: ITransaction) => tx.status === 'Pending');
+  }
+  return false;
 }
 
 export function selectPurchasedFlairs (state): IFlairMap {
-  const transactions: ITransaction[] = Object.values(state.transaction);
+  const transactions: ITransaction[] = state.session.account
+    ? Object.values(state.transaction[state.session.account] || {})
+    : [];
   const flairAddress = get(state, 'session.subReddit.flairAddress', null);
   const flairMap: IFlairMap = get(state, 'session.subReddit.flairMap', {});
 

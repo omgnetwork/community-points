@@ -1,7 +1,7 @@
 {
-  "name": "Reddit Wallet",
+  "name": "Community Points Engine",
   "description": "Extension to transfer community points",
-  "version": "0.1.0",
+  "version": "1.0.3",
   "permissions": [
     "tabs",
     "contextMenus",
@@ -9,8 +9,10 @@
   ],
   "content_scripts": [
     {
+      "run_at": "document_idle",
       "matches": [
-        "https://www.reddit.com/*"
+        "https://www.reddit.com/*",
+        "https://old.reddit.com/*"
       ],
       "js": [
         "contentScript.js"
@@ -27,19 +29,19 @@
     ],
     "persistent": true
   },
-  "browser_action": {
+  "page_action": {
     "default_icon": {
-      "16": "images/favicon.png",
-      "32": "images/favicon.png",
-      "48": "images/favicon.png",
-      "128": "images/favicon.png"
+      "16": "images/app_icon-16.png",
+      "32": "images/app_icon-32.png",
+      "48": "images/app_icon-48.png",
+      "128": "images/app_icon-128.png"
     }
   },
   "icons": {
-    "16": "images/favicon.png",
-    "32": "images/favicon.png",
-    "48": "images/favicon.png",
-    "128": "images/favicon.png"
+    "16": "images/app_icon-16.png",
+    "32": "images/app_icon-32.png",
+    "48": "images/app_icon-48.png",
+    "128": "images/app_icon-128.png"
   },
   "manifest_version": 2
 }

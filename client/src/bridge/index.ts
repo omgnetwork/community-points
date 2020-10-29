@@ -3,11 +3,16 @@ import JSONBigNumber from 'omg-json-bigint';
 import { get } from 'lodash';
 import { IMessage } from 'interfaces';
 
+interface IWindow {
+  ethereum?: any,
+  web3?: any
+}
+
 function getProvider () {
-  if ((window as any).ethereum) {
-    return (window as any).ethereum;
-  } else if ((window as any).web3) {
-    return (window as any).web3.currentProvider;
+  if ((window as IWindow).ethereum) {
+    return (window as IWindow).ethereum;
+  } else if ((window as IWindow).web3) {
+    return (window as IWindow).web3.currentProvider;
   } else {
     return null;
   }
@@ -75,8 +80,8 @@ window.addEventListener('message', async function uiMessageEventListener (event)
     }
 
     if (type === 'WEB3/ENABLE') {
-      if ((window as any).ethereum) {
-        await (window as any).ethereum.enable();
+      if ((window as IWindow).ethereum) {
+        await (window as IWindow).ethereum.enable();
       }
       return respond({
         type,

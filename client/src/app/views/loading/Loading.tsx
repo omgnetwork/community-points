@@ -7,7 +7,7 @@ import omgcp_spinner from 'app/images/omgcp_spinner.png';
 import * as styles from './Loading.module.scss';
 
 function Loading (): JSX.Element {
-  const [ timer, setTimer ] = useState(5);
+  const [ timer, setTimer ] = useState(10);
 
   useEffect(() => {
     const countdown = setInterval(() => {
@@ -42,8 +42,9 @@ function Loading (): JSX.Element {
       </div>
       {timer < 0 && (
         <>
-          <p>{"Oops. Something didn't load correctly."}</p>
-          <p>Please restart the extension.</p>
+          <p>{"Something's taking too long..."}</p>
+          <p>Check that you are signed into your Metamask extension.</p>
+          <p>If you already are, please refresh the page and reopen this extension.</p>
         </>
       )}
       {timer >= 0 && (

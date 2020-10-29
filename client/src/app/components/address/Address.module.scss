@@ -4,6 +4,18 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  .purchasedFlairs {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    flex: 1;
+    .flair {
+      width: 20px;
+      margin-left: 5px;
+    }
+  }
   .identicon {
     width: 34px;
     height: 34px;
@@ -16,8 +28,5 @@
   }
   .address {
     margin-right: 10px;
-  }
-  .copy {
-    cursor: pointer;
   }
 }

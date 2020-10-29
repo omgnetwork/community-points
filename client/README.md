@@ -1,16 +1,6 @@
-## Reddit Wallet - Chrome Extension
+## Community Points Engine - Chrome Extension
 
-This project is a Chrome extension used to transfer Reddit community points directly in the browser. It is powered by the OMG Network.
-
-### Architecture
-
-- Extensions are sandboxed javascript runtimes so we do not have direct access to the context of other scripts. We utilize Chrome's built in messaging to be able to communicate with the context of the page.
-
-- Components
-  - app.js - the user interface
-  - contentScript.js - injects bridge and forwards messages from user interface
-  - bridge.js - listens for messages from the contentScript and interacts with the web3 provider in the context of the dom
-  - background.js - listens to user actions and persists state
+This project is a Chrome extension used to transfer community points directly in the browser. It is powered by the OMG Network.
 
 ### Commands
 
@@ -24,7 +14,6 @@ This project is a Chrome extension used to transfer Reddit community points dire
 ### Development
 
 - create a `.env` file with values shown in `.env.template`
-- create `src/subRedditMap.ts` with values shown in `src/subRedditMap.ts.template`
 - `yarn install` to install dependencies
 - `yarn build:dev` to compile application
 - in a Chrome based browser (Brave or Chrome), open `Extensions` (brave:://extensions or chrome:://extensions) in `Developer mode`, and click `Load unpacked` and select the `build` folder
