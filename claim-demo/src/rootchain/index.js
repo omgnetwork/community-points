@@ -39,7 +39,7 @@ const getAccount = (provider, privateKey) => {
 }
 
 const getBalance = async (contract, account) => {
-  const balance = await contract.methods.balanceOf(account.address).call()
+  const balance = await contract.methods.balanceOf(account.address).call({from: contract.address})
   const unitBalance = subunitToUnit(balance)
   logger.info(
     `${contract.symbol} balance for ${account.name} on Ethereum Network is now ${unitBalance}`
