@@ -16,7 +16,7 @@
     "@omisego/omg-js": "^4.0.1-1.0.0",
     "@sentry/node": "^5.20.0",
     "async-mutex": "^0.2.4",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "bn.js": "^5.1.2",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
